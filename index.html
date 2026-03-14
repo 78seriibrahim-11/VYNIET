@@ -91,13 +91,27 @@
       transition: border-color .2s, color .2s;
     }
     .nav-links a:hover { border-color: var(--accent); color: var(--accent); }
-    .nav-actions { display: flex; align-items: center; gap: 20px; }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
     .nav-actions button {
       background: none; border: none; cursor: none;
       color: var(--black); font-size: 20px; padding: 4px;
       transition: color .2s;
     }
     .nav-actions button:hover { color: var(--accent); }
+    .login-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--black) !important;
+      padding: 9px 18px !important;
+      font-size: 12px !important;
+      font-family: 'DM Sans', sans-serif !important;
+      font-weight: 600 !important;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 7px;
+      transition: all .2s !important;
+    }
+    .login-btn:hover { border-color: var(--black) !important; background: var(--cream) !important; }
     .cart-btn {
       background: var(--black) !important;
       color: var(--white) !important;
@@ -586,6 +600,9 @@
       <li><a href="collections.html">Collections</a></li>
     </ul>
     <div class="nav-actions">
+      <button class="login-btn" id="loginNavBtn" onclick="window.location.href='login.html'">
+        👤 <span id="loginNavText">Login</span>
+      </button>
       <button class="cart-btn" title="Cart" onclick="window.location.href='cart.html'">
         🛍 Cart
         <span class="cart-count" id="cartCount">0</span>
@@ -1063,6 +1080,26 @@
       el.style.transition='opacity .6s ease, transform .6s ease';
       observer.observe(el);
     });
+  </script>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase
+    const _db = createClient(
+      'YOUR_SUPABASE_PROJECT_URL',
+      'YOUR_SUPABASE_ANON_KEY'
+    )
+    // Show "My Account" if already logged in, "Login" if not
+    ;(async function checkAuth(){
+      const { data:{ session } } = await _db.auth.getSession()
+      const btn  = document.getElementById('loginNavBtn')
+      const text = document.getElementById('loginNavText')
+      if(session){
+        text.textContent = 'My Account'
+        btn.onclick = ()=>{ window.location.href='account.html' }
+      }
+    })()
   </script>
 </body>
 </html>
