@@ -64,7 +64,7 @@
       border-bottom: 1px solid var(--border);
       position: sticky; top: 0; z-index: 100;
       padding: 0 48px;
-      display: flex; align-items: center; justify-content: space-between;
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center;
       height: 72px;
     }
     .nav-logo {
@@ -76,8 +76,8 @@
     }
     .nav-logo span { color: var(--accent); }
     .nav-links {
-      display: flex; gap: 36px;
-      list-style: none;
+      display: flex; gap: 28px;
+      list-style: none; justify-content: center;
     }
     .nav-links a {
       text-decoration: none;
@@ -465,7 +465,7 @@
     .newsletter {
       background: var(--accent);
       padding: 72px 48px;
-      display: flex; align-items: center; justify-content: space-between; gap: 48px;
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 48px;
     }
     .newsletter-text h2 {
       font-family: 'Bebas Neue', sans-serif;
@@ -507,7 +507,7 @@
     .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     .footer-col a { color: rgba(255,242,225,.6); font-size: 14px; font-weight: 300; transition: color .2s; }
     .footer-col a:hover { color: var(--accent); }
-    .footer-bottom { border-top: 1px solid rgba(167,146,119,.15); padding-top: 32px; display: flex; align-items: center; justify-content: space-between; }
+    .footer-bottom { border-top: 1px solid rgba(167,146,119,.15); padding-top: 32px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; }
     .footer-bottom p { color: rgba(255,242,225,.28); font-size: 12px; }
     .payment-icons { display: flex; gap: 10px; }
     .pay-icon { background: rgba(167,146,119,.1); border: 1px solid rgba(167,146,119,.2); padding: 5px 10px; font-size: 11px; color: rgba(255,242,225,.45); font-weight: 600; letter-spacing: .04em; }
@@ -522,7 +522,7 @@
     /* ── Mobile ── */
     @media (max-width: 900px) {
       nav { padding: 0 16px; width: 100%; }
-      .nav-links { display: none; }
+      
       .nav-logo { font-size: 22px; }
       .cart-btn { padding: 8px 14px !important; font-size: 11px !important; }
 
@@ -583,12 +583,9 @@
   <nav>
     <a href="#" class="nav-logo">VYNE<span>IT</span></a>
     <ul class="nav-links">
-      <a href="collections.html">Collections</a> 
-      <li><a href="#">Sale</a></li>
+      <li><a href="collections.html">Collections</a></li>
     </ul>
     <div class="nav-actions">
-      <button title="Search">🔍</button>
-      <button title="Wishlist">♡</button>
       <button class="cart-btn" title="Cart" onclick="window.location.href='cart.html'">
         🛍 Cart
         <span class="cart-count" id="cartCount">0</span>
@@ -959,6 +956,10 @@
         <h4>Shop</h4>
         <ul>
           <li><a href="#">New Arrivals</a></li>
+          <li><a href="#">Best Sellers</a></li>
+          <li><a href="#">Men's Tees</a></li>
+          <li><a href="#">Women's Tees</a></li>
+          <li><a href="#">Graphic Tees</a></li>
           <li><a href="#">Sale</a></li>
         </ul>
       </div>
@@ -981,7 +982,7 @@
           <li><a href="#">Careers</a></li>
           <li><a href="#">Press</a></li>
           <li><a href="#">Affiliates</a></li>
-         <li><a href="privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="#">Privacy Policy</a></li>
         </ul>
       </div>
     </div>
