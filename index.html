@@ -64,7 +64,7 @@
       border-bottom: 1px solid var(--border);
       position: sticky; top: 0; z-index: 100;
       padding: 0 48px;
-      display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 8px;
+      display: flex; align-items: center; justify-content: space-between;
       height: 72px;
     }
     .nav-logo {
@@ -479,7 +479,7 @@
     .newsletter {
       background: var(--accent);
       padding: 72px 48px;
-      display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 8px; gap: 48px;
+      display: flex; align-items: center; justify-content: space-between; gap: 48px;
     }
     .newsletter-text h2 {
       font-family: 'Bebas Neue', sans-serif;
@@ -521,7 +521,7 @@
     .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     .footer-col a { color: rgba(255,242,225,.6); font-size: 14px; font-weight: 300; transition: color .2s; }
     .footer-col a:hover { color: var(--accent); }
-    .footer-bottom { border-top: 1px solid rgba(167,146,119,.15); padding-top: 32px; display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 8px; }
+    .footer-bottom { border-top: 1px solid rgba(167,146,119,.15); padding-top: 32px; display: flex; align-items: center; justify-content: space-between; }
     .footer-bottom p { color: rgba(255,242,225,.28); font-size: 12px; }
     .payment-icons { display: flex; gap: 10px; }
     .pay-icon { background: rgba(167,146,119,.1); border: 1px solid rgba(167,146,119,.2); padding: 5px 10px; font-size: 11px; color: rgba(255,242,225,.45); font-weight: 600; letter-spacing: .04em; }
@@ -681,14 +681,8 @@
   <!-- Navigation -->
   <nav>
     <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()"><span></span><span></span><span></span></button><a href="#" class="nav-logo">VYNE<span>IT</span></a>
-    <ul class="nav-links">
-      <li><a href="collections.html">Collections</a></li>
-    </ul>
     <div class="nav-actions">
-      <button class="login-btn" id="loginNavBtn" onclick="window.location.href='login.html'">
-        👤 <span id="loginNavText">Login</span>
-      </button>
-      <button class="cart-btn" title="Cart" onclick="window.location.href='cart.html'">
+    <button class="cart-btn" title="Cart" onclick="window.location.href='cart.html'">
         🛍 Cart
         <span class="cart-count" id="cartCount">0</span>
       </button>
