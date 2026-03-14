@@ -404,6 +404,46 @@
   const PROMO_PCT  = 0.15;
   const FREE_SHIP_THRESHOLD = 999;
 
+  // --- Save cart to localStorage ---
+  function saveCart(){
+    localStorage.setItem('vyneit_cart', JSON.stringify(items));
+  }
+
+  // --- Render a single item row into DOM ---
+  function renderItem(item){
+    const container = document.getElementById('cartItems');
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.id = item.id;
+    div.innerHTML = `
+      <img class="cart-item-img" src="${item.img}" alt="${item.name}"/>
+      <div class="cart-item-body">
+        <div class="cart-item-top">
+          <div class="cart-item-info">
+            <div class="cart-item-cat">T-Shirt</div>
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-meta">
+              <span class="cart-meta-tag">Size: M</span>
+              <span class="cart-meta-tag">Color: Default</span>
+            </div>
+          </div>
+          <button class="remove-btn" onclick="removeItem('${item.id}')" title="Remove">×</button>
+        </div>
+        <div class="cart-item-bottom">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div class="qty-control">
+              <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+              <input class="qty-input" id="qty-${item.id}" type="number" value="${item.qty}" min="1" max="10" onchange="updateTotal()"/>
+              <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+            </div>
+            <button class="save-later-btn">Save for later</button>
+          </div>
+          <span class="item-price" id="price-${item.id}" data-unit="${item.price}">₹${Math.round(item.price * item.qty)}</span>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  }
+
   // --- HELPERS ---
   function subtotal(){
     return items.reduce((s,i)=>s + i.price * i.qty, 0);
@@ -465,8 +505,8 @@
     if(newQty > 10) newQty = 10;
     item.qty = newQty;
     input.value = newQty;
+    saveCart();
     updateTotal();
-    // animate
     const priceEl = document.getElementById('price-'+id);
     priceEl.style.transform='scale(1.15)';
     priceEl.style.color='var(--accent)';
@@ -488,6 +528,7 @@
     setTimeout(()=>{
       el.remove();
       items = items.filter(i=>i.id!==id);
+      saveCart();
       updateTotal();
       checkEmpty();
     },500);
@@ -497,6 +538,7 @@
     if(!confirm('Remove all items from cart?')) return;
     items = [];
     document.getElementById('cartItems').innerHTML='';
+    saveCart();
     updateTotal();
     checkEmpty();
   }
@@ -538,43 +580,15 @@
 
   function quickAdd(btn, name, price){
     const newId = 'item-'+(Date.now());
-    items.push({id:newId, name, price, qty:1});
-
-    // add row to DOM
-    const container = document.getElementById('cartItems');
-    const div = document.createElement('div');
-    div.className='cart-item';
-    div.id=newId;
-    div.innerHTML=`
-      <img class="cart-item-img" src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=300&auto=format&fit=crop&q=80" alt="${name}"/>
-      <div class="cart-item-body">
-        <div class="cart-item-top">
-          <div class="cart-item-info">
-            <div class="cart-item-cat">T-Shirt</div>
-            <div class="cart-item-name">${name}</div>
-            <div class="cart-item-meta"><span class="cart-meta-tag">Size: M</span><span class="cart-meta-tag">Color: Default</span></div>
-          </div>
-          <button class="remove-btn" onclick="removeItem('${newId}')" title="Remove">×</button>
-        </div>
-        <div class="cart-item-bottom">
-          <div style="display:flex;align-items:center;gap:16px">
-            <div class="qty-control">
-              <button class="qty-btn" onclick="changeQty('${newId}',-1)">−</button>
-              <input class="qty-input" id="qty-${newId}" type="number" value="1" min="1" max="10" onchange="updateTotal()"/>
-              <button class="qty-btn" onclick="changeQty('${newId}',1)">+</button>
-            </div>
-            <button class="save-later-btn">Save for later</button>
-          </div>
-          <span class="item-price" id="price-${newId}" data-unit="${price}">₹${price}</span>
-        </div>
-      </div>`;
-    container.appendChild(div);
-
+    const img = 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=300&auto=format&fit=crop&q=80';
+    const newItem = {id:newId, name, price, img, qty:1};
+    items.push(newItem);
+    renderItem(newItem);
+    saveCart();
     btn.textContent='✓ Added!';
     btn.style.background='var(--green)';
     btn.style.color='white';
     setTimeout(()=>{btn.textContent='+ Add to Cart';btn.style.background='';btn.style.color='';},1500);
-
     updateTotal();
     checkEmpty();
   }
@@ -595,8 +609,14 @@
   style.textContent='@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}';
   document.head.appendChild(style);
 
-  // Init
-  updateTotal();
+  // --- INIT: Load cart from localStorage ---
+  (function initCart(){
+    const saved = JSON.parse(localStorage.getItem('vyneit_cart') || '[]');
+    items = saved;
+    items.forEach(item => renderItem(item));
+    updateTotal();
+    checkEmpty();
+  })();
 </script>
 </body>
 </html>
