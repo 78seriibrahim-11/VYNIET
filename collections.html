@@ -27,7 +27,7 @@
     body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring{width:52px;height:52px;border-color:var(--accent)}
 
     /* NAV */
-    nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;height:72px;display:grid;grid-template-columns:auto auto 1fr auto;align-items:center;gap:8px;padding:0 48px}
+    nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 48px}
     .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.08em;color:var(--black)}
     .nav-logo span{color:var(--accent)}
     .nav-links{display:flex;gap:20px;list-style:none;justify-content:center;justify-content:center;}
@@ -253,13 +253,7 @@
 <!-- Nav -->
 <nav>
   <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()"><span></span><span></span><span></span></button><a href="index.html" class="nav-logo">VYNE<span>IT</span></a>
-  <ul class="nav-links">
-    <li><a href="collections.html" class="active">Collections</a></li>
-  </ul>
   <div class="nav-actions">
-    <button class="login-btn" id="loginNavBtn" onclick="window.location.href='login.html'">
-      👤 <span id="loginNavText">Login</span>
-    </button>
     <button class="cart-pill" onclick="window.location.href='cart.html'">
       🛍 Cart
       <span class="cart-badge" id="cartBadge">0</span>
