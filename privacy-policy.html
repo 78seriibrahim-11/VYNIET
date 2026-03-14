@@ -28,10 +28,10 @@
     body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring{width:52px;height:52px;border-color:var(--accent)}
 
     /* NAV */
-    nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 48px}
+    nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;height:72px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:0 48px}
     .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.08em;color:var(--black);text-decoration:none}
     .nav-logo span{color:var(--accent)}
-    .nav-links{display:flex;gap:36px;list-style:none}
+    .nav-links{display:flex;gap:20px;list-style:none;justify-content:center;justify-content:center;}
     .nav-links a{font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--black);padding-bottom:3px;border-bottom:1.5px solid transparent;transition:all .2s;text-decoration:none}
     .nav-links a:hover{border-color:var(--accent);color:var(--accent)}
     .nav-actions{display:flex;align-items:center;gap:8px}
@@ -84,7 +84,7 @@
     .contact-card strong{color:var(--white)}
 
     /* FOOTER */
-    footer{background:var(--black);color:var(--white);padding:40px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+    footer{background:var(--black);color:var(--white);padding:40px 48px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;flex-wrap:wrap;gap:16px}
     footer p{color:rgba(255,242,225,.35);font-size:12px}
     .footer-links{display:flex;gap:24px}
     .footer-links a{color:rgba(255,242,225,.5);font-size:12px;text-decoration:none;transition:color .2s}
@@ -92,7 +92,7 @@
 
     @media(max-width:768px){
       nav{padding:0 16px}
-      .nav-links{display:none}
+      
       .breadcrumb{padding:14px 16px}
       .policy-hero{padding:48px 20px}
       .policy-layout{grid-template-columns:1fr;padding:48px 20px 80px;gap:0}
@@ -110,11 +110,7 @@
 <nav>
   <a href="index.html" class="nav-logo">VYNE<span>IT</span></a>
   <ul class="nav-links">
-    <li><a href="index.html">New Arrivals</a></li>
-    <li><a href="index.html">Men</a></li>
-    <li><a href="index.html">Women</a></li>
-    <li><a href="index.html">Collections</a></li>
-    <li><a href="index.html">Sale</a></li>
+    <li><a href="collections.html">Collections</a></li>
   </ul>
   <div class="nav-actions">
     <a href="cart.html" class="cart-btn">
@@ -313,7 +309,7 @@
       <p>If you have any questions, concerns, or requests regarding this Privacy Policy or how we handle your data, please reach out to us:</p>
       <div class="contact-card">
         <h3>VYNEIT — Privacy Team</h3>
-        <p><strong>Email:</strong> <a href="mailto:privacy@vyneit.shop">privacy@vyneit.shop</a></p>
+        <p><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection#addddfc4dbccced4eddbd4c3c8c4d983dec5c2dd"><span class="__cf_email__" data-cfemail="ec9c9e859a8d8f95ac9a9582898598c29f84839c">[email&#160;protected]</span></a></p>
         <p><strong>Website:</strong> <a href="https://vyneit.shop">vyneit.shop</a></p>
         <p><strong>Country:</strong> India</p>
         <p style="margin-top:14px;font-size:13px;color:rgba(255,242,225,.4)">We aim to respond to all privacy-related enquiries within 5 business days.</p>
@@ -333,7 +329,7 @@
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // Cursor
   const cursor = document.getElementById('cursor');
   const ring   = document.getElementById('cursorRing');
@@ -354,14 +350,4 @@
   const sections = document.querySelectorAll('.policy-section');
   const links    = document.querySelectorAll('.sidebar-nav a');
   window.addEventListener('scroll',()=>{
-    let current='';
-    sections.forEach(s=>{
-      if(window.scrollY >= s.offsetTop - 120) current = s.id;
-    });
-    links.forEach(l=>{
-      l.classList.toggle('active', l.getAttribute('href')==='#'+current);
-    });
-  });
-</script>
-</body>
-</html>
+    let cu
