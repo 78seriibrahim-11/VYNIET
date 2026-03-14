@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VYNEIT — All Collections</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{max-width:100vw;overflow-x:hidden}
+    :root{
+      --black:#102C26;--white:#FFF2E1;--cream:#F7E7CE;
+      --accent:#A79277;--accent2:#8a7560;--muted:#7a6e62;
+      --border:#e0d4be;--card:#ffffff;--green:#2e7d4f;
+    }
+    body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--black);cursor:none}
+    a{text-decoration:none;color:inherit}
+    button{font-family:'DM Sans',sans-serif;cursor:none}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:var(--cream)}
+    ::-webkit-scrollbar-thumb{background:var(--accent)}
+
+    /* CURSOR */
+    .cursor{width:12px;height:12px;background:var(--accent);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+    .cursor-ring{width:36px;height:36px;border:1.5px solid var(--black);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .2s}
+    body:has(a:hover) .cursor,body:has(button:hover) .cursor{width:20px;height:20px}
+    body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring{width:52px;height:52px;border-color:var(--accent)}
+
+    /* NAV */
+    nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 48px}
+    .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.08em;color:var(--black)}
+    .nav-logo span{color:var(--accent)}
+    .nav-links{display:flex;gap:36px;list-style:none}
+    .nav-links a{font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--black);padding-bottom:3px;border-bottom:1.5px solid transparent;transition:all .2s}
+    .nav-links a:hover,.nav-links a.active{border-color:var(--accent);color:var(--accent)}
+    .nav-actions{display:flex;align-items:center;gap:8px}
+    .nav-icon-btn{background:none;border:none;font-size:19px;padding:8px;color:var(--black);transition:color .2s}
+    .nav-icon-btn:hover{color:var(--accent)}
+    .cart-pill{background:var(--black);color:var(--white);border:none;padding:10px 20px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:8px;transition:background .2s}
+    .cart-pill:hover{background:var(--accent)}
+    .cart-badge{background:var(--accent);color:var(--white);border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+    /* BREADCRUMB */
+    .breadcrumb{background:var(--cream);border-bottom:1px solid var(--border);padding:14px 48px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+    .breadcrumb a{color:var(--muted);transition:color .2s}
+    .breadcrumb a:hover{color:var(--accent)}
+    .breadcrumb span{color:var(--border)}
+    .breadcrumb .current{color:var(--black);font-weight:600}
+
+    /* COLLECTION HERO */
+    .coll-hero{background:var(--black);padding:56px 48px;display:flex;align-items:flex-end;justify-content:space-between;gap:32px;position:relative;overflow:hidden}
+    .coll-hero::before{content:'ALL';font-family:'Bebas Neue',sans-serif;font-size:220px;color:rgba(167,146,119,.06);position:absolute;right:-10px;top:-20px;line-height:1;pointer-events:none}
+    .coll-hero-left{}
+    .coll-eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:10px}
+    .coll-title{font-family:'DM Serif Display',serif;font-size:clamp(36px,5vw,64px);color:var(--white);line-height:1.05;margin-bottom:10px}
+    .coll-title em{font-style:italic;color:var(--accent)}
+    .coll-subtitle{color:rgba(255,242,225,.45);font-size:14px;font-weight:300}
+    .coll-stats{display:flex;gap:32px;flex-shrink:0}
+    .coll-stat{text-align:center}
+    .coll-stat-num{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--accent);line-height:1}
+    .coll-stat-label{font-size:11px;color:rgba(255,242,255,.35);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+
+    /* FILTER + SORT BAR */
+    .filter-bar{background:var(--white);border-bottom:1px solid var(--border);padding:16px 48px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;position:sticky;top:72px;z-index:100}
+    .filter-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .filter-label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+    .filter-btn{background:var(--white);border:1.5px solid var(--border);padding:7px 16px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);transition:all .2s;white-space:nowrap}
+    .filter-btn:hover,.filter-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
+    .filter-right{display:flex;align-items:center;gap:12px}
+    .sort-select{background:var(--white);border:1.5px solid var(--border);padding:7px 32px 7px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--black);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A79277' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .2s}
+    .sort-select:focus{border-color:var(--accent)}
+    .result-count{font-size:13px;color:var(--muted);white-space:nowrap}
+    .view-toggle{display:flex;gap:4px}
+    .view-btn{background:none;border:1.5px solid var(--border);width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);transition:all .2s}
+    .view-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
+
+    /* PRODUCT GRID */
+    .collection-body{padding:40px 48px 100px;max-width:1400px;margin:0 auto}
+    .product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;transition:all .3s}
+    .product-grid.view-3{grid-template-columns:repeat(3,1fr)}
+    .product-grid.view-2{grid-template-columns:repeat(2,1fr)}
+
+    /* PRODUCT CARD */
+    .product-card{background:var(--card);border:1px solid var(--border);overflow:hidden;transition:transform .3s,box-shadow .3s;animation:fadeUp .5s ease both}
+    .product-card:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(16,44,38,.12)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .product-img-wrap{position:relative;overflow:hidden;background:var(--cream);aspect-ratio:3/4}
+    .product-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+    .product-card:hover .product-img-wrap img{transform:scale(1.06)}
+    .product-badge{position:absolute;top:12px;left:12px;background:var(--black);color:var(--white);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px}
+    .product-badge.sale{background:var(--accent)}
+    .product-badge.new-tag{background:var(--green)}
+    .product-actions{position:absolute;bottom:-60px;left:0;right:0;padding:12px;display:flex;gap:8px;background:linear-gradient(transparent,rgba(16,44,38,.65));transition:bottom .3s ease}
+    .product-card:hover .product-actions{bottom:0}
+    .add-cart-btn{flex:1;background:var(--black);color:var(--white);border:none;padding:10px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-family:'DM Sans',sans-serif;transition:background .2s}
+    .add-cart-btn:hover{background:var(--accent)}
+    .wishlist-btn{flex:0 0 44px;background:rgba(255,242,225,.92);border:none;font-size:16px;transition:background .2s}
+    .wishlist-btn:hover{background:white}
+    .product-info{padding:14px 16px 18px}
+    .product-cat{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+    .product-name{font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:8px;line-height:1.25;color:var(--black)}
+    .product-colors{display:flex;gap:5px;margin-bottom:10px}
+    .color-dot{width:13px;height:13px;border-radius:50%;border:1.5px solid transparent;transition:border-color .15s}
+    .color-dot:hover{border-color:var(--black)}
+    .product-price-row{display:flex;align-items:center;gap:8px}
+    .price{font-size:16px;font-weight:700;color:var(--black)}
+    .price-old{font-size:13px;color:var(--muted);text-decoration:line-through}
+
+    /* EMPTY STATE */
+    .empty-state{display:none;text-align:center;padding:80px 20px;grid-column:1/-1}
+    .empty-state.show{display:block}
+    .empty-icon{font-size:60px;margin-bottom:20px;opacity:.3}
+    .empty-state h3{font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:10px}
+    .empty-state p{color:var(--muted);font-size:15px}
+
+    /* LOAD MORE */
+    .load-more-wrap{text-align:center;margin-top:52px}
+    .load-more-btn{background:var(--black);color:var(--white);border:none;padding:16px 48px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;transition:background .2s,transform .15s}
+    .load-more-btn:hover{background:var(--accent);transform:translateY(-2px)}
+
+    /* FOOTER */
+    footer{background:var(--black);color:var(--white);padding:48px 48px 32px}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+    .footer-brand p{color:rgba(255,242,225,.4);font-size:13px;line-height:1.7;max-width:260px;font-weight:300;margin-top:14px}
+    .footer-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.08em;color:var(--white)}
+    .footer-logo span{color:var(--accent)}
+    .footer-col h4{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,242,225,.3);margin-bottom:18px;font-weight:600}
+    .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+    .footer-col a{color:rgba(255,242,225,.6);font-size:14px;font-weight:300;transition:color .2s}
+    .footer-col a:hover{color:var(--accent)}
+    .footer-bottom{border-top:1px solid rgba(167,146,119,.15);padding-top:28px;display:flex;align-items:center;justify-content:space-between}
+    .footer-bottom p{color:rgba(255,242,225,.28);font-size:12px}
+
+    /* MOBILE */
+    @media(max-width:900px){
+      nav{padding:0 16px}
+      .nav-links{display:none}
+      .coll-hero{padding:40px 20px;flex-direction:column;gap:24px}
+      .coll-hero::before{font-size:120px}
+      .filter-bar{padding:12px 16px;top:72px}
+      .collection-body{padding:28px 16px 80px}
+      .product-grid{grid-template-columns:repeat(2,1fr);gap:14px}
+      .product-grid.view-3{grid-template-columns:repeat(2,1fr)}
+      .breadcrumb{padding:12px 16px}
+      .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
+      footer{padding:40px 20px 28px}
+    }
+    @media(max-width:480px){
+      .product-grid,.product-grid.view-3,.product-grid.view-2{grid-template-columns:repeat(2,1fr);gap:10px}
+      .coll-stats{gap:20px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Nav -->
+<nav>
+  <a href="index.html" class="nav-logo">VYNE<span>IT</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">New Arrivals</a></li>
+    <li><a href="index.html">Men</a></li>
+    <li><a href="index.html">Women</a></li>
+    <li><a href="collections.html" class="active">Collections</a></li>
+    <li><a href="index.html">Sale</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="nav-icon-btn">🔍</button>
+    <button class="nav-icon-btn">♡</button>
+    <button class="cart-pill" onclick="window.location.href='cart.html'">
+      🛍 Cart
+      <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+  <a href="index.html">Home</a>
+  <span>›</span>
+  <span class="current">All Collections</span>
+</div>
+
+<!-- Hero -->
+<div class="coll-hero">
+  <div class="coll-hero-left">
+    <div class="coll-eyebrow">✦ Browse Everything</div>
+    <h1 class="coll-title">All <em>Products</em></h1>
+    <p class="coll-subtitle">Every tee we make — premium organic cotton, bold graphics, clean fits.</p>
+  </div>
+  <div class="coll-stats">
+    <div class="coll-stat">
+      <div class="coll-stat-num">16</div>
+      <div class="coll-stat-label">Products</div>
+    </div>
+    <div class="coll-stat">
+      <div class="coll-stat-num">4</div>
+      <div class="coll-stat-label">Categories</div>
+    </div>
+    <div class="coll-stat">
+      <div class="coll-stat-num">₹499</div>
+      <div class="coll-stat-label">Starting From</div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter + Sort Bar -->
+<div class="filter-bar">
+  <div class="filter-left">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
+    <button class="filter-btn" onclick="filterProducts('men', this)">Men's</button>
+    <button class="filter-btn" onclick="filterProducts('women', this)">Women's</button>
+    <button class="filter-btn" onclick="filterProducts('graphic', this)">Graphic</button>
+    <button class="filter-btn" onclick="filterProducts('classic', this)">Classic</button>
+    <button class="filter-btn" onclick="filterProducts('sale', this)">Sale 🔥</button>
+  </div>
+  <div class="filter-right">
+    <span class="result-count" id="resultCount">16 products</span>
+    <select class="sort-select" onchange="sortProducts(this.value)">
+      <option value="default">Featured</option>
+      <option value="price-low">Price: Low to High</option>
+      <option value="price-high">Price: High to Low</option>
+      <option value="newest">Newest First</option>
+      <option value="name">Name A–Z</option>
+    </select>
+    <div class="view-toggle">
+      <button class="view-btn active" onclick="setView(4,this)" title="4 columns">⊞</button>
+      <button class="view-btn" onclick="setView(3,this)" title="3 columns">⊟</button>
+      <button class="view-btn" onclick="setView(2,this)" title="2 columns">▦</button>
+    </div>
+  </div>
+</div>
+
+<!-- Products -->
+<div class="collection-body">
+  <div class="product-grid" id="productGrid">
+
+    <!-- 1 -->
+    <div class="product-card" data-cat="classic men" data-price="599" data-name="Essential White Crew" data-new="true">
+      <div class="product-img-wrap">
+        <span class="product-badge new-tag">New</span>
+        <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&auto=format&fit=crop&q=80" alt="Essential White Crew"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Essential White Crew" data-price="599" data-img="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Classic · Men's</div>
+        <div class="product-name">Essential White Crew</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#FFF2E1;border-color:#ccc"></div>
+          <div class="color-dot" style="background:#102C26"></div>
+          <div class="color-dot" style="background:#A79277"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹599</span></div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="product-card" data-cat="graphic men" data-price="799" data-name="Urban Print Oversized" data-sale="true">
+      <div class="product-img-wrap">
+        <span class="product-badge sale">Sale 20%</span>
+        <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&auto=format&fit=crop&q=80" alt="Urban Print Oversized"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Urban Print Oversized" data-price="799" data-img="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Graphic · Men's</div>
+        <div class="product-name">Urban Print Oversized</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#102C26"></div>
+          <div class="color-dot" style="background:#A79277"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹799</span><span class="price-old">₹1,499</span></div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="product-card" data-cat="classic women" data-price="699" data-name="Faded Retro Wash">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&auto=format&fit=crop&q=80" alt="Faded Retro Wash"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Faded Retro Wash" data-price="699" data-img="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Vintage · Women's</div>
+        <div class="product-name">Faded Retro Wash</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#F7E7CE"></div>
+          <div class="color-dot" style="background:#8fa88e"></div>
+          <div class="color-dot" style="background:#A79277"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹699</span></div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="product-card" data-cat="classic men" data-price="999" data-name="Heavyweight Drop-Shoulder">
+      <div class="product-img-wrap">
+        <span class="product-badge">Limited</span>
+        <img src="https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=600&auto=format&fit=crop&q=80" alt="Heavyweight Drop-Shoulder"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Heavyweight Drop-Shoulder" data-price="999" data-img="https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Premium · Men's</div>
+        <div class="product-name">Heavyweight Drop-Shoulder</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#102C26"></div>
+          <div class="color-dot" style="background:#2d4a22"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹999</span></div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="product-card" data-cat="graphic women" data-price="849" data-name="Hand-Dyed Spiral" data-new="true">
+      <div class="product-img-wrap">
+        <span class="product-badge new-tag">New</span>
+        <img src="https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&auto=format&fit=crop&q=80" alt="Hand-Dyed Spiral"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Hand-Dyed Spiral" data-price="849" data-img="https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Artisan · Women's</div>
+        <div class="product-name">Hand-Dyed Spiral</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#F7E7CE"></div>
+          <div class="color-dot" style="background:#A79277"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹849</span></div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="product-card" data-cat="classic men" data-price="649" data-name="Breton Stripe Crew" data-new="true">
+      <div class="product-img-wrap">
+        <span class="product-badge new-tag">New</span>
+        <img src="https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&auto=format&fit=crop&q=80" alt="Breton Stripe Crew"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Breton Stripe Crew" data-price="649" data-img="https://images.unsplash.com/photo-1562157873-818bc0726f68?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Nautical · Men's</div>
+        <div class="product-name">Breton Stripe Crew</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#102C26"></div>
+          <div class="color-dot" style="background:#8b1a1a"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹649</span></div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="product-card" data-cat="classic women" data-price="499" data-name="Clean Slate V-Neck">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&auto=format&fit=crop&q=80" alt="Clean Slate V-Neck"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Clean Slate V-Neck" data-price="499" data-img="https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Minimalist · Women's</div>
+        <div class="product-name">Clean Slate V-Neck</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#FFF2E1;border-color:#ccc"></div>
+          <div class="color-dot" style="background:#808080"></div>
+          <div class="color-dot" style="background:#102C26"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹499</span></div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="product-card" data-cat="graphic men women" data-price="749" data-name="Big Logo Boxy Fit" data-sale="true">
+      <div class="product-img-wrap">
+        <span class="product-badge sale">15% Off</span>
+        <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=600&auto=format&fit=crop&q=80" alt="Big Logo Boxy Fit"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Big Logo Boxy Fit" data-price="749" data-img="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Statement · Unisex</div>
+        <div class="product-name">Big Logo Boxy Fit</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#F7E7CE"></div>
+          <div class="color-dot" style="background:#102C26"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹749</span><span class="price-old">₹1,599</span></div>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="product-card" data-cat="women classic" data-price="549" data-name="Soft Rib Crop Tee" data-new="true">
+      <div class="product-img-wrap">
+        <span class="product-badge new-tag">New</span>
+        <img src="https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=600&auto=format&fit=crop&q=80" alt="Soft Rib Crop Tee"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Soft Rib Crop Tee" data-price="549" data-img="https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Classic · Women's</div>
+        <div class="product-name">Soft Rib Crop Tee</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#f5c4b0"></div>
+          <div class="color-dot" style="background:#FFF2E1;border-color:#ccc"></div>
+          <div class="color-dot" style="background:#c9b8d4"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹549</span></div>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="product-card" data-cat="graphic men" data-price="899" data-name="Abstract Wave Print">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&auto=format&fit=crop&q=80" alt="Abstract Wave Print"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Abstract Wave Print" data-price="899" data-img="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Graphic · Men's</div>
+        <div class="product-name">Abstract Wave Print</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#1a2a4a"></div>
+          <div class="color-dot" style="background:#102C26"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹899</span></div>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="product-card" data-cat="women graphic" data-price="679" data-name="Floral Sketch Tee" data-sale="true">
+      <div class="product-img-wrap">
+        <span class="product-badge sale">Sale</span>
+        <img src="https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&auto=format&fit=crop&q=80" alt="Floral Sketch Tee"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Floral Sketch Tee" data-price="679" data-img="https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Graphic · Women's</div>
+        <div class="product-name">Floral Sketch Tee</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#e8d5c4"></div>
+          <div class="color-dot" style="background:#A79277"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹679</span><span class="price-old">₹1,299</span></div>
+      </div>
+    </div>
+
+    <!-- 12 -->
+    <div class="product-card" data-cat="men classic" data-price="559" data-name="The Everyday Tee">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1603252109303-2751441dd157?w=600&auto=format&fit=crop&q=80" alt="The Everyday Tee"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="The Everyday Tee" data-price="559" data-img="https://images.unsplash.com/photo-1603252109303-2751441dd157?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Classic · Men's</div>
+        <div class="product-name">The Everyday Tee</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#102C26"></div>
+          <div class="color-dot" style="background:#808080"></div>
+          <div class="color-dot" style="background:#FFF2E1;border-color:#ccc"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹559</span></div>
+      </div>
+    </div>
+
+    <!-- 13 -->
+    <div class="product-card" data-cat="women classic" data-price="729" data-name="Oversized Comfort Tee" data-new="true">
+      <div class="product-img-wrap">
+        <span class="product-badge new-tag">New</span>
+        <img src="https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=600&auto=format&fit=crop&q=80" alt="Oversized Comfort Tee"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Oversized Comfort Tee" data-price="729" data-img="https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Classic · Women's</div>
+        <div class="product-name">Oversized Comfort Tee</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#d4c4b0"></div>
+          <div class="color-dot" style="background:#102C26"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹729</span></div>
+      </div>
+    </div>
+
+    <!-- 14 -->
+    <div class="product-card" data-cat="graphic men women" data-price="949" data-name="Vintage Band Tee">
+      <div class="product-img-wrap">
+        <span class="product-badge">Exclusive</span>
+        <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&auto=format&fit=crop&q=80" alt="Vintage Band Tee"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Vintage Band Tee" data-price="949" data-img="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Graphic · Unisex</div>
+        <div class="product-name">Vintage Band Tee</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#1a1a1a"></div>
+          <div class="color-dot" style="background:#5a4030"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹949</span></div>
+      </div>
+    </div>
+
+    <!-- 15 -->
+    <div class="product-card" data-cat="men classic" data-price="619" data-name="Polo Collar Tee" data-sale="true">
+      <div class="product-img-wrap">
+        <span class="product-badge sale">Sale</span>
+        <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&auto=format&fit=crop&q=80" alt="Polo Collar Tee"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Polo Collar Tee" data-price="619" data-img="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Classic · Men's</div>
+        <div class="product-name">Polo Collar Tee</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#102C26"></div>
+          <div class="color-dot" style="background:#FFF2E1;border-color:#ccc"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹619</span><span class="price-old">₹1,199</span></div>
+      </div>
+    </div>
+
+    <!-- 16 -->
+    <div class="product-card" data-cat="women graphic" data-price="779" data-name="Tie-Dye Sunset" data-new="true">
+      <div class="product-img-wrap">
+        <span class="product-badge new-tag">New</span>
+        <img src="https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=600&auto=format&fit=crop&q=80" alt="Tie-Dye Sunset"/>
+        <div class="product-actions">
+          <button class="add-cart-btn" onclick="addToCart(this)" data-name="Tie-Dye Sunset" data-price="779" data-img="https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+          <button class="wishlist-btn">♡</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">Graphic · Women's</div>
+        <div class="product-name">Tie-Dye Sunset</div>
+        <div class="product-colors">
+          <div class="color-dot" style="background:#e8a87c"></div>
+          <div class="color-dot" style="background:#c4708a"></div>
+        </div>
+        <div class="product-price-row"><span class="price">₹779</span></div>
+      </div>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🔍</div>
+      <h3>No products found</h3>
+      <p>Try a different filter or browse all products</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">VYNE<span>IT</span></div>
+      <p>Premium quality tees made from 100% organic cotton. Designed to make you feel as good as you look.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="collections.html">All Products</a></li>
+        <li><a href="index.html">New Arrivals</a></li>
+        <li><a href="index.html">Best Sellers</a></li>
+        <li><a href="index.html">Sale</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="#">Size Guide</a></li>
+        <li><a href="#">Shipping Info</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">Our Story</a></li>
+        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 VYNEIT. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+  (function loop(){
+    cursor.style.left=mx+'px';cursor.style.top=my+'px';
+    rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+    ring.style.left=rx+'px';ring.style.top=ry+'px';
+    requestAnimationFrame(loop);
+  })();
+
+  // Cart badge
+  (function(){
+    const cart = JSON.parse(localStorage.getItem('vyneit_cart')||'[]');
+    document.getElementById('cartBadge').textContent = cart.reduce((s,i)=>s+i.qty,0);
+  })();
+
+  // Add to cart
+  function addToCart(btn){
+    const name  = btn.dataset.name;
+    const price = parseInt(btn.dataset.price);
+    const img   = btn.dataset.img;
+    let cart = JSON.parse(localStorage.getItem('vyneit_cart')||'[]');
+    const existing = cart.find(i=>i.name===name);
+    if(existing){ existing.qty+=1; }
+    else { cart.push({id:'item-'+Date.now(),name,price,img,qty:1}); }
+    localStorage.setItem('vyneit_cart',JSON.stringify(cart));
+    document.getElementById('cartBadge').textContent = cart.reduce((s,i)=>s+i.qty,0);
+    btn.textContent='✓ Added!';
+    btn.style.background='var(--green)';
+    setTimeout(()=>{btn.textContent='Add to Cart';btn.style.background='';},1500);
+  }
+
+  // Filter
+  let currentFilter = 'all';
+  function filterProducts(cat, btn){
+    currentFilter = cat;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const cards = document.querySelectorAll('.product-card');
+    let visible = 0;
+    cards.forEach((card,i)=>{
+      const cardCat = card.dataset.cat || '';
+      const isSale  = card.dataset.sale;
+      let show = false;
+      if(cat==='all') show=true;
+      else if(cat==='sale') show=!!isSale;
+      else show=cardCat.includes(cat);
+      card.style.display = show ? '' : 'none';
+      if(show){ card.style.animationDelay=(visible*0.05)+'s'; visible++; }
+    });
+    document.getElementById('resultCount').textContent = visible+' product'+(visible!==1?'s':'');
+    document.getElementById('emptyState').classList.toggle('show', visible===0);
+  }
+
+  // Sort
+  function sortProducts(val){
+    const grid  = document.getElementById('productGrid');
+    const cards = [...document.querySelectorAll('.product-card')];
+    cards.sort((a,b)=>{
+      if(val==='price-low')  return parseInt(a.dataset.price)-parseInt(b.dataset.price);
+      if(val==='price-high') return parseInt(b.dataset.price)-parseInt(a.dataset.price);
+      if(val==='name')       return a.dataset.name.localeCompare(b.dataset.name);
+      if(val==='newest')     return (b.dataset.new?1:0)-(a.dataset.new?1:0);
+      return 0;
+    });
+    cards.forEach((c,i)=>{ c.style.animationDelay=(i*0.04)+'s'; grid.appendChild(c); });
+    filterProducts(currentFilter, document.querySelector('.filter-btn.active'));
+  }
+
+  // View toggle
+  function setView(cols, btn){
+    document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const grid = document.getElementById('productGrid');
+    grid.className = 'product-grid';
+    if(cols===3) grid.classList.add('view-3');
+    if(cols===2) grid.classList.add('view-2');
+  }
+</script>
+</body>
+</html>
