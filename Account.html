@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VYNEIT — My Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{max-width:100vw;overflow-x:hidden}
+    :root{
+      --black:#102C26;--white:#FFF2E1;--cream:#F7E7CE;
+      --accent:#A79277;--accent2:#8a7560;--muted:#7a6e62;
+      --border:#e0d4be;--green:#2e7d4f;--red:#c0392b;
+    }
+    body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--black);cursor:none}
+    a{text-decoration:none;color:inherit}
+    button{font-family:'DM Sans',sans-serif;cursor:none}
+
+    /* CURSOR */
+    .cursor{width:12px;height:12px;background:var(--accent);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+    .cursor-ring{width:36px;height:36px;border:1.5px solid var(--black);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .2s}
+    body:has(a:hover) .cursor,body:has(button:hover) .cursor{width:20px;height:20px}
+    body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring{width:52px;height:52px;border-color:var(--accent)}
+
+    /* NAV */
+    nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;height:72px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:0 48px}
+    .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.08em;color:var(--black)}
+    .nav-logo span{color:var(--accent)}
+    .nav-center{display:flex;justify-content:center}
+    .nav-links{display:flex;gap:28px;list-style:none}
+    .nav-links a{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--black);padding-bottom:3px;border-bottom:1.5px solid transparent;transition:all .2s}
+    .nav-links a:hover{border-color:var(--accent);color:var(--accent)}
+    .nav-right{display:flex;align-items:center;gap:10px}
+    .cart-pill{background:var(--black);color:var(--white);border:none;padding:10px 20px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:8px;transition:background .2s}
+    .cart-pill:hover{background:var(--accent)}
+    .cart-badge{background:var(--accent);color:var(--white);border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+    /* BREADCRUMB */
+    .breadcrumb{background:var(--cream);border-bottom:1px solid var(--border);padding:14px 48px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+    .breadcrumb a{color:var(--muted);transition:color .2s}
+    .breadcrumb a:hover{color:var(--accent)}
+    .breadcrumb span{color:var(--border)}
+    .breadcrumb .current{color:var(--black);font-weight:600}
+
+    /* LOADING SCREEN */
+    .loading-screen{position:fixed;inset:0;background:var(--white);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px}
+    .loading-screen.hidden{display:none}
+    .loader{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-screen p{font-size:13px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+
+    /* PAGE LAYOUT */
+    .account-page{max-width:1200px;margin:0 auto;padding:52px 48px 100px;display:grid;grid-template-columns:260px 1fr;gap:48px;align-items:start}
+
+    /* SIDEBAR */
+    .account-sidebar{position:sticky;top:96px}
+    .profile-card{background:var(--black);padding:28px 24px;margin-bottom:8px;text-align:center}
+    .avatar{width:72px;height:72px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);margin:0 auto 14px;letter-spacing:.04em}
+    .profile-name{font-family:'DM Serif Display',serif;font-size:18px;color:var(--white);margin-bottom:4px}
+    .profile-email{font-size:12px;color:rgba(255,242,225,.45);letter-spacing:.04em}
+    .sidebar-nav{list-style:none;display:flex;flex-direction:column;gap:2px}
+    .sidebar-nav li a,.sidebar-nav li button{display:flex;align-items:center;gap:12px;padding:12px 16px;font-size:13px;color:var(--muted);border-left:2px solid var(--border);transition:all .2s;font-weight:500;background:none;border-top:none;border-right:none;border-bottom:none;width:100%;text-align:left;letter-spacing:.02em}
+    .sidebar-nav li a:hover,.sidebar-nav li button:hover{border-color:var(--accent);color:var(--black);background:var(--cream)}
+    .sidebar-nav li a.active{border-color:var(--black);color:var(--black);background:var(--cream);font-weight:600}
+    .sidebar-nav .logout-btn{color:var(--red)!important;margin-top:8px;border-color:transparent!important}
+    .sidebar-nav .logout-btn:hover{background:#fdecea!important;border-color:var(--red)!important}
+    .nav-icon{font-size:16px;width:20px;text-align:center}
+
+    /* CONTENT PANELS */
+    .account-content{}
+    .panel{display:none}
+    .panel.active{display:block;animation:fadeUp .4s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:1.5px solid var(--border)}
+    .panel-title{font-family:'DM Serif Display',serif;font-size:32px;line-height:1}
+    .panel-title em{font-style:italic;color:var(--accent)}
+
+    /* STATS CARDS */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+    .stat-card{background:var(--cream);border:1px solid var(--border);padding:20px 22px}
+    .stat-card-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--black);line-height:1;margin-bottom:4px}
+    .stat-card-label{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+
+    /* FORM ELEMENTS */
+    .form-section{background:var(--card-bg,#fff);border:1px solid var(--border);padding:28px 32px;margin-bottom:20px}
+    .form-section-title{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--black);margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .form-group{margin-bottom:18px}
+    .form-group.full{grid-column:1/-1}
+    label{display:block;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+    input,textarea,select{width:100%;padding:12px 15px;border:1.5px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--black);outline:none;transition:border-color .2s}
+    input:focus,textarea:focus,select:focus{border-color:var(--black)}
+    input:disabled{background:var(--cream);color:var(--muted)}
+    textarea{resize:vertical;min-height:80px}
+    .save-btn{background:var(--black);color:var(--white);border:none;padding:13px 32px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:background .2s,transform .15s}
+    .save-btn:hover{background:var(--accent);transform:translateY(-1px)}
+    .save-btn.saved{background:var(--green)}
+
+    /* ORDERS TABLE */
+    .orders-table{width:100%;border-collapse:collapse}
+    .orders-table th{text-align:left;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:10px 14px;background:var(--cream);border-bottom:1px solid var(--border)}
+    .orders-table td{padding:14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+    .orders-table tr:hover td{background:rgba(247,231,206,.3)}
+    .order-status{display:inline-block;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .status-delivered{background:#e8f5ee;color:#1a5c30}
+    .status-shipped{background:#e8f0fe;color:#1a3a8f}
+    .status-processing{background:#fff3e0;color:#8a4500}
+    .order-id{font-family:'DM Sans',sans-serif;font-weight:700;color:var(--accent)}
+
+    /* EMPTY ORDERS */
+    .empty-orders{text-align:center;padding:60px 20px}
+    .empty-orders .empty-icon{font-size:52px;opacity:.3;margin-bottom:16px}
+    .empty-orders h3{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:8px}
+    .empty-orders p{color:var(--muted);font-size:14px;margin-bottom:24px}
+    .shop-now-btn{background:var(--black);color:var(--white);border:none;padding:13px 32px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:background .2s}
+    .shop-now-btn:hover{background:var(--accent)}
+
+    /* SUCCESS ALERT */
+    .alert{padding:12px 16px;font-size:13px;font-weight:500;margin-bottom:18px;display:none;align-items:center;gap:8px;border-left:3px solid var(--green);background:#e8f5ee;color:#1a5c30}
+    .alert.show{display:flex}
+
+    /* FOOTER */
+    footer{background:var(--black);color:rgba(255,242,225,.3);text-align:center;padding:24px;font-size:12px}
+
+    @media(max-width:900px){
+      nav,breadcrumb{padding:0 16px}
+      .account-page{grid-template-columns:1fr;padding:32px 16px 80px;gap:32px}
+      .account-sidebar{position:static}
+      .stats-row{grid-template-columns:1fr 1fr}
+      .form-grid{grid-template-columns:1fr}
+      .breadcrumb{padding:12px 16px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loader"></div>
+  <p>Loading your account…</p>
+</div>
+
+<!-- Nav -->
+<nav>
+  <a href="index.html" class="nav-logo">VYNE<span>IT</span></a>
+  <div class="nav-center">
+    <ul class="nav-links">
+      <li><a href="collections.html">Collections</a></li>
+    </ul>
+  </div>
+  <div class="nav-right">
+    <button class="cart-pill" onclick="window.location.href='cart.html'">
+      🛍 Cart <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+  <a href="index.html">Home</a>
+  <span>›</span>
+  <span class="current">My Account</span>
+</div>
+
+<!-- Account Page -->
+<div class="account-page">
+
+  <!-- Sidebar -->
+  <aside class="account-sidebar">
+    <div class="profile-card">
+      <div class="avatar" id="avatarInitials">?</div>
+      <div class="profile-name" id="sidebarName">Loading…</div>
+      <div class="profile-email" id="sidebarEmail"></div>
+    </div>
+    <ul class="sidebar-nav">
+      <li><a href="#" class="active" onclick="showPanel('overview',this,event)"><span class="nav-icon">🏠</span> Overview</a></li>
+      <li><a href="#" onclick="showPanel('orders',this,event)"><span class="nav-icon">📦</span> My Orders</a></li>
+      <li><a href="#" onclick="showPanel('profile',this,event)"><span class="nav-icon">👤</span> Edit Profile</a></li>
+      <li><a href="#" onclick="showPanel('address',this,event)"><span class="nav-icon">📍</span> Addresses</a></li>
+      <li><a href="#" onclick="showPanel('password',this,event)"><span class="nav-icon">🔒</span> Change Password</a></li>
+      <li><button class="logout-btn" onclick="handleLogout()"><span class="nav-icon">🚪</span> Sign Out</button></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="account-content">
+
+    <!-- Overview Panel -->
+    <div class="panel active" id="panel-overview">
+      <div class="panel-header">
+        <h2 class="panel-title">Welcome back, <em id="welcomeName">…</em></h2>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-card-num" id="totalOrders">0</div>
+          <div class="stat-card-label">Total Orders</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="cartItems">0</div>
+          <div class="stat-card-label">Items in Cart</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="memberSince">—</div>
+          <div class="stat-card-label">Member Since</div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Account Details</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <div style="font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Full Name</div>
+            <div style="font-size:15px;font-weight:600" id="detailName">—</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Email</div>
+            <div style="font-size:15px;font-weight:600" id="detailEmail">—</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Phone</div>
+            <div style="font-size:15px;font-weight:600" id="detailPhone">—</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Account ID</div>
+            <div style="font-size:12px;color:var(--muted);font-family:monospace" id="detailId">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Panel -->
+    <div class="panel" id="panel-orders">
+      <div class="panel-header">
+        <h2 class="panel-title">My <em>Orders</em></h2>
+      </div>
+      <div id="ordersContent">
+        <div class="empty-orders">
+          <div class="empty-icon">📦</div>
+          <h3>No orders yet</h3>
+          <p>Looks like you haven't placed any orders. Start shopping!</p>
+          <button class="shop-now-btn" onclick="window.location.href='collections.html'">Browse Collections →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Panel -->
+    <div class="panel" id="panel-profile">
+      <div class="panel-header">
+        <h2 class="panel-title">Edit <em>Profile</em></h2>
+      </div>
+      <div class="alert" id="profileAlert">✓ Profile updated successfully!</div>
+      <div class="form-section">
+        <div class="form-section-title">Personal Information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="editFirst" placeholder="Rahul"/>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="editLast" placeholder="Sharma"/>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="editEmail" disabled/>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="editPhone" placeholder="+91 99999 99999"/>
+          </div>
+        </div>
+        <button class="save-btn" id="saveProfileBtn" onclick="saveProfile()">Save Changes</button>
+      </div>
+    </div>
+
+    <!-- Address Panel -->
+    <div class="panel" id="panel-address">
+      <div class="panel-header">
+        <h2 class="panel-title">My <em>Addresses</em></h2>
+      </div>
+      <div class="alert" id="addressAlert">✓ Address saved successfully!</div>
+      <div class="form-section">
+        <div class="form-section-title">Default Shipping Address</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Street Address</label>
+            <input type="text" id="addrStreet" placeholder="123, MG Road"/>
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" id="addrCity" placeholder="New Delhi"/>
+          </div>
+          <div class="form-group">
+            <label>State</label>
+            <input type="text" id="addrState" placeholder="Delhi"/>
+          </div>
+          <div class="form-group">
+            <label>PIN Code</label>
+            <input type="text" id="addrPin" placeholder="110001"/>
+          </div>
+          <div class="form-group">
+            <label>Country</label>
+            <input type="text" id="addrCountry" value="India"/>
+          </div>
+        </div>
+        <button class="save-btn" id="saveAddressBtn" onclick="saveAddress()">Save Address</button>
+      </div>
+    </div>
+
+    <!-- Password Panel -->
+    <div class="panel" id="panel-password">
+      <div class="panel-header">
+        <h2 class="panel-title">Change <em>Password</em></h2>
+      </div>
+      <div class="alert" id="passwordAlert">✓ Password updated successfully!</div>
+      <div class="form-section">
+        <div class="form-section-title">Update Password</div>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" id="newPassword" placeholder="Min. 6 characters"/>
+        </div>
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <input type="password" id="confirmPassword" placeholder="Repeat new password"/>
+        </div>
+        <button class="save-btn" id="savePasswordBtn" onclick="savePassword()">Update Password</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer>© 2025 VYNEIT. All rights reserved.</footer>
+
+<script>
+  // ── Supabase Init ──────────────────────────────────────────
+  const { createClient } = supabase
+  const db = createClient(
+    'YOUR_SUPABASE_PROJECT_URL',   // ← Replace with your URL
+    'YOUR_SUPABASE_ANON_KEY'       // ← Replace with your anon key
+  )
+
+  // ── Cursor ─────────────────────────────────────────────────
+  const cursor = document.getElementById('cursor')
+  const ring   = document.getElementById('cursorRing')
+  let mx=0,my=0,rx=0,ry=0
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY})
+  ;(function loop(){
+    cursor.style.left=mx+'px';cursor.style.top=my+'px'
+    rx+=(mx-rx)*.12;ry+=(my-ry)*.12
+    ring.style.left=rx+'px';ring.style.top=ry+'px'
+    requestAnimationFrame(loop)
+  })()
+
+  // ── Cart Badge ─────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function(){
+    const cartData = JSON.parse(localStorage.getItem('vyneit_cart')||'[]')
+    const qty = cartData.reduce((s,i)=>s+i.qty,0)
+    const badgeEl = document.getElementById('cartBadge')
+    const itemsEl = document.getElementById('cartItems')
+    if(badgeEl) badgeEl.textContent = qty
+    if(itemsEl) itemsEl.textContent = qty
+  })
+
+  // ── Current User Data ──────────────────────────────────────
+  let currentUser = null
+  let currentProfile = null
+
+  // ── Load Account ───────────────────────────────────────────
+  async function loadAccount(){
+    const { data:{ session } } = await db.auth.getSession()
+
+    if(!session){
+      window.location.href = 'login.html'
+      return
+    }
+
+    currentUser = session.user
+    document.getElementById('loadingScreen').classList.add('hidden')
+
+    // Get profile from profiles table
+    const { data: profile } = await db
+      .from('profiles')
+      .select('*')
+      .eq('id', currentUser.id)
+      .single()
+
+    currentProfile = profile
+
+    const fullName  = profile?.full_name || currentUser.user_metadata?.full_name || 'Customer'
+    const firstName = fullName.split(' ')[0]
+    const email     = currentUser.email
+    const phone     = profile?.phone || currentUser.user_metadata?.phone || '—'
+    const joined    = new Date(currentUser.created_at)
+    const joinedStr = joined.toLocaleString('en-IN',{month:'short',year:'numeric'})
+
+    // Sidebar
+    document.getElementById('avatarInitials').textContent = fullName.substring(0,2).toUpperCase()
+    document.getElementById('sidebarName').textContent    = fullName
+    document.getElementById('sidebarEmail').textContent   = email
+
+    // Overview
+    document.getElementById('welcomeName').textContent = firstName
+    document.getElementById('memberSince').textContent  = joinedStr
+    document.getElementById('detailName').textContent   = fullName
+    document.getElementById('detailEmail').textContent  = email
+    document.getElementById('detailPhone').textContent  = phone
+    document.getElementById('detailId').textContent     = currentUser.id.substring(0,16)+'…'
+
+    // Profile form
+    const nameParts = fullName.split(' ')
+    document.getElementById('editFirst').value = nameParts[0] || ''
+    document.getElementById('editLast').value  = nameParts.slice(1).join(' ') || ''
+    document.getElementById('editEmail').value = email
+    document.getElementById('editPhone').value = phone !== '—' ? phone : ''
+
+    // Address form
+    if(profile?.address){
+      try{
+        const addr = JSON.parse(profile.address)
+        document.getElementById('addrStreet').value  = addr.street  || ''
+        document.getElementById('addrCity').value    = addr.city    || ''
+        document.getElementById('addrState').value   = addr.state   || ''
+        document.getElementById('addrPin').value     = addr.pin     || ''
+        document.getElementById('addrCountry').value = addr.country || 'India'
+      } catch(e){}
+    }
+
+    // Load orders count
+    const { count } = await db
+      .from('orders')
+      .select('*', { count:'exact', head:true })
+      .eq('user_id', currentUser.id)
+
+    document.getElementById('totalOrders').textContent = count || 0
+    loadOrders()
+  }
+
+  // ── Load Orders ────────────────────────────────────────────
+  async function loadOrders(){
+    const { data: orders } = await db
+      .from('orders')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false })
+
+    if(!orders || orders.length === 0) return
+
+    const html = `
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${orders.map(o=>`
+            <tr>
+              <td><span class="order-id">#${o.id.substring(0,8).toUpperCase()}</span></td>
+              <td>${new Date(o.created_at).toLocaleDateString('en-IN')}</td>
+              <td>${o.items_count || 1} item(s)</td>
+              <td>₹${o.total || 0}</td>
+              <td><span class="order-status status-${(o.status||'processing').toLowerCase()}">${o.status || 'Processing'}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`
+    document.getElementById('ordersContent').innerHTML = html
+  }
+
+  // ── Panel Switch ───────────────────────────────────────────
+  function showPanel(name, link, e){
+    if(e) e.preventDefault()
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'))
+    document.querySelectorAll('.sidebar-nav a').forEach(a=>a.classList.remove('active'))
+    document.getElementById('panel-'+name).classList.add('active')
+    if(link) link.classList.add('active')
+  }
+
+  // ── Save Profile ───────────────────────────────────────────
+  async function saveProfile(){
+    const btn       = document.getElementById('saveProfileBtn')
+    const firstName = document.getElementById('editFirst').value.trim()
+    const lastName  = document.getElementById('editLast').value.trim()
+    const phone     = document.getElementById('editPhone').value.trim()
+    const fullName  = (firstName+' '+lastName).trim()
+
+    btn.textContent = 'Saving…'
+    btn.disabled = true
+
+    const { error } = await db
+      .from('profiles')
+      .upsert({ id: currentUser.id, full_name: fullName, phone, email: currentUser.email })
+
+    btn.disabled = false
+
+    if(error){
+      btn.textContent = 'Save Changes'
+      alert('Error: '+error.message)
+    } else {
+      btn.textContent = '✓ Saved!'
+      btn.classList.add('saved')
+      document.getElementById('profileAlert').classList.add('show')
+      document.getElementById('sidebarName').textContent  = fullName
+      document.getElementById('avatarInitials').textContent = fullName.substring(0,2).toUpperCase()
+      document.getElementById('detailName').textContent   = fullName
+      document.getElementById('detailPhone').textContent  = phone
+      setTimeout(()=>{
+        btn.textContent='Save Changes'
+        btn.classList.remove('saved')
+        document.getElementById('profileAlert').classList.remove('show')
+      }, 2500)
+    }
+  }
+
+  // ── Save Address ───────────────────────────────────────────
+  async function saveAddress(){
+    const btn  = document.getElementById('saveAddressBtn')
+    const addr = {
+      street:  document.getElementById('addrStreet').value.trim(),
+      city:    document.getElementById('addrCity').value.trim(),
+      state:   document.getElementById('addrState').value.trim(),
+      pin:     document.getElementById('addrPin').value.trim(),
+      country: document.getElementById('addrCountry').value.trim()
+    }
+
+    btn.textContent = 'Saving…'
+    btn.disabled = true
+
+    const { error } = await db
+      .from('profiles')
+      .upsert({ id: currentUser.id, address: JSON.stringify(addr), email: currentUser.email })
+
+    btn.disabled = false
+
+    if(error){
+      btn.textContent = 'Save Address'
+      alert('Error: '+error.message)
+    } else {
+      btn.textContent = '✓ Saved!'
+      btn.classList.add('saved')
+      document.getElementById('addressAlert').classList.add('show')
+      setTimeout(()=>{
+        btn.textContent='Save Address'
+        btn.classList.remove('saved')
+        document.getElementById('addressAlert').classList.remove('show')
+      }, 2500)
+    }
+  }
+
+  // ── Change Password ────────────────────────────────────────
+  async function savePassword(){
+    const btn     = document.getElementById('savePasswordBtn')
+    const newPw   = document.getElementById('newPassword').value
+    const confirm = document.getElementById('confirmPassword').value
+
+    if(!newPw || newPw.length < 6) return alert('Password must be at least 6 characters')
+    if(newPw !== confirm) return alert('Passwords do not match')
+
+    btn.textContent = 'Updating…'
+    btn.disabled = true
+
+    const { error } = await db.auth.updateUser({ password: newPw })
+
+    btn.disabled = false
+
+    if(error){
+      btn.textContent = 'Update Password'
+      alert('Error: '+error.message)
+    } else {
+      btn.textContent = '✓ Updated!'
+      btn.classList.add('saved')
+      document.getElementById('passwordAlert').classList.add('show')
+      document.getElementById('newPassword').value = ''
+      document.getElementById('confirmPassword').value = ''
+      setTimeout(()=>{
+        btn.textContent='Update Password'
+        btn.classList.remove('saved')
+        document.getElementById('passwordAlert').classList.remove('show')
+      }, 2500)
+    }
+  }
+
+  // ── Logout ─────────────────────────────────────────────────
+  async function handleLogout(){
+    if(!confirm('Are you sure you want to sign out?')) return
+    await db.auth.signOut()
+    window.location.href = 'index.html'
+  }
+
+  // ── Init ───────────────────────────────────────────────────
+  loadAccount()
+</script>
+</body>
+</html>
