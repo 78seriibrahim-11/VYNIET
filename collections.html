@@ -61,10 +61,17 @@
     .coll-stat-label{font-size:11px;color:rgba(255,242,255,.35);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
 
     /* FILTER + SORT BAR */
-    .filter-bar{background:var(--white);border-bottom:1px solid var(--border);padding:16px 48px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:72px;z-index:100}
-    .filter-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .filter-label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:4px}
-    .filter-btn{background:var(--white);border:1.5px solid var(--border);padding:7px 16px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);transition:all .2s;white-space:nowrap}
+    .filter-bar{background:var(--white);border-bottom:1px solid var(--border);padding:14px 48px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;position:sticky;top:72px;z-index:100}
+    .filter-left{position:relative;display:flex;align-items:center;gap:10px}
+    .filter-toggle-btn{background:var(--white);border:1.5px solid var(--border);padding:8px 18px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--black);display:flex;align-items:center;gap:8px;transition:all .2s}
+    .filter-toggle-btn:hover{border-color:var(--black)}
+    .filter-toggle-btn.open{background:var(--black);color:var(--white);border-color:var(--black)}
+    .active-filter-label{background:var(--accent);color:var(--white);padding:2px 8px;font-size:10px;border-radius:2px;letter-spacing:.06em}
+    .toggle-arrow{font-size:11px;transition:transform .2s}
+    .filter-toggle-btn.open .toggle-arrow{transform:rotate(180deg)}
+    .filter-dropdown{display:none;position:absolute;top:calc(100% + 10px);left:0;background:var(--white);border:1.5px solid var(--border);padding:10px;flex-direction:column;gap:6px;min-width:180px;box-shadow:0 8px 32px rgba(16,44,38,.12);z-index:200}
+    .filter-dropdown.visible{display:flex}
+    .filter-btn{background:var(--white);border:1.5px solid var(--border);padding:8px 16px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);transition:all .2s;text-align:left}
     .filter-btn:hover,.filter-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
     .filter-right{display:flex;align-items:center;gap:12px}
     .sort-select{background:var(--white);border:1.5px solid var(--border);padding:7px 32px 7px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--black);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A79277' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .2s}
@@ -203,13 +210,17 @@
 <!-- Filter + Sort Bar -->
 <div class="filter-bar">
   <div class="filter-left">
-    <span class="filter-label">Filter:</span>
-    <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
-    <button class="filter-btn" onclick="filterProducts('men', this)">Men's</button>
-    <button class="filter-btn" onclick="filterProducts('women', this)">Women's</button>
-    <button class="filter-btn" onclick="filterProducts('graphic', this)">Graphic</button>
-    <button class="filter-btn" onclick="filterProducts('classic', this)">Classic</button>
-    <button class="filter-btn" onclick="filterProducts('sale', this)">Sale 🔥</button>
+    <button class="filter-toggle-btn" onclick="toggleFilters(this)" id="filterToggle">
+      ⚙ Filter <span class="active-filter-label" id="activeFilterLabel">All</span> <span class="toggle-arrow">▾</span>
+    </button>
+    <div class="filter-dropdown" id="filterDropdown">
+      <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
+      <button class="filter-btn" onclick="filterProducts('men', this)">Men's</button>
+      <button class="filter-btn" onclick="filterProducts('women', this)">Women's</button>
+      <button class="filter-btn" onclick="filterProducts('graphic', this)">Graphic</button>
+      <button class="filter-btn" onclick="filterProducts('classic', this)">Classic</button>
+      <button class="filter-btn" onclick="filterProducts('sale', this)">Sale 🔥</button>
+    </div>
   </div>
   <div class="filter-right">
     <span class="result-count" id="resultCount">16 products</span>
@@ -652,12 +663,37 @@
     setTimeout(()=>{btn.textContent='Add to Cart';btn.style.background='';},1500);
   }
 
+  // Toggle filter dropdown
+  function toggleFilters(btn){
+    const dropdown = document.getElementById('filterDropdown');
+    const isOpen = dropdown.classList.contains('visible');
+    dropdown.classList.toggle('visible', !isOpen);
+    btn.classList.toggle('open', !isOpen);
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e){
+    const bar = document.getElementById('filterToggle');
+    const dropdown = document.getElementById('filterDropdown');
+    if(!bar.contains(e.target) && !dropdown.contains(e.target)){
+      dropdown.classList.remove('visible');
+      bar.classList.remove('open');
+    }
+  });
+
   // Filter
   let currentFilter = 'all';
   function filterProducts(cat, btn){
     currentFilter = cat;
+    // Update active button
     document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
+    // Update label on toggle button
+    document.getElementById('activeFilterLabel').textContent = btn.textContent.replace('🔥','').trim();
+    // Close dropdown
+    document.getElementById('filterDropdown').classList.remove('visible');
+    document.getElementById('filterToggle').classList.remove('open');
+    // Show/hide cards
     const cards = document.querySelectorAll('.product-card');
     let visible = 0;
     cards.forEach((card,i)=>{
