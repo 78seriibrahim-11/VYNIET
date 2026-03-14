@@ -28,7 +28,7 @@
     body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring{width:52px;height:52px;border-color:var(--accent)}
 
     /* NAV */
-    nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;height:72px;display:grid;grid-template-columns:auto auto 1fr auto;align-items:center;gap:8px;padding:0 48px}
+    nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 48px}
     .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.08em;color:var(--black);text-decoration:none}
     .nav-logo span{color:var(--accent)}
     .nav-links{display:flex;gap:20px;list-style:none;justify-content:center;justify-content:center;}
@@ -86,7 +86,7 @@
     .contact-card strong{color:var(--white)}
 
     /* FOOTER */
-    footer{background:var(--black);color:var(--white);padding:40px 48px;display:grid;grid-template-columns:auto auto 1fr auto;align-items:center;gap:8px;flex-wrap:wrap;gap:16px}
+    footer{background:var(--black);color:var(--white);padding:40px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
     footer p{color:rgba(255,242,225,.35);font-size:12px}
     .footer-links{display:flex;gap:24px}
     .footer-links a{color:rgba(255,242,225,.5);font-size:12px;text-decoration:none;transition:color .2s}
@@ -196,13 +196,7 @@
 <!-- Nav -->
 <nav>
   <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()"><span></span><span></span><span></span></button><a href="index.html" class="nav-logo">VYNE<span>IT</span></a>
-  <ul class="nav-links">
-    <li><a href="collections.html">Collections</a></li>
-  </ul>
   <div class="nav-actions">
-    <button class="login-btn" id="loginNavBtn" onclick="window.location.href='login.html'">
-      👤 <span id="loginNavText">Login</span>
-    </button>
     <a href="cart.html" class="cart-btn">
       🛍 Cart
       <span class="cart-badge" id="cartBadge">0</span>
@@ -419,103 +413,83 @@
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  // Cursor
-  const cursor = document.getElementById('cursor');
-  const ring   = document.getElementById('cursorRing');
-  let mx=0,my=0,rx=0,ry=0;
-  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-  (function loop(){
-    cursor.style.left=mx+'px';cursor.style.top=my+'px';
-    rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
-    ring.style.left=rx+'px';ring.style.top=ry+'px';
-    requestAnimationFrame(loop);
-  })();
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ── Supabase ───────────────────────────────────────────────
+  const { createClient } = supabase
+  const _db = createClient(
+    'YOUR_SUPABASE_PROJECT_URL',
+    'YOUR_SUPABASE_ANON_KEY'
+  )
 
-  // Cart badge from localStorage
-  const cart = JSON.parse(localStorage.getItem('vyneit_cart')||'[]');
-  document.getElementById('cartBadge').textContent = cart.reduce((s,i)=>s+i.qty,0);
+  document.addEventListener('DOMContentLoaded', function(){
 
-  // Sidebar active highlight on scroll
-  const sections = document.querySelectorAll('.policy-section');
-  const links    = document.querySelectorAll('.sidebar-nav a');
-  window.addEventListener('scroll',()=>{
-    let cu
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const { createClient } = supabase
-    const _db = createClient(
-      'YOUR_SUPABASE_PROJECT_URL',
-      'YOUR_SUPABASE_ANON_KEY'
-    )
-      // ── DRAWER ─────────────────────────────────────────────────
-  function openDrawer(){
-    document.getElementById('sideDrawer').classList.add('open')
-    document.getElementById('drawerOverlay').classList.add('show')
-    document.getElementById('hamburgerBtn').classList.add('open')
-    document.body.style.overflow='hidden'
-  }
-  function closeDrawer(){
-    document.getElementById('sideDrawer').classList.remove('open')
-    document.getElementById('drawerOverlay').classList.remove('show')
-    document.getElementById('hamburgerBtn').classList.remove('open')
-    document.body.style.overflow=''
-  }
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer() })
-
-  async function handleDrawerLogout(){
-    if(!confirm('Sign out of VYNEIT?')) return
-    await _db.auth.signOut()
-    window.location.href='index.html'
-  }
-
-  // ── AUTH CHECK (drawer + login btn) ───────────────────────
-  ;(async function initAuth(){
-    let session = null
-    try{
-      const res = await _db.auth.getSession()
-      session = res.data.session
-    } catch(e){}
-
-    // Update login button in nav
-    const loginBtn  = document.getElementById('loginNavBtn')
-    const loginText = document.getElementById('loginNavText')
-    if(loginBtn){
-      if(session){
-        loginBtn.style.display = 'none'  // hide login btn when logged in
-      }
+    // ── Cursor ───────────────────────────────────────────────
+    const cursor = document.getElementById('cursor')
+    const ring   = document.getElementById('cursorRing')
+    if(cursor && ring){
+      let mx=0,my=0,rx=0,ry=0
+      document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY})
+      ;(function loop(){
+        cursor.style.left=mx+'px'; cursor.style.top=my+'px'
+        rx+=(mx-rx)*.12; ry+=(my-ry)*.12
+        ring.style.left=rx+'px'; ring.style.top=ry+'px'
+        requestAnimationFrame(loop)
+      })()
     }
 
-    // Update drawer
-    if(session){
+    // ── Cart badge ───────────────────────────────────────────
+    const cart = JSON.parse(localStorage.getItem('vyneit_cart')||'[]')
+    const badge = document.getElementById('cartBadge')
+    if(badge) badge.textContent = cart.reduce((s,i)=>s+i.qty,0)
+
+    // ── Sidebar scroll highlight ─────────────────────────────
+    const sections = document.querySelectorAll('.policy-section')
+    const links    = document.querySelectorAll('.sidebar-nav a')
+    window.addEventListener('scroll',()=>{
+      let current = ''
+      sections.forEach(s=>{ if(window.scrollY >= s.offsetTop-120) current=s.id })
+      links.forEach(l=>{ l.classList.toggle('active', l.getAttribute('href')==='#'+current) })
+    })
+
+    // ── Drawer ───────────────────────────────────────────────
+    window.openDrawer  = function(){ document.getElementById('sideDrawer').classList.add('open'); document.getElementById('drawerOverlay').classList.add('show'); document.getElementById('hamburgerBtn').classList.add('open'); document.body.style.overflow='hidden' }
+    window.closeDrawer = function(){ document.getElementById('sideDrawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('show'); document.getElementById('hamburgerBtn').classList.remove('open'); document.body.style.overflow='' }
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer() })
+
+    window.handleDrawerLogout = async function(){
+      if(!confirm('Sign out of VYNEIT?')) return
+      await _db.auth.signOut()
+      window.location.href='index.html'
+    }
+}) // DOMContentLoaded
+
+  // ── AUTH STATE ────────────────────────────────────────────
+  _db.auth.onAuthStateChange(async (event, session) => {
+    const loggedInEl  = document.getElementById('drawerLoggedIn')
+    const loggedOutEl = document.getElementById('drawerLoggedOut')
+    const authMenu    = document.getElementById('drawerAuthMenu')
+    const guestMenu   = document.getElementById('drawerGuestMenu')
+    if(!loggedInEl) return
+    if(session && session.user){
       const user = session.user
-      const { data: profile } = await _db.from('profiles').select('full_name,email').eq('id',user.id).single()
-      const name  = profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0]
-      const email = user.email
-      const initials = name.substring(0,2).toUpperCase()
-
-      document.getElementById('drawerLoggedIn').style.display  = 'block'
-      document.getElementById('drawerLoggedOut').style.display = 'none'
-      document.getElementById('drawerAuthMenu').style.display  = 'block'
-      document.getElementById('drawerGuestMenu').style.display = 'none'
-      document.getElementById('drawerAvatar').textContent = initials
-      document.getElementById('drawerName').textContent   = name
-      document.getElementById('drawerEmail').textContent  = email
+      let name = user.user_metadata?.full_name || user.email.split('@')[0]
+      try {
+        const { data: p } = await _db.from('profiles').select('full_name').eq('id',user.id).single()
+        if(p?.full_name) name = p.full_name
+      } catch(e){}
+      loggedInEl.style.display='block'; loggedOutEl.style.display='none'
+      authMenu.style.display='block';   guestMenu.style.display='none'
+      const a=document.getElementById('drawerAvatar'), n=document.getElementById('drawerName'), em=document.getElementById('drawerEmail')
+      if(a) a.textContent=name.substring(0,2).toUpperCase()
+      if(n) n.textContent=name
+      if(em) em.textContent=user.email
+    } else {
+      loggedInEl.style.display='none'; loggedOutEl.style.display='block'
+      authMenu.style.display='none';   guestMenu.style.display='block'
     }
-  })()
+  })
 
-
-  ;(async function checkAuth(){
-      const { data:{ session } } = await _db.auth.getSession()
-      const btn  = document.getElementById('loginNavBtn')
-      const text = document.getElementById('loginNavText')
-      if(!btn) return
-      if(session){
-        text.textContent = 'My Account'
-        btn.onclick = ()=>{ window.location.href='account.html' }
-      }
-    })()
-  </script>
+</script>
 </body>
 </html>
