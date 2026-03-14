@@ -668,7 +668,7 @@
           <span class="product-badge new-tag">New</span>
           <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&auto=format&fit=crop&q=80" alt="Classic White Tee"/>
           <div class="product-actions">
-            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Essential White Crew" data-price="599" data-img="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
             <button class="wishlist-btn">♡</button>
           </div>
         </div>
@@ -689,7 +689,7 @@
           <span class="product-badge sale">Sale 20%</span>
           <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&auto=format&fit=crop&q=80" alt="Graphic Tee"/>
           <div class="product-actions">
-            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Urban Print Oversized" data-price="799" data-img="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
             <button class="wishlist-btn">♡</button>
           </div>
         </div>
@@ -709,7 +709,7 @@
         <div class="product-img-wrap">
           <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&auto=format&fit=crop&q=80" alt="Vintage Tee"/>
           <div class="product-actions">
-            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Faded Retro Wash" data-price="699" data-img="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
             <button class="wishlist-btn">♡</button>
           </div>
         </div>
@@ -730,7 +730,7 @@
           <span class="product-badge">Limited</span>
           <img src="https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=600&auto=format&fit=crop&q=80" alt="Premium Tee"/>
           <div class="product-actions">
-            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Heavyweight Drop-Shoulder" data-price="999" data-img="https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
             <button class="wishlist-btn">♡</button>
           </div>
         </div>
@@ -783,7 +783,7 @@
           <span class="product-badge new-tag">New</span>
           <img src="https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&auto=format&fit=crop&q=80" alt="Tie Dye"/>
           <div class="product-actions">
-            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Hand-Dyed Spiral" data-price="849" data-img="https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
             <button class="wishlist-btn">♡</button>
           </div>
         </div>
@@ -803,7 +803,7 @@
           <span class="product-badge new-tag">New</span>
           <img src="https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&auto=format&fit=crop&q=80" alt="Stripe Tee"/>
           <div class="product-actions">
-            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Breton Stripe Crew" data-price="649" data-img="https://images.unsplash.com/photo-1562157873-818bc0726f68?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
             <button class="wishlist-btn">♡</button>
           </div>
         </div>
@@ -822,7 +822,7 @@
         <div class="product-img-wrap">
           <img src="https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&auto=format&fit=crop&q=80" alt="V-Neck"/>
           <div class="product-actions">
-            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Clean Slate V-Neck" data-price="499" data-img="https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
             <button class="wishlist-btn">♡</button>
           </div>
         </div>
@@ -843,7 +843,7 @@
           <span class="product-badge sale">15% Off</span>
           <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=600&auto=format&fit=crop&q=80" alt="Logo Tee"/>
           <div class="product-actions">
-            <button class="add-cart-btn" onclick="addToCart(this)">Add to Cart</button>
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Big Logo Boxy Fit" data-price="749" data-img="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
             <button class="wishlist-btn">♡</button>
           </div>
         </div>
@@ -1017,14 +1017,42 @@
       requestAnimationFrame(animCursor);
     })();
 
-    // Add to cart
+    // Add to cart — saves to localStorage so cart page can read it
     function addToCart(btn){
-      const count = document.getElementById('cartCount');
-      count.textContent = parseInt(count.textContent)+1;
+      const name  = btn.dataset.name;
+      const price = parseInt(btn.dataset.price);
+      const img   = btn.dataset.img;
+
+      // Load existing cart
+      let cart = JSON.parse(localStorage.getItem('vyneit_cart') || '[]');
+
+      // If product already in cart, increase qty
+      const existing = cart.find(i => i.name === name);
+      if(existing){
+        existing.qty += 1;
+      } else {
+        cart.push({ id: 'item-' + Date.now(), name, price, img, qty: 1 });
+      }
+
+      // Save back
+      localStorage.setItem('vyneit_cart', JSON.stringify(cart));
+
+      // Update badge count
+      const total = cart.reduce((s,i) => s + i.qty, 0);
+      document.getElementById('cartCount').textContent = total;
+
+      // Button feedback
       btn.textContent = '✓ Added!';
       btn.style.background = '#27ae60';
-      setTimeout(()=>{btn.textContent='Add to Cart';btn.style.background='';},1500);
+      setTimeout(()=>{ btn.textContent='Add to Cart'; btn.style.background=''; }, 1500);
     }
+
+    // Load cart count from localStorage on page load
+    (function loadCartCount(){
+      const cart = JSON.parse(localStorage.getItem('vyneit_cart') || '[]');
+      const total = cart.reduce((s,i) => s + i.qty, 0);
+      document.getElementById('cartCount').textContent = total;
+    })();
 
     // Scroll reveal
     const observer = new IntersectionObserver(entries=>{
