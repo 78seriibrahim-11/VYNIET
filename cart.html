@@ -728,44 +728,7 @@
     await _db.auth.signOut()
     window.location.href='index.html'
   }
-
-  // ── AUTH CHECK (drawer + login btn) ───────────────────────
-  ;(async function initAuth(){
-    let session = null
-    try{
-      const res = await _db.auth.getSession()
-      session = res.data.session
-    } catch(e){}
-
-    // Update login button in nav
-    const loginBtn  = document.getElementById('loginNavBtn')
-    const loginText = document.getElementById('loginNavText')
-    if(loginBtn){
-      if(session){
-        loginBtn.style.display = 'none'  // hide login btn when logged in
-      }
-    }
-
-    // Update drawer
-    if(session){
-      const user = session.user
-      const { data: profile } = await _db.from('profiles').select('full_name,email').eq('id',user.id).single()
-      const name  = profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0]
-      const email = user.email
-      const initials = name.substring(0,2).toUpperCase()
-
-      document.getElementById('drawerLoggedIn').style.display  = 'block'
-      document.getElementById('drawerLoggedOut').style.display = 'none'
-      document.getElementById('drawerAuthMenu').style.display  = 'block'
-      document.getElementById('drawerGuestMenu').style.display = 'none'
-      document.getElementById('drawerAvatar').textContent = initials
-      document.getElementById('drawerName').textContent   = name
-      document.getElementById('drawerEmail').textContent  = email
-    }
-  })()
-
-
-  ;(async function checkAuth(){
+;(async function checkAuth(){
       const { data:{ session } } = await _db.auth.getSession()
       const btn  = document.getElementById('loginNavBtn')
       const text = document.getElementById('loginNavText')
@@ -775,6 +738,46 @@
         btn.onclick = ()=>{ window.location.href='account.html' }
       }
     })()
+
+  // ── AUTH STATE (fires immediately & on every change) ──────
+  _db.auth.onAuthStateChange(async (event, session) => {
+    const loggedInEl  = document.getElementById('drawerLoggedIn')
+    const loggedOutEl = document.getElementById('drawerLoggedOut')
+    const authMenu    = document.getElementById('drawerAuthMenu')
+    const guestMenu   = document.getElementById('drawerGuestMenu')
+
+    if(!loggedInEl) return  // drawer not on this page
+
+    if(session && session.user){
+      const user = session.user
+      let name = user.user_metadata?.full_name || user.email.split('@')[0]
+
+      // Try getting name from profiles table
+      try {
+        const { data: profile } = await _db.from('profiles').select('full_name').eq('id', user.id).single()
+        if(profile?.full_name) name = profile.full_name
+      } catch(e){}
+
+      loggedInEl.style.display  = 'block'
+      loggedOutEl.style.display = 'none'
+      authMenu.style.display    = 'block'
+      guestMenu.style.display   = 'none'
+
+      const avatar = document.getElementById('drawerAvatar')
+      const dName  = document.getElementById('drawerName')
+      const dEmail = document.getElementById('drawerEmail')
+      if(avatar) avatar.textContent = name.substring(0,2).toUpperCase()
+      if(dName)  dName.textContent  = name
+      if(dEmail) dEmail.textContent = user.email
+
+    } else {
+      loggedInEl.style.display  = 'none'
+      loggedOutEl.style.display = 'block'
+      authMenu.style.display    = 'none'
+      guestMenu.style.display   = 'block'
+    }
+  })
+
   </script>
 </body>
 </html>
