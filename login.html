@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VYNEIT — Login / Sign Up</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{max-width:100vw;overflow-x:hidden;height:100%}
+    :root{
+      --black:#102C26;--white:#FFF2E1;--cream:#F7E7CE;
+      --accent:#A79277;--accent2:#8a7560;--muted:#7a6e62;
+      --border:#e0d4be;--green:#2e7d4f;--red:#c0392b;
+    }
+    body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--black);cursor:none;min-height:100vh;display:flex;flex-direction:column}
+
+    /* CURSOR */
+    .cursor{width:12px;height:12px;background:var(--accent);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+    .cursor-ring{width:36px;height:36px;border:1.5px solid var(--black);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .2s}
+    body:has(a:hover) .cursor,body:has(button:hover) .cursor{width:20px;height:20px}
+    body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring{width:52px;height:52px;border-color:var(--accent)}
+
+    /* NAV */
+    nav{background:var(--white);border-bottom:1px solid var(--border);height:72px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:0 48px}
+    .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.08em;color:var(--black);text-decoration:none}
+    .nav-logo span{color:var(--accent)}
+    .nav-center{display:flex;justify-content:center}
+    .nav-links{display:flex;gap:28px;list-style:none;justify-content:center}
+    .nav-links a{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--black);padding-bottom:3px;border-bottom:1.5px solid transparent;transition:all .2s;text-decoration:none}
+    .nav-links a:hover{border-color:var(--accent);color:var(--accent)}
+    .cart-pill{background:var(--black);color:var(--white);border:none;padding:10px 20px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:8px;transition:background .2s;text-decoration:none;cursor:none}
+    .cart-pill:hover{background:var(--accent)}
+    .cart-badge{background:var(--accent);color:var(--white);border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+    /* MAIN LAYOUT */
+    .auth-page{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 72px)}
+
+    /* LEFT PANEL */
+    .auth-left{background:var(--black);padding:72px 64px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+    .auth-left::before{content:'VYNEIT';font-family:'Bebas Neue',sans-serif;font-size:180px;color:rgba(167,146,119,.06);position:absolute;bottom:-20px;left:-10px;line-height:1;pointer-events:none;white-space:nowrap}
+    .auth-left-tag{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:20px}
+    .auth-left h1{font-family:'DM Serif Display',serif;font-size:clamp(40px,5vw,64px);color:var(--white);line-height:1.05;margin-bottom:20px}
+    .auth-left h1 em{font-style:italic;color:var(--accent)}
+    .auth-left p{color:rgba(255,242,225,.45);font-size:15px;line-height:1.75;max-width:360px;margin-bottom:40px;font-weight:300}
+    .perks{display:flex;flex-direction:column;gap:14px}
+    .perk{display:flex;align-items:center;gap:14px;color:rgba(255,242,225,.7);font-size:14px}
+    .perk-icon{width:36px;height:36px;background:rgba(167,146,119,.15);border:1px solid rgba(167,146,119,.25);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+
+    /* RIGHT PANEL — FORM */
+    .auth-right{background:var(--white);display:flex;align-items:center;justify-content:center;padding:48px 32px}
+    .auth-card{width:100%;max-width:420px}
+
+    /* TABS */
+    .auth-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:36px}
+    .auth-tab{flex:1;padding:14px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;color:var(--muted);transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-2px}
+    .auth-tab.active{color:var(--black);border-color:var(--black)}
+    .auth-tab:hover{color:var(--black)}
+
+    /* FORMS */
+    .auth-form{display:none}
+    .auth-form.active{display:block}
+    .form-title{font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:8px;color:var(--black)}
+    .form-subtitle{font-size:14px;color:var(--muted);margin-bottom:28px;font-weight:300}
+
+    .form-group{margin-bottom:18px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    label{display:block;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+    input{width:100%;padding:13px 16px;border:1.5px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--black);outline:none;transition:border-color .2s}
+    input:focus{border-color:var(--black)}
+    input.error{border-color:var(--red)}
+    input::placeholder{color:#bbb}
+    .input-wrap{position:relative}
+    .toggle-pw{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:16px;color:var(--muted);padding:0;line-height:1}
+    .toggle-pw:hover{color:var(--black)}
+
+    /* FORGOT */
+    .forgot-link{display:block;text-align:right;font-size:12px;color:var(--accent);text-decoration:underline;text-underline-offset:3px;margin-top:-10px;margin-bottom:18px;cursor:none}
+    .forgot-link:hover{color:var(--accent2)}
+
+    /* SUBMIT BTN */
+    .submit-btn{width:100%;background:var(--black);color:var(--white);border:none;padding:16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;transition:background .2s,transform .15s;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:10px}
+    .submit-btn:hover{background:var(--accent);transform:translateY(-1px)}
+    .submit-btn:disabled{background:#ccc;transform:none;cursor:not-allowed}
+    .btn-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:none}
+    .submit-btn.loading .btn-spinner{display:block}
+    .submit-btn.loading .btn-text{display:none}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* DIVIDER */
+    .divider{display:flex;align-items:center;gap:12px;margin:22px 0;color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* GOOGLE BTN */
+    .google-btn{width:100%;background:var(--white);border:1.5px solid var(--border);padding:13px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--black);display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color .2s,background .2s}
+    .google-btn:hover{border-color:var(--black);background:var(--cream)}
+    .google-icon{width:18px;height:18px}
+
+    /* ALERT */
+    .alert{padding:12px 16px;font-size:13px;font-weight:500;margin-bottom:18px;display:none;align-items:center;gap:8px;border-radius:0}
+    .alert.show{display:flex}
+    .alert.success{background:#e8f5ee;border-left:3px solid var(--green);color:#1a5c30}
+    .alert.error{background:#fdecea;border-left:3px solid var(--red);color:#8b1a1a}
+
+    /* TERMS */
+    .terms-text{font-size:12px;color:var(--muted);margin-top:16px;text-align:center;line-height:1.6}
+    .terms-text a{color:var(--accent);text-decoration:underline}
+
+    /* PASSWORD STRENGTH */
+    .pw-strength{margin-top:6px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+    .pw-strength-bar{height:100%;width:0%;transition:width .3s,background .3s;border-radius:2px}
+
+    /* FOOTER */
+    footer{background:var(--black);color:rgba(255,242,225,.3);text-align:center;padding:20px;font-size:12px}
+    footer a{color:var(--accent);margin:0 8px;text-decoration:none}
+
+    @media(max-width:768px){
+      .auth-page{grid-template-columns:1fr}
+      .auth-left{display:none}
+      nav{padding:0 16px}
+      .nav-links{gap:12px}
+      .nav-links a{font-size:11px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Nav -->
+<nav>
+  <a href="index.html" class="nav-logo">VYNE<span>IT</span></a>
+  <div class="nav-center">
+    <ul class="nav-links">
+      <li><a href="collections.html">Collections</a></li>
+    </ul>
+  </div>
+  <a href="cart.html" class="cart-pill">
+    🛍 Cart <span class="cart-badge" id="cartBadge">0</span>
+  </a>
+</nav>
+
+<!-- Auth Page -->
+<div class="auth-page">
+
+  <!-- Left: Brand Panel -->
+  <div class="auth-left">
+    <div class="auth-left-tag">✦ Welcome to VYNEIT</div>
+    <h1>Your Style,<br>Your <em>Account</em></h1>
+    <p>Join thousands of customers who shop premium organic tees. Track orders, save favourites, and checkout faster.</p>
+    <div class="perks">
+      <div class="perk"><div class="perk-icon">📦</div>Track all your orders in one place</div>
+      <div class="perk"><div class="perk-icon">⚡</div>Faster checkout — saved addresses</div>
+      <div class="perk"><div class="perk-icon">🎁</div>Exclusive member-only offers</div>
+      <div class="perk"><div class="perk-icon">♡</div>Save your wishlist forever</div>
+    </div>
+  </div>
+
+  <!-- Right: Form -->
+  <div class="auth-right">
+    <div class="auth-card">
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">Login</button>
+        <button class="auth-tab" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert" id="alertBox">
+        <span id="alertIcon">✓</span>
+        <span id="alertMsg"></span>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div class="auth-form active" id="loginForm">
+        <div class="form-title">Welcome back</div>
+        <div class="form-subtitle">Enter your email and password to sign in</div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password"/>
+            <button class="toggle-pw" onclick="togglePassword('loginPassword', this)">👁</button>
+          </div>
+        </div>
+        <a href="#" class="forgot-link" onclick="forgotPassword(event)">Forgot password?</a>
+
+        <button class="submit-btn" id="loginBtn" onclick="handleLogin()">
+          <span class="btn-text">Sign In →</span>
+          <div class="btn-spinner"></div>
+        </button>
+
+        <div class="divider">or</div>
+        <button class="google-btn" onclick="handleGoogleLogin()">
+          <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+
+        <p class="terms-text">Don't have an account? <a href="#" onclick="switchTab('signup')">Sign up free</a></p>
+      </div>
+
+      <!-- SIGNUP FORM -->
+      <div class="auth-form" id="signupForm">
+        <div class="form-title">Create account</div>
+        <div class="form-subtitle">Join VYNEIT and start shopping</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="signupFirst" placeholder="Rahul" autocomplete="given-name"/>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="signupLast" placeholder="Sharma" autocomplete="family-name"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="signupPhone" placeholder="+91 99999 99999" autocomplete="tel"/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <input type="password" id="signupPassword" placeholder="Min. 6 characters" oninput="checkPasswordStrength(this.value)" autocomplete="new-password"/>
+            <button class="toggle-pw" onclick="togglePassword('signupPassword', this)">👁</button>
+          </div>
+          <div class="pw-strength"><div class="pw-strength-bar" id="pwBar"></div></div>
+        </div>
+
+        <button class="submit-btn" id="signupBtn" onclick="handleSignup()">
+          <span class="btn-text">Create Account →</span>
+          <div class="btn-spinner"></div>
+        </button>
+
+        <div class="divider">or</div>
+        <button class="google-btn" onclick="handleGoogleLogin()">
+          <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+
+        <p class="terms-text">By signing up you agree to our <a href="privacy-policy.html">Privacy Policy</a>.<br>Already have an account? <a href="#" onclick="switchTab('login')">Sign in</a></p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  © 2025 VYNEIT. All rights reserved.
+  <a href="privacy-policy.html">Privacy</a>
+  <a href="index.html">Shop</a>
+</footer>
+
+<script>
+  // ── Supabase Init ──────────────────────────────────────────
+  const { createClient } = supabase
+  const db = createClient(
+    'YOUR_SUPABASE_PROJECT_URL',   // ← Replace with your URL
+    'YOUR_SUPABASE_ANON_KEY'       // ← Replace with your anon key
+  )
+
+  // ── Cursor ─────────────────────────────────────────────────
+  const cursor = document.getElementById('cursor')
+  const ring   = document.getElementById('cursorRing')
+  let mx=0,my=0,rx=0,ry=0
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY})
+  ;(function loop(){
+    cursor.style.left=mx+'px';cursor.style.top=my+'px'
+    rx+=(mx-rx)*.12;ry+=(my-ry)*.12
+    ring.style.left=rx+'px';ring.style.top=ry+'px'
+    requestAnimationFrame(loop)
+  })()
+
+  // ── Cart Badge ─────────────────────────────────────────────
+  const cart = JSON.parse(localStorage.getItem('vyneit_cart')||'[]')
+  document.getElementById('cartBadge').textContent = cart.reduce((s,i)=>s+i.qty,0)
+
+  // ── Tab Switch ─────────────────────────────────────────────
+  function switchTab(tab){
+    document.querySelectorAll('.auth-tab').forEach((t,i)=>{
+      t.classList.toggle('active', (tab==='login'&&i===0)||(tab==='signup'&&i===1))
+    })
+    document.getElementById('loginForm').classList.toggle('active', tab==='login')
+    document.getElementById('signupForm').classList.toggle('active', tab==='signup')
+    hideAlert()
+  }
+
+  // ── Alert ──────────────────────────────────────────────────
+  function showAlert(msg, type='error'){
+    const box = document.getElementById('alertBox')
+    document.getElementById('alertMsg').textContent = msg
+    document.getElementById('alertIcon').textContent = type==='success' ? '✓' : '✕'
+    box.className = 'alert show '+type
+    box.scrollIntoView({behavior:'smooth', block:'nearest'})
+  }
+  function hideAlert(){ document.getElementById('alertBox').className='alert' }
+
+  // ── Loading State ──────────────────────────────────────────
+  function setLoading(btnId, loading){
+    const btn = document.getElementById(btnId)
+    btn.classList.toggle('loading', loading)
+    btn.disabled = loading
+  }
+
+  // ── Password Toggle ────────────────────────────────────────
+  function togglePassword(inputId, btn){
+    const input = document.getElementById(inputId)
+    const isText = input.type === 'text'
+    input.type = isText ? 'password' : 'text'
+    btn.textContent = isText ? '👁' : '🙈'
+  }
+
+  // ── Password Strength ──────────────────────────────────────
+  function checkPasswordStrength(pw){
+    const bar = document.getElementById('pwBar')
+    let strength = 0
+    if(pw.length >= 6) strength++
+    if(pw.length >= 10) strength++
+    if(/[A-Z]/.test(pw)) strength++
+    if(/[0-9]/.test(pw)) strength++
+    if(/[^A-Za-z0-9]/.test(pw)) strength++
+    const pct = (strength/5)*100
+    bar.style.width = pct+'%'
+    bar.style.background = pct<40 ? '#e74c3c' : pct<70 ? '#f39c12' : '#27ae60'
+  }
+
+  // ── Login ──────────────────────────────────────────────────
+  async function handleLogin(){
+    hideAlert()
+    const email    = document.getElementById('loginEmail').value.trim()
+    const password = document.getElementById('loginPassword').value
+
+    if(!email){ return showAlert('Please enter your email address') }
+    if(!password){ return showAlert('Please enter your password') }
+
+    setLoading('loginBtn', true)
+
+    const { data, error } = await db.auth.signInWithPassword({ email, password })
+
+    setLoading('loginBtn', false)
+
+    if(error){
+      if(error.message.includes('Invalid login')) showAlert('Wrong email or password. Please try again.')
+      else showAlert(error.message)
+    } else {
+      showAlert('Welcome back! Redirecting...', 'success')
+      setTimeout(()=>{ window.location.href = 'account.html' }, 1200)
+    }
+  }
+
+  // ── Sign Up ────────────────────────────────────────────────
+  async function handleSignup(){
+    hideAlert()
+    const firstName = document.getElementById('signupFirst').value.trim()
+    const lastName  = document.getElementById('signupLast').value.trim()
+    const email     = document.getElementById('signupEmail').value.trim()
+    const phone     = document.getElementById('signupPhone').value.trim()
+    const password  = document.getElementById('signupPassword').value
+
+    if(!firstName){ return showAlert('Please enter your first name') }
+    if(!email){ return showAlert('Please enter your email address') }
+    if(!password || password.length < 6){ return showAlert('Password must be at least 6 characters') }
+
+    setLoading('signupBtn', true)
+
+    const { data, error } = await db.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: firstName+' '+lastName,
+          phone: phone
+        }
+      }
+    })
+
+    setLoading('signupBtn', false)
+
+    if(error){
+      if(error.message.includes('already registered')) showAlert('This email is already registered. Please login instead.')
+      else showAlert(error.message)
+    } else {
+      // Save extra profile info to profiles table
+      if(data.user){
+        await db.from('profiles').upsert({
+          id:         data.user.id,
+          full_name:  firstName+' '+lastName,
+          phone:      phone,
+          email:      email
+        })
+      }
+      showAlert('Account created! Please check your email to verify.', 'success')
+      setTimeout(()=>{ switchTab('login') }, 2500)
+    }
+  }
+
+  // ── Google Login ───────────────────────────────────────────
+  async function handleGoogleLogin(){
+    await db.auth.signInWithOAuth({
+      provider: 'google',
+      options:  { redirectTo: window.location.origin+'/account.html' }
+    })
+  }
+
+  // ── Forgot Password ────────────────────────────────────────
+  async function forgotPassword(e){
+    e.preventDefault()
+    const email = document.getElementById('loginEmail').value.trim()
+    if(!email){ return showAlert('Enter your email address above first') }
+    const { error } = await db.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin+'/login.html'
+    })
+    if(error) showAlert(error.message)
+    else showAlert('Password reset email sent! Check your inbox.', 'success')
+  }
+
+  // ── Check if already logged in ────────────────────────────
+  ;(async function(){
+    const { data:{ session } } = await db.auth.getSession()
+    if(session) window.location.href = 'account.html'
+  })()
+
+  // ── Enter key support ─────────────────────────────────────
+  document.addEventListener('keydown', e=>{
+    if(e.key !== 'Enter') return
+    const loginActive = document.getElementById('loginForm').classList.contains('active')
+    if(loginActive) handleLogin()
+    else handleSignup()
+  })
+</script>
+</body>
+</html>
