@@ -633,23 +633,24 @@
     }
   }
 
-  function applyPromo(){
-    const code = document.getElementById('promoInput').value.trim().toUpperCase();
-    if(code===PROMO_CODE){
-      promoApplied=true;
-      document.getElementById('promoSuccess').classList.add('show');
-      document.getElementById('promoInput').style.borderColor='var(--green)';
-      document.querySelector('.promo-apply-btn').textContent='✓ Applied';
-      document.querySelector('.promo-apply-btn').style.background='var(--green)';
-      updateTotal();
-    } else {
-      document.getElementById('promoInput').style.borderColor='var(--red)';
-      document.getElementById('promoInput').style.animation='shake .3s ease';
-      setTimeout(()=>{
-        document.getElementById('promoInput').style.borderColor='';
-        document.getElementById('promoInput').style.animation='';
-      },600);
-    }
+  async function applyCoupon() {
+
+const code = document.getElementById("couponInput").value.trim()
+
+const { data, error } = await supabase
+.from("coupons")
+.select("*")
+.eq("code", code)
+.single()
+
+if(error || !data){
+alert("Invalid coupon")
+return
+}
+
+alert("Coupon applied: " + data.discount + "% discount")
+
+}
   }
 
   // Allow Enter key for promo
