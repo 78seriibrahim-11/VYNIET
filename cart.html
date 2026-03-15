@@ -339,12 +339,12 @@
     <div class="promo-section" id="promoSection">
       <div class="promo-label">Promo Code</div>
       <div class="promo-row">
-        <input class="promo-input" id="promoInput" type="text" placeholder="Enter discount code…"/>
-        <button class="promo-apply-btn" onclick="applyPromo()">Apply</button>
+        <input class="promo-input" id="promoInput" type="text" placeholder="Enter discount code…" style="text-transform:uppercase"/>
+        <button class="promo-apply-btn" id="promoApplyBtn" onclick="applyPromo()">Apply</button>
+        <button id="promoRemoveBtn" onclick="removeCoupon()" style="display:none;background:var(--red);color:white;border:none;padding:13px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .2s" title="Remove coupon">✕</button>
       </div>
-      <div class="promo-success" id="promoSuccess">
-        ✅ Code <b style="margin:0 4px">THREAD15</b> applied — 15% off!
-      </div>
+      <div class="promo-success" id="promoSuccess"></div>
+      <div id="promoError" style="display:none;margin-top:10px;color:var(--red);font-size:13px;font-weight:600"></div>
     </div>
 
     <!-- Upsell -->
@@ -412,7 +412,7 @@
         <span class="value" id="summarySubtotal">₹0</span>
       </div>
       <div class="summary-row" id="discountRow" style="display:none">
-        <span class="label">Discount (THREAD15)</span>
+        <span class="label">Discount (<span id="appliedCouponCode">—</span>)</span>
         <span class="value discount" id="summaryDiscount">−₹0</span>
       </div>
       <div class="summary-row">
@@ -478,9 +478,10 @@
 
   // --- STATE ---
   let items = [];
-  let promoApplied = false;
-  const PROMO_CODE = 'THREAD15';
-  const PROMO_PCT  = 0.15;
+
+  // ── Coupon State ───────────────────────────────────────────
+  let promoApplied   = false;
+  let activeCoupon   = null;   // stores the full coupon object from Supabase
   const FREE_SHIP_THRESHOLD = 999;
 
   // --- Save cart to localStorage ---
@@ -529,7 +530,8 @@
   }
   function updateTotal(){
     const sub  = subtotal();
-    const disc = promoApplied ? sub * PROMO_PCT : 0;
+    const discPct = (promoApplied && activeCoupon) ? activeCoupon.discount : 0;
+    const disc = Math.round(sub * discPct / 100);
     const ship  = sub >= FREE_SHIP_THRESHOLD ? 0 : 99;
     const tax   = parseFloat(((sub - disc) * 0.08).toFixed(2));
     const total = sub - disc + ship + tax;
@@ -549,9 +551,10 @@
     document.getElementById('summaryShipping').className    = 'value'+(ship===0?' free':'');
 
     // discount row
-    if(promoApplied){
+    if(promoApplied && activeCoupon){
       document.getElementById('discountRow').style.display = 'flex';
-      document.getElementById('summaryDiscount').textContent = '−₹'+Math.round(disc);
+      document.getElementById('appliedCouponCode').textContent = activeCoupon.code + ' −' + discPct + '%';
+      document.getElementById('summaryDiscount').textContent = '−₹'+disc;
     } else {
       document.getElementById('discountRow').style.display = 'none';
     }
@@ -633,29 +636,134 @@
     }
   }
 
-  async function applyCoupon() {
-
-const code = document.getElementById("couponInput").value.trim()
-
-const { data, error } = await supabase
-.from("coupons")
-.select("*")
-.eq("code", code)
-.single()
-
-if(error || !data){
-alert("Invalid coupon")
-return
-}
-
-alert("Coupon applied: " + data.discount + "% discount")
-
-}
+  // ── COUPON HELPERS ─────────────────────────────────────────
+  function showCouponSuccess(msg){
+    const s = document.getElementById('promoSuccess');
+    const e = document.getElementById('promoError');
+    s.textContent = '✅ ' + msg;
+    s.classList.add('show');
+    e.style.display = 'none';
+    document.getElementById('promoInput').style.borderColor = 'var(--green)';
+    document.getElementById('promoInput').disabled = true;
+    document.getElementById('promoRemoveBtn').style.display = 'block';
+  }
+  function showCouponError(msg){
+    const s = document.getElementById('promoSuccess');
+    const e = document.getElementById('promoError');
+    e.textContent = '❌ ' + msg;
+    e.style.display = 'block';
+    s.classList.remove('show');
+    document.getElementById('promoInput').style.borderColor = 'var(--red)';
+    document.getElementById('promoInput').style.animation = 'shake .3s ease';
+    setTimeout(()=>{
+      document.getElementById('promoInput').style.borderColor = '';
+      document.getElementById('promoInput').style.animation = '';
+    }, 600);
+  }
+  function resetCouponUI(){
+    document.getElementById('promoSuccess').classList.remove('show');
+    document.getElementById('promoError').style.display = 'none';
+    document.getElementById('promoInput').style.borderColor = '';
+    const btn = document.getElementById('promoApplyBtn');
+    btn.textContent = 'Apply';
+    btn.style.background = '';
+    btn.disabled = false;
   }
 
-  // Allow Enter key for promo
-  document.getElementById('promoInput').addEventListener('keydown',e=>{
-    if(e.key==='Enter') applyPromo();
+  // ── APPLY COUPON (Supabase) ────────────────────────────────
+  async function applyPromo(){
+    const code = document.getElementById('promoInput').value.trim().toUpperCase();
+    if(!code){ showCouponError('Please enter a coupon code'); return; }
+
+    // Prevent applying twice
+    if(promoApplied){
+      showCouponError('A coupon is already applied. Remove it first.');
+      return;
+    }
+
+    const btn = document.getElementById('promoApplyBtn');
+    btn.textContent = 'Checking…';
+    btn.disabled = true;
+
+    try {
+      // ── Query Supabase coupons table ───────────────────────
+      const { data, error } = await _db
+        .from('coupons')
+        .select('*')
+        .eq('code', code)
+        .single();
+
+      if(error || !data){
+        btn.textContent = 'Apply'; btn.disabled = false;
+        showCouponError('Invalid coupon code. Please check and try again.');
+        return;
+      }
+
+      const coupon = data;
+      const sub    = subtotal();
+      const now    = new Date();
+
+      // ── Check expiry ───────────────────────────────────────
+      if(coupon.expiry_date && new Date(coupon.expiry_date) < now){
+        btn.textContent = 'Apply'; btn.disabled = false;
+        showCouponError('This coupon has expired.');
+        return;
+      }
+
+      // ── Check min order ────────────────────────────────────
+      if(coupon.min_order && sub < coupon.min_order){
+        btn.textContent = 'Apply'; btn.disabled = false;
+        showCouponError('Minimum order of ₹' + coupon.min_order + ' required for this coupon. Add ₹' + (coupon.min_order - sub) + ' more.');
+        return;
+      }
+
+      // ── Check usage limit ──────────────────────────────────
+      if(coupon.usage_limit && coupon.used_count >= coupon.usage_limit){
+        btn.textContent = 'Apply'; btn.disabled = false;
+        showCouponError('This coupon has reached its usage limit.');
+        return;
+      }
+
+      // ── All checks passed — Apply coupon ───────────────────
+      promoApplied = true;
+      activeCoupon = coupon;
+
+      // Increment used_count in Supabase
+      await _db.from('coupons')
+        .update({ used_count: (coupon.used_count || 0) + 1 })
+        .eq('id', coupon.id);
+
+      // Update UI
+      btn.textContent = '✓ Applied';
+      btn.style.background = 'var(--green)';
+
+      const discAmt = Math.round(sub * coupon.discount / 100);
+      showCouponSuccess(
+        'Code "' + coupon.code + '" applied — ' + coupon.discount + '% off! You save ₹' + discAmt
+      );
+      updateTotal();
+
+    } catch(e){
+      btn.textContent = 'Apply'; btn.disabled = false;
+      showCouponError('Something went wrong. Please try again.');
+      console.error('Coupon error:', e);
+    }
+  }
+
+  // ── REMOVE COUPON ──────────────────────────────────────────
+  function removeCoupon(){
+    promoApplied = false;
+    activeCoupon = null;
+    document.getElementById('promoInput').value = '';
+    document.getElementById('promoInput').disabled = false;
+    document.getElementById('promoRemoveBtn').style.display = 'none';
+    resetCouponUI();
+    updateTotal();
+  }
+
+  // ── Enter key for coupon ───────────────────────────────────
+  document.getElementById('promoInput').addEventListener('keydown', e=>{
+    if(e.key === 'Enter') applyPromo();
   });
 
   function quickAdd(btn, name, price){
@@ -707,8 +815,8 @@ alert("Coupon applied: " + data.discount + "% discount")
   <script>
     const { createClient } = supabase
     const _db = createClient(
-      'https://agwrykpdhnqycwqwpegj.supabase.co',   // 🔑 CHANGE THIS → Paste your Supabase Project URL here
-      'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22'       // 🔑 CHANGE THIS → Paste your Supabase Publishable Key here
+      'YOUR_SUPABASE_PROJECT_URL',   // 🔑 CHANGE THIS → Paste your Supabase Project URL here
+      'YOUR_SUPABASE_ANON_KEY'       // 🔑 CHANGE THIS → Paste your Supabase Publishable Key here
     )
 
     // ── Drawer open/close ────────────────────────────────────
