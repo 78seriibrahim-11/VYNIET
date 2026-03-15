@@ -1167,8 +1167,8 @@
   <script>
     const { createClient } = supabase
     const _db = createClient(
-      'YOUR_SUPABASE_PROJECT_URL',
-      'YOUR_SUPABASE_ANON_KEY'
+      'https://agwrykpdhnqycwqwpegj.supabase.co',   // 🔑 CHANGE THIS → Paste your Supabase Project URL here
+      'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'       // 🔑 CHANGE THIS → Paste your Supabase Publishable Key here
     )
 
     // ── Drawer open/close ────────────────────────────────────
@@ -1186,7 +1186,7 @@
     }
     document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer() })
 
-    // ── Update drawer UI with user data ──────────────────────
+    // ── Update drawer UI ─────────────────────────────────────
     function updateDrawer(userData){
       const loggedInEl  = document.getElementById('drawerLoggedIn')
       const loggedOutEl = document.getElementById('drawerLoggedOut')
@@ -1208,31 +1208,50 @@
       }
     }
 
-    // ── STEP 1: Read localStorage INSTANTLY (zero delay) ─────
-    ;(function(){
-      const saved = JSON.parse(localStorage.getItem('vyneit_user') || 'null')
-      updateDrawer(saved)
+    // ── Build user object from Supabase user + profile ───────
+    async function buildAndSaveUser(user){
+      let name = user.user_metadata?.full_name || user.email.split('@')[0]
+      try {
+        const { data: p } = await _db.from('profiles').select('full_name').eq('id',user.id).single()
+        if(p?.full_name) name = p.full_name
+      } catch(e){}
+      const userData = { id: user.id, email: user.email, name, initials: name.substring(0,2).toUpperCase() }
+      localStorage.setItem('vyneit_user', JSON.stringify(userData))
+      return userData
+    }
+
+    // ── INIT: Check session immediately on page load ──────────
+    // First show from localStorage (instant, zero delay)
+    const _cached = JSON.parse(localStorage.getItem('vyneit_user') || 'null')
+    updateDrawer(_cached)
+
+    // Then call getSession() — works even without a state change event
+    // This is the KEY fix: getSession() catches existing sessions on page load
+    ;(async function(){
+      try {
+        const { data: { session } } = await _db.auth.getSession()
+        if(session && session.user){
+          const userData = await buildAndSaveUser(session.user)
+          updateDrawer(userData)
+        } else if(!session){
+          localStorage.removeItem('vyneit_user')
+          updateDrawer(null)
+        }
+      } catch(e){}
     })()
 
-    // ── STEP 2: Verify with Supabase in background ───────────
+    // Also listen for future auth changes (login/logout in same tab)
     _db.auth.onAuthStateChange(async (event, session) => {
       if(event === 'SIGNED_OUT' || !session){
         localStorage.removeItem('vyneit_user')
         updateDrawer(null)
       } else if(session && session.user){
-        const user = session.user
-        let name = user.user_metadata?.full_name || user.email.split('@')[0]
-        try {
-          const { data: p } = await _db.from('profiles').select('full_name').eq('id',user.id).single()
-          if(p?.full_name) name = p.full_name
-        } catch(e){}
-        const userData = { id: user.id, email: user.email, name, initials: name.substring(0,2).toUpperCase() }
-        localStorage.setItem('vyneit_user', JSON.stringify(userData))
+        const userData = await buildAndSaveUser(session.user)
         updateDrawer(userData)
       }
     })
 
-    // ── STEP 3: Logout clears everything ─────────────────────
+    // ── Logout ────────────────────────────────────────────────
     function handleDrawerLogout(){
       if(!confirm('Sign out of VYNEIT?')) return
       localStorage.removeItem('vyneit_user')
@@ -1241,6 +1260,7 @@
         window.location.href='index.html'
       })
     }
+
   </script>
 </body>
 </html>
