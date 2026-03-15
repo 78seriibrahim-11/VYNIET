@@ -1161,6 +1161,7 @@
     });
   </script>
 
+
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -1169,76 +1170,77 @@
       'YOUR_SUPABASE_PROJECT_URL',
       'YOUR_SUPABASE_ANON_KEY'
     )
-    // Show "My Account" if already logged in, "Login" if not
-      // ── DRAWER ─────────────────────────────────────────────────
-  function openDrawer(){
-    document.getElementById('sideDrawer').classList.add('open')
-    document.getElementById('drawerOverlay').classList.add('show')
-    document.getElementById('hamburgerBtn').classList.add('open')
-    document.body.style.overflow='hidden'
-  }
-  function closeDrawer(){
-    document.getElementById('sideDrawer').classList.remove('open')
-    document.getElementById('drawerOverlay').classList.remove('show')
-    document.getElementById('hamburgerBtn').classList.remove('open')
-    document.body.style.overflow=''
-  }
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer() })
 
-  async function handleDrawerLogout(){
-    if(!confirm('Sign out of VYNEIT?')) return
-    await _db.auth.signOut()
-    window.location.href='index.html'
-  }
-;(async function checkAuth(){
-      const { data:{ session } } = await _db.auth.getSession()
-      const btn  = document.getElementById('loginNavBtn')
-      const text = document.getElementById('loginNavText')
-      if(session){
-        text.textContent = 'My Account'
-        btn.onclick = ()=>{ window.location.href='account.html' }
+    // ── Drawer open/close ────────────────────────────────────
+    function openDrawer(){
+      document.getElementById('sideDrawer').classList.add('open')
+      document.getElementById('drawerOverlay').classList.add('show')
+      document.getElementById('hamburgerBtn').classList.add('open')
+      document.body.style.overflow='hidden'
+    }
+    function closeDrawer(){
+      document.getElementById('sideDrawer').classList.remove('open')
+      document.getElementById('drawerOverlay').classList.remove('show')
+      document.getElementById('hamburgerBtn').classList.remove('open')
+      document.body.style.overflow=''
+    }
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer() })
+
+    // ── Update drawer UI with user data ──────────────────────
+    function updateDrawer(userData){
+      const loggedInEl  = document.getElementById('drawerLoggedIn')
+      const loggedOutEl = document.getElementById('drawerLoggedOut')
+      const authMenu    = document.getElementById('drawerAuthMenu')
+      const guestMenu   = document.getElementById('drawerGuestMenu')
+      if(!loggedInEl) return
+      if(userData){
+        loggedInEl.style.display='block'; loggedOutEl.style.display='none'
+        authMenu.style.display='block';   guestMenu.style.display='none'
+        const a=document.getElementById('drawerAvatar')
+        const n=document.getElementById('drawerName')
+        const em=document.getElementById('drawerEmail')
+        if(a)  a.textContent  = (userData.name||'?').substring(0,2).toUpperCase()
+        if(n)  n.textContent  = userData.name  || 'User'
+        if(em) em.textContent = userData.email || ''
+      } else {
+        loggedInEl.style.display='none'; loggedOutEl.style.display='block'
+        authMenu.style.display='none';   guestMenu.style.display='block'
       }
+    }
+
+    // ── STEP 1: Read localStorage INSTANTLY (zero delay) ─────
+    ;(function(){
+      const saved = JSON.parse(localStorage.getItem('vyneit_user') || 'null')
+      updateDrawer(saved)
     })()
 
-  // ── AUTH STATE (fires immediately & on every change) ──────
-  _db.auth.onAuthStateChange(async (event, session) => {
-    const loggedInEl  = document.getElementById('drawerLoggedIn')
-    const loggedOutEl = document.getElementById('drawerLoggedOut')
-    const authMenu    = document.getElementById('drawerAuthMenu')
-    const guestMenu   = document.getElementById('drawerGuestMenu')
+    // ── STEP 2: Verify with Supabase in background ───────────
+    _db.auth.onAuthStateChange(async (event, session) => {
+      if(event === 'SIGNED_OUT' || !session){
+        localStorage.removeItem('vyneit_user')
+        updateDrawer(null)
+      } else if(session && session.user){
+        const user = session.user
+        let name = user.user_metadata?.full_name || user.email.split('@')[0]
+        try {
+          const { data: p } = await _db.from('profiles').select('full_name').eq('id',user.id).single()
+          if(p?.full_name) name = p.full_name
+        } catch(e){}
+        const userData = { id: user.id, email: user.email, name, initials: name.substring(0,2).toUpperCase() }
+        localStorage.setItem('vyneit_user', JSON.stringify(userData))
+        updateDrawer(userData)
+      }
+    })
 
-    if(!loggedInEl) return  // drawer not on this page
-
-    if(session && session.user){
-      const user = session.user
-      let name = user.user_metadata?.full_name || user.email.split('@')[0]
-
-      // Try getting name from profiles table
-      try {
-        const { data: profile } = await _db.from('profiles').select('full_name').eq('id', user.id).single()
-        if(profile?.full_name) name = profile.full_name
-      } catch(e){}
-
-      loggedInEl.style.display  = 'block'
-      loggedOutEl.style.display = 'none'
-      authMenu.style.display    = 'block'
-      guestMenu.style.display   = 'none'
-
-      const avatar = document.getElementById('drawerAvatar')
-      const dName  = document.getElementById('drawerName')
-      const dEmail = document.getElementById('drawerEmail')
-      if(avatar) avatar.textContent = name.substring(0,2).toUpperCase()
-      if(dName)  dName.textContent  = name
-      if(dEmail) dEmail.textContent = user.email
-
-    } else {
-      loggedInEl.style.display  = 'none'
-      loggedOutEl.style.display = 'block'
-      authMenu.style.display    = 'none'
-      guestMenu.style.display   = 'block'
+    // ── STEP 3: Logout clears everything ─────────────────────
+    function handleDrawerLogout(){
+      if(!confirm('Sign out of VYNEIT?')) return
+      localStorage.removeItem('vyneit_user')
+      _db.auth.signOut().then(()=>{
+        updateDrawer(null)
+        window.location.href='index.html'
+      })
     }
-  })
-
   </script>
 </body>
 </html>
