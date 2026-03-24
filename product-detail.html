@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Urban Print Oversized — VYNEIT</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+
+/* ===== YOUR ORIGINAL VARIABLES ===== */
+:root {
+  --bg:#0a0a0a;
+  --bg-card:#111;
+  --border:#222;
+  --border-mid:#2e2e2e;
+  --text:#f2ede4;
+  --text-soft:#a8a098;
+  --text-dim:#555;
+  --gold:#c9a96e;
+  --gold-light:#e8d9bc;
+}
+
+/* ===== RESET ===== */
+*{margin:0;padding:0;box-sizing:border-box;
+transition:all .25s cubic-bezier(.25,.46,.45,.94);
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Plus Jakarta Sans',sans-serif;
+  cursor:none;
+}
+
+/* ===== GRAIN TEXTURE ===== */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:url('https://grainy-gradients.vercel.app/noise.svg');
+  opacity:.03;
+  pointer-events:none;
+  z-index:1;
+}
+body>*{position:relative;z-index:2}
+
+/* ===== NAV ===== */
+.nav{
+  display:flex;
+  justify-content:space-between;
+  padding:20px 40px;
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Playfair Display',serif;
+  letter-spacing:.2em;
+  color:var(--gold-light);
+}
+.nav-cart{
+  border:1px solid var(--border-mid);
+  padding:8px 16px;
+  cursor:pointer;
+}
+.nav-cart:hover{
+  box-shadow:0 0 12px rgba(201,169,110,.15);
+}
+
+/* ===== PRODUCT ===== */
+.container{
+  display:grid;
+  grid-template-columns:1fr 400px;
+  gap:50px;
+  padding:40px;
+}
+
+img{width:100%}
+
+/* ===== TITLE ===== */
+h1{
+  font-family:'Playfair Display',serif;
+  font-size:36px;
+  letter-spacing:-.02em;
+}
+h1 em{color:var(--gold);font-style:italic}
+
+/* ===== BUTTON ===== */
+.btn{
+  background:var(--gold-light);
+  color:#000;
+  border:none;
+  padding:14px;
+  cursor:pointer;
+  margin-top:20px;
+}
+.btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 18px rgba(201,169,110,.25);
+}
+
+/* ===== CARD HOVER ===== */
+.card img{
+  transition:transform .5s;
+}
+.card:hover img{
+  transform:scale(1.08);
+}
+
+/* ===== CUSTOM CURSOR ===== */
+.cursor-dot,
+.cursor-outline{
+  position:fixed;
+  top:0;left:0;
+  pointer-events:none;
+  transform:translate(-50%,-50%);
+  z-index:9999;
+}
+.cursor-dot{
+  width:6px;height:6px;
+  background:var(--gold-light);
+  border-radius:50%;
+}
+.cursor-outline{
+  width:28px;height:28px;
+  border:1px solid var(--gold);
+  border-radius:50%;
+  transition:transform .15s ease;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- CURSOR -->
+
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+
+<!-- NAV -->
+
+<div class="nav">
+  <div class="nav-logo">VYNEIT</div>
+  <div class="nav-cart">Cart</div>
+</div>
+
+<!-- PRODUCT -->
+
+<div class="container">
+
+  <div class="card">
+    <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=900"/>
+  </div>
+
+  <div>
+    <h1>Urban Print <br><em>Oversized</em></h1>
+    <p style="margin-top:10px;color:var(--text-soft)">
+      Premium oversized graphic tee
+    </p>
+
+```
+<h2 style="margin-top:20px">₹799</h2>
+
+<button class="btn">Add to Cart</button>
+```
+
+  </div>
+
+</div>
+
+<script>
+
+/* ===== CURSOR ===== */
+const dot=document.querySelector(".cursor-dot");
+const outline=document.querySelector(".cursor-outline");
+
+window.addEventListener("mousemove",e=>{
+  dot.style.top=e.clientY+"px";
+  dot.style.left=e.clientX+"px";
+
+  outline.style.top=e.clientY+"px";
+  outline.style.left=e.clientX+"px";
+});
+
+/* hover grow */
+document.querySelectorAll("a,button").forEach(el=>{
+  el.addEventListener("mouseenter",()=>{
+    outline.style.transform="translate(-50%,-50%) scale(1.4)";
+  });
+  el.addEventListener("mouseleave",()=>{
+    outline.style.transform="translate(-50%,-50%) scale(1)";
+  });
+});
+
+</script>
+
+</body>
+</html>
