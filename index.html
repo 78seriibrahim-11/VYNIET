@@ -1281,24 +1281,26 @@ if(profileSection) profileSection.style.display = 'block'
 
     // Then call getSession() — works even without a state change event
     // This is the KEY fix: getSession() catches existing sessions on page load
-    ;(async function(){
-  try {
-    const { data: { session } } = await _db.auth.getSession()
-
-    if(session && session.user){
-      const userData = await buildAndSaveUser(session.user)
-
-      // 🔥 ALWAYS update UI with fresh data
-      updateDrawer(userData)
-
-    } else {
-      localStorage.removeItem('vyneit_user')
-      updateDrawer(null)
-    }
-  } catch(e){
-    console.log(e)
+   // 🔥 Wait for auth to be ready
+_db.auth.onAuthStateChange(async (event, session) => {
+  if(session && session.user){
+    const userData = await buildAndSaveUser(session.user)
+    updateDrawer(userData)
+  } else {
+    localStorage.removeItem('vyneit_user')
+    updateDrawer(null)
   }
-})()
+})
+
+// 🔥 ALSO manually check AFTER small delay (CRITICAL FIX)
+setTimeout(async () => {
+  const { data: { session } } = await _db.auth.getSession()
+
+  if(session && session.user){
+    const userData = await buildAndSaveUser(session.user)
+    updateDrawer(userData)
+  }
+}, 300) // wait 300ms for session restore
 
     // Also listen for future auth changes (login/logout in same tab)
     _db.auth.onAuthStateChange(async (event, session) => {
