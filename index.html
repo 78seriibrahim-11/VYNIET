@@ -1274,29 +1274,16 @@
       }
     })
 
-    // Show cached first
-const _cached = JSON.parse(localStorage.getItem('vyneit_user') || 'null')
-updateDrawer(_cached)
-
-// 🔥 Then ALWAYS sync with Supabase
-;(async function(){
-  try {
-    const { data: { session } } = await _db.auth.getSession()
-
-    if(session && session.user){
-      const userData = await buildAndSaveUser(session.user)
-
-      // 🔥 FORCE UI refresh
-      updateDrawer(userData)
-
-    } else {
+    // ── Logout ────────────────────────────────────────────────
+    function handleDrawerLogout(){
+      if(!confirm('Sign out of VYNEIT?')) return
       localStorage.removeItem('vyneit_user')
-      updateDrawer(null)
+      _db.auth.signOut().then(()=>{
+        updateDrawer(null)
+        window.location.href='index.html'
+      })
     }
-  } catch(e){
-    console.log(e)
-  }
-})()
+
 
   </script>
 </body>
