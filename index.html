@@ -1192,20 +1192,50 @@
       const loggedOutEl = document.getElementById('drawerLoggedOut')
       const authMenu    = document.getElementById('drawerAuthMenu')
       const guestMenu   = document.getElementById('drawerGuestMenu')
-      if(!loggedInEl) return
+      if(!loggedInEl || !loggedOutEl) return
       if(userData){
-        loggedInEl.style.display='block'; loggedOutEl.style.display='none'
-        authMenu.style.display='block';   guestMenu.style.display='none'
-        const a=document.getElementById('drawerAvatar')
-        const n=document.getElementById('drawerName')
-        const em=document.getElementById('drawerEmail')
-        if(a)  a.textContent  = (userData.name||'?').substring(0,2).toUpperCase()
-        if(n)  n.textContent  = userData.name  || 'User'
-        if(em) em.textContent = userData.email || ''
-      } else {
-        loggedInEl.style.display='none'; loggedOutEl.style.display='block'
-        authMenu.style.display='none';   guestMenu.style.display='block'
-      }
+       loggedInEl.style.display = 'block'
+loggedOutEl.style.display = 'none'
+authMenu.style.display = 'block'
+guestMenu.style.display = 'none'
+
+// Drawer update
+const a = document.getElementById('drawerAvatar')
+const n = document.getElementById('drawerName')
+const em = document.getElementById('drawerEmail')
+
+if(a) a.textContent = (userData.name || '?').substring(0,2).toUpperCase()
+if(n) n.textContent = userData.name || 'User'
+if(em) em.textContent = userData.email || ''
+
+// 🔥 NEW: Header / Home page update
+const headerName = document.getElementById('headerUserName')
+const headerEmail = document.getElementById('headerUserEmail')
+
+if(headerName) headerName.textContent = userData.name
+if(headerEmail) headerEmail.textContent = userData.email
+
+// hide login button
+const loginBtn = document.getElementById('loginBtn')
+if(loginBtn) loginBtn.style.display = 'none'
+
+// show profile section
+const profileSection = document.getElementById('profileSection')
+if(profileSection) profileSection.style.display = 'block'
+      } 
+      else {
+  loggedInEl.style.display = 'none'
+  loggedOutEl.style.display = 'block'
+  authMenu.style.display = 'none'
+  guestMenu.style.display = 'block'
+
+  // 🔥 Reset header
+  const loginBtn = document.getElementById('loginBtn')
+  if(loginBtn) loginBtn.style.display = 'block'
+
+  const profileSection = document.getElementById('profileSection')
+  if(profileSection) profileSection.style.display = 'none'
+}
     }
 
    async function buildAndSaveUser(user){
@@ -1246,22 +1276,29 @@
     // ── INIT: Check session immediately on page load ──────────
     // First show from localStorage (instant, zero delay)
     const _cached = JSON.parse(localStorage.getItem('vyneit_user') || 'null')
-    updateDrawer(_cached)
+   // ❌ REMOVE cached render (this is causing issue)
+// updateDrawer(_cached)
 
     // Then call getSession() — works even without a state change event
     // This is the KEY fix: getSession() catches existing sessions on page load
     ;(async function(){
-      try {
-        const { data: { session } } = await _db.auth.getSession()
-        if(session && session.user){
-          const userData = await buildAndSaveUser(session.user)
-          updateDrawer(userData)
-        } else if(!session){
-          localStorage.removeItem('vyneit_user')
-          updateDrawer(null)
-        }
-      } catch(e){}
-    })()
+  try {
+    const { data: { session } } = await _db.auth.getSession()
+
+    if(session && session.user){
+      const userData = await buildAndSaveUser(session.user)
+
+      // 🔥 ALWAYS update UI with fresh data
+      updateDrawer(userData)
+
+    } else {
+      localStorage.removeItem('vyneit_user')
+      updateDrawer(null)
+    }
+  } catch(e){
+    console.log(e)
+  }
+})()
 
     // Also listen for future auth changes (login/logout in same tab)
     _db.auth.onAuthStateChange(async (event, session) => {
