@@ -1170,7 +1170,17 @@
       'https://agwrykpdhnqycwqwpegj.supabase.co',   // 🔑 CHANGE THIS → Paste your Supabase Project URL here
       'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'       // 🔑 CHANGE THIS → Paste your Supabase Publishable Key here
     )
+// 🔥 FIX: run on page load
+window.addEventListener("load", async () => {
+  const { data: { session } } = await _db.auth.getSession();
 
+  if(session && session.user){
+    const userData = await buildAndSaveUser(session.user);
+    updateDrawer(userData);
+  } else {
+    updateDrawer(null);
+  }
+});
     // ── Drawer open/close ────────────────────────────────────
     function openDrawer(){
       document.getElementById('sideDrawer').classList.add('open')
