@@ -783,13 +783,14 @@
 
   function checkout(){
     const btn = document.querySelector('.checkout-btn');
-    btn.textContent='Processing…';
+    if(!items.length){ alert('Your cart is empty!'); return; }
+    btn.innerHTML='⏳ Redirecting…';
     btn.style.background='var(--accent)';
     btn.disabled=true;
+    saveCart();
     setTimeout(()=>{
-      btn.innerHTML='✓ Redirecting to Checkout…';
-      btn.style.background='var(--green)';
-    },1200);
+      window.location.href='checkout.html';
+    },600);
   }
 
   // Shake animation
