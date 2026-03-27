@@ -1292,18 +1292,9 @@ if(profileSection) profileSection.style.display = 'block'
     // Then call getSession() — works even without a state change event
     // This is the KEY fix: getSession() catches existing sessions on page load
    // 🔥 Wait for auth to be ready
-_db.auth.onAuthStateChange(async (event, session) => {
-  if(session && session.user){
-    const userData = await buildAndSaveUser(session.user)
-    updateDrawer(userData)
-  } else {
-    localStorage.removeItem('vyneit_user')
-    updateDrawer(null)
-  }
-})
 
 // 🔥 ALSO manually check AFTER small delay (CRITICAL FIX)
-setTimeout(async () => {
+window.addEventListener("load", async () => {
   const { data: { session } } = await _db.auth.getSession()
 
   if(session && session.user){
