@@ -1208,17 +1208,40 @@
       }
     }
 
-    // ── Build user object from Supabase user + profile ───────
-    async function buildAndSaveUser(user){
-      let name = user.user_metadata?.full_name || user.email.split('@')[0]
-      try {
-        const { data: p } = await _db.from('profiles').select('full_name').eq('id',user.id).single()
-        if(p?.full_name) name = p.full_name
-      } catch(e){}
-      const userData = { id: user.id, email: user.email, name, initials: name.substring(0,2).toUpperCase() }
-      localStorage.setItem('vyneit_user', JSON.stringify(userData))
-      return userData
-    }
+   async function buildAndSaveUser(user){
+  let name = user.user_metadata?.full_name || user.email.split('@')[0]
+
+  try {
+    const { data: p } = await _db
+      .from('profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .single()
+
+    if(p?.full_name) name = p.full_name
+  } catch(e){}
+
+  const userData = {
+    user_id: user.id,
+    email: user.email,
+    name: name,
+    initials: name.substring(0,2).toUpperCase()
+  }
+
+  // 🔥 NEW: Save to Supabase database
+  const { error } = await _db
+    .from('users')
+    .upsert([userData])   // use upsert (no duplicate users)
+
+  if(error){
+    console.log("DB Error:", error)
+  }
+
+  // ✅ Keep localStorage (optional for fast UI)
+  localStorage.setItem('vyneit_user', JSON.stringify(userData))
+
+  return userData
+}
 
     // ── INIT: Check session immediately on page load ──────────
     // First show from localStorage (instant, zero delay)
@@ -1251,15 +1274,29 @@
       }
     })
 
-    // ── Logout ────────────────────────────────────────────────
-    function handleDrawerLogout(){
-      if(!confirm('Sign out of VYNEIT?')) return
+    // Show cached first
+const _cached = JSON.parse(localStorage.getItem('vyneit_user') || 'null')
+updateDrawer(_cached)
+
+// 🔥 Then ALWAYS sync with Supabase
+;(async function(){
+  try {
+    const { data: { session } } = await _db.auth.getSession()
+
+    if(session && session.user){
+      const userData = await buildAndSaveUser(session.user)
+
+      // 🔥 FORCE UI refresh
+      updateDrawer(userData)
+
+    } else {
       localStorage.removeItem('vyneit_user')
-      _db.auth.signOut().then(()=>{
-        updateDrawer(null)
-        window.location.href='index.html'
-      })
+      updateDrawer(null)
     }
+  } catch(e){
+    console.log(e)
+  }
+})()
 
   </script>
 </body>
