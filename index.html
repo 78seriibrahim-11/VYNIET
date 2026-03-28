@@ -1107,16 +1107,28 @@
       requestAnimationFrame(animCursor);
     })();
 
-    // Add to cart — saves to localStorage so cart page can read it
+    // ── Per-account cart key ─────────────────────────────────
+    // Each logged-in user gets their own cart. Guests share a guest cart.
+    function getCartKey(){
+      const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+      return user && user.user_id ? 'vyneit_cart_' + user.user_id : 'vyneit_cart_guest';
+    }
+
+    function refreshCartBadge(){
+      const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
+      const total = cart.reduce((s,i) => s + i.qty, 0);
+      document.getElementById('cartCount').textContent = total;
+    }
+
+    // Add to cart — per-user key
     function addToCart(btn){
       const name  = btn.dataset.name;
       const price = parseInt(btn.dataset.price);
       const img   = btn.dataset.img;
 
-      // Load existing cart
-      let cart = JSON.parse(localStorage.getItem('vyneit_cart') || '[]');
+      const cartKey = getCartKey();
+      let cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
 
-      // If product already in cart, increase qty
       const existing = cart.find(i => i.name === name);
       if(existing){
         existing.qty += 1;
@@ -1124,25 +1136,16 @@
         cart.push({ id: 'item-' + Date.now(), name, price, img, qty: 1 });
       }
 
-      // Save back
-      localStorage.setItem('vyneit_cart', JSON.stringify(cart));
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+      refreshCartBadge();
 
-      // Update badge count
-      const total = cart.reduce((s,i) => s + i.qty, 0);
-      document.getElementById('cartCount').textContent = total;
-
-      // Button feedback
       btn.textContent = '✓ Added!';
       btn.style.background = '#27ae60';
       setTimeout(()=>{ btn.textContent='Add to Cart'; btn.style.background=''; }, 1500);
     }
 
-    // Load cart count from localStorage on page load
-    (function loadCartCount(){
-      const cart = JSON.parse(localStorage.getItem('vyneit_cart') || '[]');
-      const total = cart.reduce((s,i) => s + i.qty, 0);
-      document.getElementById('cartCount').textContent = total;
-    })();
+    // Load cart count on page load (guest key until session resolves)
+    refreshCartBadge();
 
     // Scroll reveal
     const observer = new IntersectionObserver(entries=>{
@@ -1167,20 +1170,14 @@
   <script>
     const { createClient } = supabase
     const _db = createClient(
-      'https://agwrykpdhnqycwqwpegj.supabase.co',   // 🔑 CHANGE THIS → Paste your Supabase Project URL here
-      'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'       // 🔑 CHANGE THIS → Paste your Supabase Publishable Key here
+      'https://agwrykpdhnqycwqwpegj.supabase.co',
+      'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'
     )
-// 🔥 FIX: run on page load
-window.addEventListener("load", async () => {
-  const { data: { session } } = await _db.auth.getSession();
 
-  if(session && session.user){
-    const userData = await buildAndSaveUser(session.user);
-    updateDrawer(userData);
-  } else {
+    // ── Show logged-out state immediately (never show stale profile) ──
+    // We do NOT read from localStorage cache here — always wait for Supabase
     updateDrawer(null);
-  }
-});
+
     // ── Drawer open/close ────────────────────────────────────
     function openDrawer(){
       document.getElementById('sideDrawer').classList.add('open')
@@ -1203,114 +1200,86 @@ window.addEventListener("load", async () => {
       const authMenu    = document.getElementById('drawerAuthMenu')
       const guestMenu   = document.getElementById('drawerGuestMenu')
       if(!loggedInEl || !loggedOutEl) return
+
       if(userData){
-       loggedInEl.style.display = 'block'
-loggedOutEl.style.display = 'none'
-authMenu.style.display = 'block'
-guestMenu.style.display = 'none'
+        loggedInEl.style.display = 'block'
+        loggedOutEl.style.display = 'none'
+        authMenu.style.display = 'block'
+        guestMenu.style.display = 'none'
 
-// Drawer update
-const a = document.getElementById('drawerAvatar')
-const n = document.getElementById('drawerName')
-const em = document.getElementById('drawerEmail')
+        const a  = document.getElementById('drawerAvatar')
+        const n  = document.getElementById('drawerName')
+        const em = document.getElementById('drawerEmail')
+        if(a)  a.textContent  = (userData.name || '?').substring(0,2).toUpperCase()
+        if(n)  n.textContent  = userData.name  || 'User'
+        if(em) em.textContent = userData.email || ''
 
-if(a) a.textContent = (userData.name || '?').substring(0,2).toUpperCase()
-if(n) n.textContent = userData.name || 'User'
-if(em) em.textContent = userData.email || ''
+        const headerName  = document.getElementById('headerUserName')
+        const headerEmail = document.getElementById('headerUserEmail')
+        if(headerName)  headerName.textContent  = userData.name
+        if(headerEmail) headerEmail.textContent = userData.email
 
-// 🔥 NEW: Header / Home page update
-const headerName = document.getElementById('headerUserName')
-const headerEmail = document.getElementById('headerUserEmail')
+        const loginBtn = document.getElementById('loginBtn')
+        if(loginBtn) loginBtn.style.display = 'none'
 
-if(headerName) headerName.textContent = userData.name
-if(headerEmail) headerEmail.textContent = userData.email
+        const profileSection = document.getElementById('profileSection')
+        if(profileSection) profileSection.style.display = 'block'
+      } else {
+        loggedInEl.style.display = 'none'
+        loggedOutEl.style.display = 'block'
+        authMenu.style.display = 'none'
+        guestMenu.style.display = 'block'
 
-// hide login button
-const loginBtn = document.getElementById('loginBtn')
-if(loginBtn) loginBtn.style.display = 'none'
+        const loginBtn = document.getElementById('loginBtn')
+        if(loginBtn) loginBtn.style.display = 'block'
 
-// show profile section
-const profileSection = document.getElementById('profileSection')
-if(profileSection) profileSection.style.display = 'block'
-      } 
-      else {
-  loggedInEl.style.display = 'none'
-  loggedOutEl.style.display = 'block'
-  authMenu.style.display = 'none'
-  guestMenu.style.display = 'block'
-
-  // 🔥 Reset header
-  const loginBtn = document.getElementById('loginBtn')
-  if(loginBtn) loginBtn.style.display = 'block'
-
-  const profileSection = document.getElementById('profileSection')
-  if(profileSection) profileSection.style.display = 'none'
-}
+        const profileSection = document.getElementById('profileSection')
+        if(profileSection) profileSection.style.display = 'none'
+      }
     }
 
-   async function buildAndSaveUser(user){
-  let name = user.user_metadata?.full_name || user.email.split('@')[0]
+    async function buildAndSaveUser(user){
+      let name = user.user_metadata?.full_name || user.email.split('@')[0]
 
-  try {
-    const { data: p } = await _db
-      .from('profiles')
-      .select('full_name')
-      .eq('id', user.id)
-      .single()
+      try {
+        const { data: p } = await _db
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single()
+        if(p?.full_name) name = p.full_name
+      } catch(e){}
 
-    if(p?.full_name) name = p.full_name
-  } catch(e){}
+      const userData = {
+        user_id: user.id,
+        email: user.email,
+        name: name,
+        initials: name.substring(0,2).toUpperCase()
+      }
 
-  const userData = {
-    user_id: user.id,
-    email: user.email,
-    name: name,
-    initials: name.substring(0,2).toUpperCase()
-  }
+      // Save to Supabase
+      const { error } = await _db.from('users').upsert([userData])
+      if(error) console.log("DB Error:", error)
 
-  // 🔥 NEW: Save to Supabase database
-  const { error } = await _db
-    .from('users')
-    .upsert([userData])   // use upsert (no duplicate users)
+      // Save to localStorage — used only for cart key lookup, NOT for UI
+      localStorage.setItem('vyneit_user', JSON.stringify(userData))
 
-  if(error){
-    console.log("DB Error:", error)
-  }
+      return userData
+    }
 
-  // ✅ Keep localStorage (optional for fast UI)
-  localStorage.setItem('vyneit_user', JSON.stringify(userData))
-
-  return userData
-}
-
-    // ── INIT: Check session immediately on page load ──────────
-    // First show from localStorage (instant, zero delay)
-    const _cached = JSON.parse(localStorage.getItem('vyneit_user') || 'null')
-   // ❌ REMOVE cached render (this is causing issue)
-// updateDrawer(_cached)
-
-    // Then call getSession() — works even without a state change event
-    // This is the KEY fix: getSession() catches existing sessions on page load
-   // 🔥 Wait for auth to be ready
-
-// 🔥 ALSO manually check AFTER small delay (CRITICAL FIX)
-window.addEventListener("load", async () => {
-  const { data: { session } } = await _db.auth.getSession()
-
-  if(session && session.user){
-    const userData = await buildAndSaveUser(session.user)
-    updateDrawer(userData)
-  }
-}, 300) // wait 300ms for session restore
-
-    // Also listen for future auth changes (login/logout in same tab)
+    // ── Single auth listener — handles login, logout, and page load ──
     _db.auth.onAuthStateChange(async (event, session) => {
-      if(event === 'SIGNED_OUT' || !session){
-        localStorage.removeItem('vyneit_user')
-        updateDrawer(null)
-      } else if(session && session.user){
+      if(session && session.user){
         const userData = await buildAndSaveUser(session.user)
         updateDrawer(userData)
+        // Switch cart badge to this user's cart
+        refreshCartBadge()
+      } else {
+        // Clear user data on logout or no session
+        localStorage.removeItem('vyneit_user')
+        updateDrawer(null)
+        // Switch cart badge to guest cart
+        refreshCartBadge()
       }
     })
 
@@ -1320,10 +1289,10 @@ window.addEventListener("load", async () => {
       localStorage.removeItem('vyneit_user')
       _db.auth.signOut().then(()=>{
         updateDrawer(null)
+        refreshCartBadge()
         window.location.href='index.html'
       })
     }
-
 
   </script>
 </body>
