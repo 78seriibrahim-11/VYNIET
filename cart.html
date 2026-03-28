@@ -806,26 +806,26 @@
 
   // --- INIT: Load cart — called after auth resolves so getCartKey() is accurate ---
   function initCart(){
-    // Clear any previously rendered items (safety guard for double-call)
     document.getElementById('cartItems').innerHTML = '';
     items = [];
-
     const saved = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
     items = saved;
     items.forEach(item => renderItem(item));
     updateTotal();
     checkEmpty();
   }
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
+</script>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
     const { createClient } = supabase
     const _db = createClient(
       'https://agwrykpdhnqycwqwpegj.supabase.co',
       'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'
     )
 
-    // Start in logged-out state — never show stale profile data
+    // Start in logged-out state
     updateDrawer(null);
 
     // ── Drawer open/close ────────────────────────────────────
@@ -883,17 +883,23 @@
 
     async function handleSession(session){
       if(session && session.user){
-        if(_lastUid === session.user.id) return; // already handled
+        if(_lastUid === session.user.id) return;
         _lastUid = session.user.id;
+
+        // ✅ Show profile INSTANTLY from session data
+        const quickName = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+        updateDrawer({ user_id: session.user.id, email: session.user.email, name: quickName });
+
+        // Fetch full profile in background
         const userData = await buildAndSaveUser(session.user)
         updateDrawer(userData)
       } else {
-        if(_lastUid === null && _cartLoaded) return; // already in guest state
+        if(_lastUid === null && _cartLoaded) return;
         _lastUid = null;
         localStorage.removeItem('vyneit_user')
         updateDrawer(null)
       }
-      // Load cart with the now-correct key (logged-in user key or guest key)
+      // Load cart with the now-correct key
       if(!_cartLoaded){
         _cartLoaded = true;
         initCart();
