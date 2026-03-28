@@ -761,30 +761,45 @@
     return parseFloat(String(val||0).replace(/[,₹\s]/g,'')) || 0;
   }
 
-  // ── CART KEY (matches cart.html) ────────────────────────────
-  function getCartKey(){
-    const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-    return (user && user.user_id) ? 'vyneit_cart_' + user.user_id : 'vyneit_cart_guest';
+  // ── CART KEY — tries both user_id and id formats ─────────────
+  function getCartKey(user){
+    const uid = (user && (user.user_id || user.id));
+    return uid ? 'vyneit_cart_' + uid : 'vyneit_cart_guest';
   }
 
-  // ── LOAD CART — Supabase first for logged-in, localStorage for guests ──
+  // ── STATE ────────────────────────────────────────────────────
   let cartItems = [];
   let cartDiscount = 0;
   let cartCoupon = null;
 
-  async function loadCart(){
-    cartItems = [];
+  // ── LOAD CART ────────────────────────────────────────────────
+  // Immediately tries localStorage, then upgrades from Supabase when ready
+  async function loadCart(userId){
+    // Always start with localStorage so the cart never stays blank
     const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+    const localKey = getCartKey(user);
+    const localData = JSON.parse(localStorage.getItem(localKey) || '[]');
 
-    if(user && user.user_id && window._db){
+    // If Supabase is ready and we have a userId, fetch from DB
+    if(userId && window._db){
       try {
-        const { data: rows } = await window._db.from('carts').select('*').eq('user_id', user.user_id);
-        if(rows && rows.length > 0){
-          cartItems = rows.map(r=>({ id: r.item_id, name: r.name, price: r.price, img: r.img, qty: r.qty, size: r.size, color: r.color }));
+        const { data: rows, error } = await window._db
+          .from('carts').select('*').eq('user_id', userId);
+        if(!error && rows && rows.length > 0){
+          cartItems = rows.map(r=>({
+            id: r.item_id, name: r.name, price: r.price,
+            img: r.img, qty: r.qty, size: r.size, color: r.color
+          }));
+        } else {
+          // Supabase returned empty — use localStorage as fallback
+          cartItems = localData;
         }
-      } catch(e){ console.error('Cart fetch error:', e); }
+      } catch(e){
+        console.error('[VYNEIT] Cart fetch error:', e);
+        cartItems = localData; // fall back to localStorage on error
+      }
     } else {
-      cartItems = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
+      cartItems = localData;
     }
 
     const couponData = JSON.parse(localStorage.getItem('vyneit_applied_coupon') || 'null');
@@ -1001,7 +1016,8 @@
     document.getElementById('successOverlay').classList.add('show');
   }
 
-  // ── INIT: loadCart() is triggered after Supabase auth resolves ──
+  // ── INIT: Load cart immediately from localStorage (never stays blank) ──
+  loadCart(null);
 
   // Add spin keyframe
   const st = document.createElement('style');
@@ -1066,35 +1082,40 @@
     return userData;
   }
 
-  // ── CART LOADING STRATEGY ───────────────────────────────────
-  // Step 1: Load immediately from localStorage so cart is never stuck loading
-  loadCart();
-
-  // Step 2: After Supabase auth resolves, reload from Supabase if logged in
+  // ── AUTH → CART: reload cart with real userId once session is known ──
   let _lastUid = null;
 
   async function handleSession(session){
     if(session && session.user){
-      if(_lastUid === session.user.id) return; // already handled
+      if(_lastUid === session.user.id) return; // already handled this user
       _lastUid = session.user.id;
-      // Show drawer instantly from session data
+
+      // Fill drawer instantly from session
       updateDrawer({ user_id: session.user.id, email: session.user.email,
         name: session.user.user_metadata?.full_name || session.user.email.split('@')[0] });
-      // Fetch full profile (name, phone) from profiles table
+
+      // Fetch full profile (name + phone) in background
       const userData = await buildAndSaveUser(session.user);
       updateDrawer(userData);
-      // Reload cart from Supabase now that we know who the user is
-      loadCart();
+
+      // Now reload cart from Supabase with the confirmed userId
+      loadCart(session.user.id);
+
     } else {
-      if(_lastUid === null) return; // already in guest state
-      _lastUid = null;
-      localStorage.removeItem('vyneit_user');
-      updateDrawer(null);
-      loadCart(); // reload as guest
+      // Logged out — reset and show guest cart
+      if(_lastUid !== null){
+        _lastUid = null;
+        localStorage.removeItem('vyneit_user');
+        updateDrawer(null);
+        loadCart(null);
+      }
+      // If _lastUid was already null: loadCart(null) already ran at init, no-op
     }
   }
 
+  // getSession covers existing sessions (e.g. returning from login page)
   _db.auth.getSession().then(({ data: { session } }) => handleSession(session));
+  // onAuthStateChange covers login/logout during session
   _db.auth.onAuthStateChange((_event, session) => handleSession(session));
 
   function handleDrawerLogout(){
