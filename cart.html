@@ -135,6 +135,8 @@
     .checkout-btn{width:100%;background:var(--black);color:var(--white);border:none;padding:18px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:12px;transition:background .2s,transform .15s;margin-bottom:14px}
     .checkout-btn:hover{background:var(--accent);transform:translateY(-2px)}
     .checkout-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+    .paypal-btn{width:100%;background:#ffc439;color:#003087;border:none;padding:15px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;margin-bottom:20px}
+    .paypal-btn:hover{opacity:.88}
     .secure-badges{display:flex;flex-direction:column;gap:8px;padding-top:16px;border-top:1px solid var(--border)}
     .secure-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
     .secure-row span{font-size:16px}
@@ -433,9 +435,14 @@
         <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         Proceed to Checkout
       </button>
+      <button class="paypal-btn">
+        <span style="font-size:18px">𝐏</span> Pay with PayPal
+      </button>
+
       <div class="secure-badges">
         <div class="secure-row"><span>🔒</span> 256-bit SSL Secure Checkout</div>
-        <div class="secure-row"><span>📦</span> Ships within 3-7 business days</div>
+        <div class="secure-row"><span>↩️</span> Free 30-day returns</div>
+        <div class="secure-row"><span>📦</span> Ships within 1–2 business days</div>
       </div>
     </div>
 
@@ -477,15 +484,24 @@
   let activeCoupon   = null;
   const FREE_SHIP_THRESHOLD = 999;
 
-  // ── Per-account cart key — must match index.html logic ─────
+  // ── Per-account cart key ────────────────────────────────────
   function getCartKey(){
     const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
     return (user && user.user_id) ? 'vyneit_cart_' + user.user_id : 'vyneit_cart_guest';
   }
 
-  // --- Save cart to localStorage (always uses current user's key) ---
-  function saveCart(){
+  // Save to localStorage + Supabase (for logged-in users)
+  async function saveCart(){
     localStorage.setItem(getCartKey(), JSON.stringify(items));
+    const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+    if(user && user.user_id && window._db){
+      // Delete all then re-insert (simplest sync strategy)
+      await window._db.from('carts').delete().eq('user_id', user.user_id);
+      if(items.length > 0){
+        const rows = items.map(i=>({ user_id: user.user_id, item_id: i.id, name: i.name, price: i.price, img: i.img, qty: i.qty }));
+        await window._db.from('carts').insert(rows);
+      }
+    }
   }
 
   // --- Render a single item row into DOM ---
@@ -797,12 +813,25 @@
   style.textContent='@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}';
   document.head.appendChild(style);
 
-  // --- INIT: Load cart — called after auth resolves so getCartKey() is accurate ---
-  function initCart(){
+  // --- INIT: Load cart — Supabase first for logged-in, localStorage for guests ---
+  async function initCart(){
     document.getElementById('cartItems').innerHTML = '';
     items = [];
-    const saved = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
-    items = saved;
+
+    const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+    if(user && user.user_id && window._db){
+      // Logged in — fetch from Supabase (cross-device source of truth)
+      const { data: rows } = await window._db.from('carts').select('*').eq('user_id', user.user_id);
+      if(rows && rows.length > 0){
+        items = rows.map(r=>({ id: r.item_id, name: r.name, price: r.price, img: r.img, qty: r.qty }));
+        // Also update localStorage to keep badge in sync
+        localStorage.setItem(getCartKey(), JSON.stringify(items));
+      }
+    } else {
+      // Guest — localStorage only
+      items = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
+    }
+
     items.forEach(item => renderItem(item));
     updateTotal();
     checkEmpty();
@@ -813,10 +842,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const { createClient } = supabase
-    const _db = createClient(
+    window._db = createClient(
       'https://agwrykpdhnqycwqwpegj.supabase.co',
       'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'
     )
+    const _db = window._db
 
     // Start in logged-out state
     updateDrawer(null);
