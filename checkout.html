@@ -756,19 +756,37 @@
   }
 
   // ── PRICE SANITIZER ─────────────────────────────────────────
-  // Handles numbers stored as strings like "1,299" or "₹1,299"
   function parsePrice(val){
     if(typeof val === 'number') return val;
     return parseFloat(String(val||0).replace(/[,₹\s]/g,'')) || 0;
   }
 
-  // ── LOAD CART FROM LOCALSTORAGE ─────────────────────────────
+  // ── CART KEY (matches cart.html) ────────────────────────────
+  function getCartKey(){
+    const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+    return (user && user.user_id) ? 'vyneit_cart_' + user.user_id : 'vyneit_cart_guest';
+  }
+
+  // ── LOAD CART — Supabase first for logged-in, localStorage for guests ──
   let cartItems = [];
   let cartDiscount = 0;
   let cartCoupon = null;
 
-  function loadCart(){
-    cartItems = JSON.parse(localStorage.getItem('vyneit_cart') || '[]');
+  async function loadCart(){
+    cartItems = [];
+    const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+
+    if(user && user.user_id && window._db){
+      try {
+        const { data: rows } = await window._db.from('carts').select('*').eq('user_id', user.user_id);
+        if(rows && rows.length > 0){
+          cartItems = rows.map(r=>({ id: r.item_id, name: r.name, price: r.price, img: r.img, qty: r.qty, size: r.size, color: r.color }));
+        }
+      } catch(e){ console.error('Cart fetch error:', e); }
+    } else {
+      cartItems = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
+    }
+
     const couponData = JSON.parse(localStorage.getItem('vyneit_applied_coupon') || 'null');
     if(couponData){ cartDiscount = couponData.discount || 0; cartCoupon = couponData; }
     renderSummaryItems();
@@ -983,8 +1001,7 @@
     document.getElementById('successOverlay').classList.add('show');
   }
 
-  // ── INIT ────────────────────────────────────────────────────
-  loadCart();
+  // ── INIT: loadCart() is triggered after Supabase auth resolves ──
 
   // Add spin keyframe
   const st = document.createElement('style');
@@ -1000,6 +1017,7 @@
     'https://agwrykpdhnqycwqwpegj.supabase.co',
     'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'
   );
+  window._db = _db;
 
   function updateDrawer(userData){
     const loggedInEl  = document.getElementById('drawerLoggedIn');
@@ -1016,24 +1034,25 @@
       if(a)  a.textContent  = (userData.name||'?').substring(0,2).toUpperCase();
       if(n)  n.textContent  = userData.name  || 'User';
       if(em) em.textContent = userData.email || '';
-      // Pre-fill contact fields
+      // Auto-fill contact fields
       const emailInput = document.getElementById('email');
       if(emailInput && !emailInput.value) emailInput.value = userData.email || '';
       const parts = (userData.name||'').split(' ');
       safeSet('firstName', parts[0]);
       safeSet('lastName', parts.slice(1).join(' '));
       if(userData.phone) safeSet('phone', userData.phone);
-      // Hide "Sign in" notice since user is already logged in
+      // Hide sign-in notice — user is already logged in
       const signInNotice = document.querySelector('.guest-address-notice');
       if(signInNotice) signInNotice.style.display = 'none';
-      // Load saved addresses
-      if(userData.id) loadSavedAddresses(userData.id);
+      // Load saved addresses — user_id matches cart.html convention
+      if(userData.user_id) loadSavedAddresses(userData.user_id);
     } else {
       loggedInEl.style.display='none'; loggedOutEl.style.display='block';
       authMenu.style.display='none';   guestMenu.style.display='block';
     }
   }
 
+  // Stores user_id (not id) to match cart.html so getCartKey() works
   async function buildAndSaveUser(user){
     let name = user.user_metadata?.full_name || user.email.split('@')[0];
     let phone = user.user_metadata?.phone || '';
@@ -1042,40 +1061,44 @@
       if(p?.full_name) name = p.full_name;
       if(p?.phone) phone = p.phone;
     } catch(e){}
-    const userData = { id: user.id, email: user.email, name, phone, initials: name.substring(0,2).toUpperCase() };
+    const userData = { user_id: user.id, email: user.email, name, phone, initials: name.substring(0,2).toUpperCase() };
     localStorage.setItem('vyneit_user', JSON.stringify(userData));
     return userData;
   }
 
-  const _cached = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-  updateDrawer(_cached);
+  // Guard: only init cart once, after auth state is known
+  let _cartLoaded = false;
+  let _lastUid = null;
 
-  ;(async function(){
-    try {
-      const { data: { session } } = await _db.auth.getSession();
-      if(session && session.user){
-        const userData = await buildAndSaveUser(session.user);
-        updateDrawer(userData);
-      } else if(!session){
-        localStorage.removeItem('vyneit_user');
-        updateDrawer(null);
-      }
-    } catch(e){}
-  })();
-
-  _db.auth.onAuthStateChange(async (event, session) => {
-    if(event==='SIGNED_OUT' || !session){
-      localStorage.removeItem('vyneit_user');
-      updateDrawer(null);
-    } else if(session && session.user){
+  async function handleSession(session){
+    if(session && session.user){
+      if(_lastUid === session.user.id) return;
+      _lastUid = session.user.id;
+      // Show drawer instantly
+      updateDrawer({ user_id: session.user.id, email: session.user.email,
+        name: session.user.user_metadata?.full_name || session.user.email.split('@')[0] });
+      // Fetch full profile in background
       const userData = await buildAndSaveUser(session.user);
       updateDrawer(userData);
+    } else {
+      _lastUid = null;
+      localStorage.removeItem('vyneit_user');
+      updateDrawer(null);
     }
-  });
+    // Load cart after auth state is resolved
+    if(!_cartLoaded){
+      _cartLoaded = true;
+      loadCart();
+    }
+  }
+
+  _db.auth.getSession().then(({ data: { session } }) => handleSession(session));
+  _db.auth.onAuthStateChange((_event, session) => handleSession(session));
 
   function handleDrawerLogout(){
     if(!confirm('Sign out of VYNEIT?')) return;
     localStorage.removeItem('vyneit_user');
+    _lastUid = null;
     _db.auth.signOut().then(()=>{
       updateDrawer(null);
       window.location.href='index.html';
