@@ -1066,29 +1066,31 @@
     return userData;
   }
 
-  // Guard: only init cart once, after auth state is known
-  let _cartLoaded = false;
+  // ── CART LOADING STRATEGY ───────────────────────────────────
+  // Step 1: Load immediately from localStorage so cart is never stuck loading
+  loadCart();
+
+  // Step 2: After Supabase auth resolves, reload from Supabase if logged in
   let _lastUid = null;
 
   async function handleSession(session){
     if(session && session.user){
-      if(_lastUid === session.user.id) return;
+      if(_lastUid === session.user.id) return; // already handled
       _lastUid = session.user.id;
-      // Show drawer instantly
+      // Show drawer instantly from session data
       updateDrawer({ user_id: session.user.id, email: session.user.email,
         name: session.user.user_metadata?.full_name || session.user.email.split('@')[0] });
-      // Fetch full profile in background
+      // Fetch full profile (name, phone) from profiles table
       const userData = await buildAndSaveUser(session.user);
       updateDrawer(userData);
+      // Reload cart from Supabase now that we know who the user is
+      loadCart();
     } else {
+      if(_lastUid === null) return; // already in guest state
       _lastUid = null;
       localStorage.removeItem('vyneit_user');
       updateDrawer(null);
-    }
-    // Load cart after auth state is resolved
-    if(!_cartLoaded){
-      _cartLoaded = true;
-      loadCart();
+      loadCart(); // reload as guest
     }
   }
 
