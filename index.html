@@ -1267,26 +1267,42 @@
       return userData
     }
 
-    // ── Single auth listener — handles login, logout, and page load ──
-    _db.auth.onAuthStateChange(async (event, session) => {
+    // ── Auth state management ────────────────────────────────
+    // Guard so we never process the same session twice
+    let _lastUid = null;
+
+    async function handleSession(session){
       if(session && session.user){
+        // Skip if we already rendered this exact user
+        if(_lastUid === session.user.id) return;
+        _lastUid = session.user.id;
         const userData = await buildAndSaveUser(session.user)
         updateDrawer(userData)
-        // Switch cart badge to this user's cart
         refreshCartBadge()
       } else {
-        // Clear user data on logout or no session
+        if(_lastUid === null) return; // already in guest state, skip
+        _lastUid = null;
         localStorage.removeItem('vyneit_user')
         updateDrawer(null)
-        // Switch cart badge to guest cart
         refreshCartBadge()
       }
+    }
+
+    // 1️⃣ Immediately check for an existing session (covers page-load / redirect-back from login)
+    _db.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session)
+    })
+
+    // 2️⃣ Listen for future changes (login, logout, token refresh)
+    _db.auth.onAuthStateChange((_event, session) => {
+      handleSession(session)
     })
 
     // ── Logout ────────────────────────────────────────────────
     function handleDrawerLogout(){
       if(!confirm('Sign out of VYNEIT?')) return
       localStorage.removeItem('vyneit_user')
+      _lastUid = null;
       _db.auth.signOut().then(()=>{
         updateDrawer(null)
         refreshCartBadge()
