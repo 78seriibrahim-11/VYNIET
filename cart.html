@@ -481,12 +481,18 @@
 
   // ── Coupon State ───────────────────────────────────────────
   let promoApplied   = false;
-  let activeCoupon   = null;   // stores the full coupon object from Supabase
+  let activeCoupon   = null;
   const FREE_SHIP_THRESHOLD = 999;
 
-  // --- Save cart to localStorage ---
+  // ── Per-account cart key — must match index.html logic ─────
+  function getCartKey(){
+    const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+    return (user && user.user_id) ? 'vyneit_cart_' + user.user_id : 'vyneit_cart_guest';
+  }
+
+  // --- Save cart to localStorage (always uses current user's key) ---
   function saveCart(){
-    localStorage.setItem('vyneit_cart', JSON.stringify(items));
+    localStorage.setItem(getCartKey(), JSON.stringify(items));
   }
 
   // --- Render a single item row into DOM ---
@@ -798,27 +804,29 @@
   style.textContent='@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}';
   document.head.appendChild(style);
 
-  // --- INIT: Load cart from localStorage ---
-  (function initCart(){
-    const saved = JSON.parse(localStorage.getItem('vyneit_cart') || '[]');
+  // --- INIT: Load cart — called after auth resolves so getCartKey() is accurate ---
+  function initCart(){
+    // Clear any previously rendered items (safety guard for double-call)
+    document.getElementById('cartItems').innerHTML = '';
+    items = [];
+
+    const saved = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
     items = saved;
     items.forEach(item => renderItem(item));
     updateTotal();
     checkEmpty();
-  })();
-</script>
-</body>
-</html>
-
-
+  }
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const { createClient } = supabase
     const _db = createClient(
-      'https://agwrykpdhnqycwqwpegj.supabase.co',   // 🔑 CHANGE THIS → Paste your Supabase Project URL here
-      'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'       // 🔑 CHANGE THIS → Paste your Supabase Publishable Key here
+      'https://agwrykpdhnqycwqwpegj.supabase.co',
+      'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'
     )
+
+    // Start in logged-out state — never show stale profile data
+    updateDrawer(null);
 
     // ── Drawer open/close ────────────────────────────────────
     function openDrawer(){
@@ -864,46 +872,49 @@
         const { data: p } = await _db.from('profiles').select('full_name').eq('id',user.id).single()
         if(p?.full_name) name = p.full_name
       } catch(e){}
-      const userData = { id: user.id, email: user.email, name, initials: name.substring(0,2).toUpperCase() }
+      const userData = { user_id: user.id, email: user.email, name, initials: name.substring(0,2).toUpperCase() }
       localStorage.setItem('vyneit_user', JSON.stringify(userData))
       return userData
     }
 
-    // ── INIT: Check session immediately on page load ──────────
-    // First show from localStorage (instant, zero delay)
-    const _cached = JSON.parse(localStorage.getItem('vyneit_user') || 'null')
-    updateDrawer(_cached)
+    // ── Guard: only init cart once ───────────────────────────
+    let _cartLoaded = false;
+    let _lastUid = null;
 
-    // Then call getSession() — works even without a state change event
-    // This is the KEY fix: getSession() catches existing sessions on page load
-    ;(async function(){
-      try {
-        const { data: { session } } = await _db.auth.getSession()
-        if(session && session.user){
-          const userData = await buildAndSaveUser(session.user)
-          updateDrawer(userData)
-        } else if(!session){
-          localStorage.removeItem('vyneit_user')
-          updateDrawer(null)
-        }
-      } catch(e){}
-    })()
-
-    // Also listen for future auth changes (login/logout in same tab)
-    _db.auth.onAuthStateChange(async (event, session) => {
-      if(event === 'SIGNED_OUT' || !session){
-        localStorage.removeItem('vyneit_user')
-        updateDrawer(null)
-      } else if(session && session.user){
+    async function handleSession(session){
+      if(session && session.user){
+        if(_lastUid === session.user.id) return; // already handled
+        _lastUid = session.user.id;
         const userData = await buildAndSaveUser(session.user)
         updateDrawer(userData)
+      } else {
+        if(_lastUid === null && _cartLoaded) return; // already in guest state
+        _lastUid = null;
+        localStorage.removeItem('vyneit_user')
+        updateDrawer(null)
       }
+      // Load cart with the now-correct key (logged-in user key or guest key)
+      if(!_cartLoaded){
+        _cartLoaded = true;
+        initCart();
+      }
+    }
+
+    // 1️⃣ Check for existing session first (catches redirect-back after login)
+    _db.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session)
+    })
+
+    // 2️⃣ Listen for future auth changes (login/logout in same tab)
+    _db.auth.onAuthStateChange((_event, session) => {
+      handleSession(session)
     })
 
     // ── Logout ────────────────────────────────────────────────
     function handleDrawerLogout(){
       if(!confirm('Sign out of VYNEIT?')) return
       localStorage.removeItem('vyneit_user')
+      _lastUid = null;
       _db.auth.signOut().then(()=>{
         updateDrawer(null)
         window.location.href='index.html'
