@@ -1107,8 +1107,7 @@
       requestAnimationFrame(animCursor);
     })();
 
-    // ── Per-account cart key ─────────────────────────────────
-    // Each logged-in user gets their own cart. Guests share a guest cart.
+    // ── Cart helpers ─────────────────────────────────────────
     function getCartKey(){
       const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
       return user && user.user_id ? 'vyneit_cart_' + user.user_id : 'vyneit_cart_guest';
@@ -1116,35 +1115,44 @@
 
     function refreshCartBadge(){
       const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
-      const total = cart.reduce((s,i) => s + i.qty, 0);
-      document.getElementById('cartCount').textContent = total;
+      document.getElementById('cartCount').textContent = cart.reduce((s,i)=>s+i.qty,0);
     }
 
-    // Add to cart — per-user key
-    function addToCart(btn){
+    // Add to cart — saves locally AND syncs to Supabase for logged-in users
+    async function addToCart(btn){
       const name  = btn.dataset.name;
       const price = parseInt(btn.dataset.price);
       const img   = btn.dataset.img;
 
       const cartKey = getCartKey();
       let cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
-
       const existing = cart.find(i => i.name === name);
+      let itemId;
       if(existing){
         existing.qty += 1;
+        itemId = existing.id;
       } else {
-        cart.push({ id: 'item-' + Date.now(), name, price, img, qty: 1 });
+        itemId = 'item-' + Date.now();
+        cart.push({ id: itemId, name, price, img, qty: 1 });
       }
-
       localStorage.setItem(cartKey, JSON.stringify(cart));
       refreshCartBadge();
+
+      // Sync to Supabase if logged in
+      const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+      if(user && user.user_id && window._db){
+        const row = cart.find(i => i.id === itemId);
+        await window._db.from('carts').upsert([{
+          user_id: user.user_id, item_id: row.id,
+          name: row.name, price: row.price, img: row.img, qty: row.qty
+        }]);
+      }
 
       btn.textContent = '✓ Added!';
       btn.style.background = '#27ae60';
       setTimeout(()=>{ btn.textContent='Add to Cart'; btn.style.background=''; }, 1500);
     }
 
-    // Load cart count on page load (guest key until session resolves)
     refreshCartBadge();
 
     // Scroll reveal
@@ -1169,10 +1177,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const { createClient } = supabase
-    const _db = createClient(
+    window._db = createClient(
       'https://agwrykpdhnqycwqwpegj.supabase.co',
       'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'
     )
+    const _db = window._db
 
     // ── Show logged-out state immediately (never show stale profile) ──
     // We do NOT read from localStorage cache here — always wait for Supabase
@@ -1268,19 +1277,29 @@
     }
 
     // ── Auth state management ────────────────────────────────
-    // Guard so we never process the same session twice
     let _lastUid = null;
 
     async function handleSession(session){
       if(session && session.user){
-        // Skip if we already rendered this exact user
         if(_lastUid === session.user.id) return;
         _lastUid = session.user.id;
+
+        // Show profile instantly
+        const quickName = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+        updateDrawer({ user_id: session.user.id, email: session.user.email, name: quickName });
+
         const userData = await buildAndSaveUser(session.user)
         updateDrawer(userData)
+
+        // Pull cart from Supabase → localStorage so badge is correct cross-device
+        const { data: rows } = await _db.from('carts').select('*').eq('user_id', session.user.id);
+        if(rows && rows.length > 0){
+          const cart = rows.map(r=>({ id: r.item_id, name: r.name, price: r.price, img: r.img, qty: r.qty }));
+          localStorage.setItem('vyneit_cart_' + session.user.id, JSON.stringify(cart));
+        }
         refreshCartBadge()
       } else {
-        if(_lastUid === null) return; // already in guest state, skip
+        if(_lastUid === null) return;
         _lastUid = null;
         localStorage.removeItem('vyneit_user')
         updateDrawer(null)
