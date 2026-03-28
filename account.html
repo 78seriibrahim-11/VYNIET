@@ -358,7 +358,9 @@
 
   // ── Cart Badge ─────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function(){
-    const cartData = JSON.parse(localStorage.getItem('vyneit_cart')||'[]')
+    const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null')
+    const cartKey = user?.user_id ? 'vyneit_cart_' + user.user_id : 'vyneit_cart_guest'
+    const cartData = JSON.parse(localStorage.getItem(cartKey) || '[]')
     const qty = cartData.reduce((s,i)=>s+i.qty,0)
     const badgeEl = document.getElementById('cartBadge')
     const itemsEl = document.getElementById('cartItems')
