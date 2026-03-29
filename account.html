@@ -286,25 +286,37 @@
       <div class="form-section">
         <div class="form-section-title">Default Shipping Address</div>
         <div class="form-grid">
-          <div class="form-group full">
-            <label>Street Address</label>
-            <input type="text" id="addrStreet" placeholder="123, MG Road"/>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="addrName" placeholder="Rahul Sharma"/>
           </div>
           <div class="form-group">
-            <label>City</label>
+            <label>Phone Number</label>
+            <input type="tel" id="addrPhone" placeholder="+91 99999 99999"/>
+          </div>
+          <div class="form-group full">
+            <label>Street Address <span style="color:var(--red)">*</span></label>
+            <input type="text" id="addrStreet" placeholder="House No, Street Name"/>
+          </div>
+          <div class="form-group full">
+            <label>Address Line 2</label>
+            <input type="text" id="addrStreet2" placeholder="Apartment, Block, Landmark (optional)"/>
+          </div>
+          <div class="form-group">
+            <label>City <span style="color:var(--red)">*</span></label>
             <input type="text" id="addrCity" placeholder="New Delhi"/>
           </div>
           <div class="form-group">
-            <label>State</label>
+            <label>State <span style="color:var(--red)">*</span></label>
             <input type="text" id="addrState" placeholder="Delhi"/>
           </div>
           <div class="form-group">
-            <label>PIN Code</label>
-            <input type="text" id="addrPin" placeholder="110001"/>
+            <label>PIN Code <span style="color:var(--red)">*</span></label>
+            <input type="text" id="addrPin" placeholder="110001" maxlength="6"/>
           </div>
           <div class="form-group">
             <label>Country</label>
-            <input type="text" id="addrCountry" value="India"/>
+            <input type="text" id="addrCountry" value="India" readonly style="background:var(--cream);color:var(--muted)"/>
           </div>
         </div>
         <button class="save-btn" id="saveAddressBtn" onclick="saveAddress()">Save Address</button>
@@ -361,7 +373,7 @@
     const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null')
     const cartKey = user?.user_id ? 'vyneit_cart_' + user.user_id : 'vyneit_cart_guest'
     const cartData = JSON.parse(localStorage.getItem(cartKey) || '[]')
-    const qty = cartData.reduce((s,i)=>s+i.qty,0)
+    const qty = cartData.reduce((s,i)=>s+(i.qty||1),0)
     const badgeEl = document.getElementById('cartBadge')
     const itemsEl = document.getElementById('cartItems')
     if(badgeEl) badgeEl.textContent = qty
@@ -420,16 +432,23 @@
     document.getElementById('editEmail').value = email
     document.getElementById('editPhone').value = phone !== '—' ? phone : ''
 
-    // Address form
-    if(profile?.address){
-      try{
-        const addr = JSON.parse(profile.address)
-        document.getElementById('addrStreet').value  = addr.street  || ''
-        document.getElementById('addrCity').value    = addr.city    || ''
-        document.getElementById('addrState').value   = addr.state   || ''
-        document.getElementById('addrPin').value     = addr.pin     || ''
-        document.getElementById('addrCountry').value = addr.country || 'India'
-      } catch(e){}
+    // Address form — load from addresses table
+    const { data: savedAddr } = await db
+      .from('addresses')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    if(savedAddr){
+      document.getElementById('addrStreet').value  = savedAddr.line1   || ''
+      document.getElementById('addrStreet2').value = savedAddr.line2   || ''
+      document.getElementById('addrCity').value    = savedAddr.city    || ''
+      document.getElementById('addrState').value   = savedAddr.state   || ''
+      document.getElementById('addrPin').value     = savedAddr.pincode || ''
+      document.getElementById('addrName').value    = savedAddr.full_name || ''
+      document.getElementById('addrPhone').value   = savedAddr.phone   || ''
     }
 
     // Load orders count
@@ -523,35 +542,61 @@
     }
   }
 
-  // ── Save Address ───────────────────────────────────────────
+  // ── Save Address — saves to addresses table (autofills checkout) ──
   async function saveAddress(){
-    const btn  = document.getElementById('saveAddressBtn')
-    const addr = {
-      street:  document.getElementById('addrStreet').value.trim(),
-      city:    document.getElementById('addrCity').value.trim(),
-      state:   document.getElementById('addrState').value.trim(),
-      pin:     document.getElementById('addrPin').value.trim(),
-      country: document.getElementById('addrCountry').value.trim()
+    const btn = document.getElementById('saveAddressBtn')
+
+    const full_name = document.getElementById('addrName').value.trim()
+    const phone     = document.getElementById('addrPhone').value.trim()
+    const line1     = document.getElementById('addrStreet').value.trim()
+    const line2     = document.getElementById('addrStreet2').value.trim()
+    const city      = document.getElementById('addrCity').value.trim()
+    const state     = document.getElementById('addrState').value.trim()
+    const pincode   = document.getElementById('addrPin').value.trim()
+
+    if(!line1 || !city || !state || !pincode){
+      alert('Please fill in Street Address, City, State and PIN Code.')
+      return
     }
 
     btn.textContent = 'Saving…'
     btn.disabled = true
 
-    const { error } = await db
-      .from('profiles')
-      .upsert({ id: currentUser.id, address: JSON.stringify(addr), email: currentUser.email })
+    // Check if user already has an address row
+    const { data: existing } = await db
+      .from('addresses')
+      .select('id')
+      .eq('user_id', currentUser.id)
+      .limit(1)
+      .single()
+
+    let error
+    if(existing){
+      // Update existing address
+      const res = await db
+        .from('addresses')
+        .update({ full_name, phone, line1, line2, city, state, pincode, tag: 'Home' })
+        .eq('id', existing.id)
+      error = res.error
+    } else {
+      // Insert new address
+      const res = await db
+        .from('addresses')
+        .insert({ user_id: currentUser.id, full_name, phone, line1, line2, city, state, pincode, tag: 'Home' })
+      error = res.error
+    }
 
     btn.disabled = false
 
     if(error){
       btn.textContent = 'Save Address'
-      alert('Error: '+error.message)
+      alert('Error saving address: ' + error.message)
     } else {
       btn.textContent = '✓ Saved!'
       btn.classList.add('saved')
       document.getElementById('addressAlert').classList.add('show')
       setTimeout(()=>{
-        btn.textContent='Save Address'
+        btn.textContent = 'Save Address'
         btn.classList.remove('saved')
         document.getElementById('addressAlert').classList.remove('show')
       }, 2500)
