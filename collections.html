@@ -679,3 +679,213 @@
       <h3>No products found</h3>
       <p>Try a different filter or browse all products</p>
     </div>
+</div><!-- /product-grid -->
+</div><!-- /collection-body -->
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="nav-logo" style="font-size:24px">VYNE<span>IT</span></a>
+      <p>Premium quality tees made from 100% organic cotton. Designed to make you feel as good as you look.</p>
+    </div>
+    <div class="footer-col"><h4>Shop</h4><ul>
+      <li><a href="collections.html">All Products</a></li>
+      <li><a href="index.html">New Arrivals</a></li>
+      <li><a href="index.html">Best Sellers</a></li>
+      <li><a href="collections.html?sale=true">Sale</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Help</h4><ul>
+      <li><a href="#">Size Guide</a></li>
+      <li><a href="#">Shipping Info</a></li>
+      <li><a href="#">Returns &amp; Exchanges</a></li>
+      <li><a href="#">Contact Us</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Company</h4><ul>
+      <li><a href="#">Our Story</a></li>
+      <li><a href="#">Sustainability</a></li>
+      <li><a href="privacy-policy.html">Privacy Policy</a></li>
+      <li><a href="#">Careers</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 VYNEIT. All rights reserved.</p>
+    <div class="pay-icons">
+      <span class="pay-icon">VISA</span><span class="pay-icon">MC</span>
+      <span class="pay-icon">UPI</span><span class="pay-icon">COD</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+  (function loop(){cursor.style.left=mx+'px';cursor.style.top=my+'px';rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+
+  function getCartKey(){
+    const u=JSON.parse(localStorage.getItem('vyneit_user')||'null');
+    return u&&u.user_id?'vyneit_cart_'+u.user_id:'vyneit_cart_guest';
+  }
+  function refreshCartBadge(){
+    const cart=JSON.parse(localStorage.getItem(getCartKey())||'[]');
+    const el=document.getElementById('cartBadge');
+    if(el) el.textContent=cart.reduce((s,i)=>s+i.qty,0);
+  }
+
+  /* ── GO TO PRODUCT DETAIL ── reads data-* from card element ── */
+  function goToProduct(cardEl){
+    const p={
+      name:cardEl.dataset.name,
+      price:parseInt(cardEl.dataset.price),
+      img:cardEl.dataset.img,
+      oldPrice:cardEl.dataset.oldprice?parseInt(cardEl.dataset.oldprice):null,
+      badge:cardEl.dataset.badge||null,
+      category:cardEl.dataset.category||'',
+      cat:cardEl.dataset.category||''
+    };
+    localStorage.setItem('vyneit_current_product',JSON.stringify(p));
+    window.location.href='product-detail.html';
+  }
+
+  async function addToCart(btn){
+    const name=btn.dataset.name,price=parseInt(btn.dataset.price),img=btn.dataset.img;
+    const cartKey=getCartKey();
+    let cart=JSON.parse(localStorage.getItem(cartKey)||'[]');
+    const existing=cart.find(i=>i.name===name);
+    const itemId=existing?existing.id:'item-'+Date.now();
+    if(existing){existing.qty+=1;}else{cart.push({id:itemId,name,price,img,qty:1});}
+    localStorage.setItem(cartKey,JSON.stringify(cart));
+    refreshCartBadge();
+    const user=JSON.parse(localStorage.getItem('vyneit_user')||'null');
+    if(user&&user.user_id&&window._db){
+      const row=cart.find(i=>i.id===itemId);
+      await window._db.from('carts').upsert([{user_id:user.user_id,item_id:row.id,name:row.name,price:row.price,img:row.img,qty:row.qty}]);
+    }
+    btn.textContent='✓ Added!';btn.style.background='var(--green)';
+    setTimeout(()=>{btn.textContent='Add to Cart';btn.style.background='';},1500);
+  }
+
+  function toggleFilters(btn){
+    const dd=document.getElementById('filterDropdown'),open=dd.classList.contains('visible');
+    dd.classList.toggle('visible',!open);btn.classList.toggle('open',!open);
+  }
+  document.addEventListener('click',function(e){
+    const bar=document.getElementById('filterToggle'),dd=document.getElementById('filterDropdown');
+    if(!bar.contains(e.target)&&!dd.contains(e.target)){dd.classList.remove('visible');bar.classList.remove('open');}
+  });
+
+  let currentFilter='all';
+  function filterProducts(cat,btn){
+    currentFilter=cat;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    if(btn)btn.classList.add('active');
+    document.getElementById('activeFilterLabel').textContent=btn?btn.textContent.replace('🔥','').trim():cat;
+    document.getElementById('filterDropdown').classList.remove('visible');
+    document.getElementById('filterToggle').classList.remove('open');
+    const cards=document.querySelectorAll('.product-card');
+    let visible=0;
+    cards.forEach((card,i)=>{
+      const cardCat=card.dataset.cat||'',isSale=card.dataset.sale;
+      let show=cat==='all'?true:cat==='sale'?!!isSale:cardCat.includes(cat);
+      card.style.display=show?'':'none';
+      if(show){card.style.animationDelay=(visible*.04)+'s';visible++;}
+    });
+    document.getElementById('resultCount').textContent=visible+' product'+(visible!==1?'s':'');
+    document.getElementById('emptyState').classList.toggle('show',visible===0);
+  }
+
+  function sortProducts(val){
+    const grid=document.getElementById('productGrid');
+    const cards=[...document.querySelectorAll('.product-card')];
+    cards.sort((a,b)=>{
+      if(val==='price-low') return parseInt(a.dataset.price)-parseInt(b.dataset.price);
+      if(val==='price-high') return parseInt(b.dataset.price)-parseInt(a.dataset.price);
+      if(val==='name') return a.dataset.name.localeCompare(b.dataset.name);
+      if(val==='newest') return (b.dataset.new?1:0)-(a.dataset.new?1:0);
+      return 0;
+    });
+    cards.forEach((c,i)=>{c.style.animationDelay=(i*.04)+'s';grid.appendChild(c);});
+    filterProducts(currentFilter,document.querySelector('.filter-btn.active'));
+  }
+
+  function setView(cols,btn){
+    document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const grid=document.getElementById('productGrid');
+    grid.className='product-grid';
+    if(cols===3)grid.classList.add('view-3');
+    if(cols===2)grid.classList.add('view-2');
+  }
+
+  function openDrawer(){document.getElementById('sideDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('show');document.getElementById('hamburgerBtn').classList.add('open');document.body.style.overflow='hidden';}
+  function closeDrawer(){document.getElementById('sideDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('show');document.getElementById('hamburgerBtn').classList.remove('open');document.body.style.overflow='';}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
+
+  function updateDrawer(userData){
+    const li=document.getElementById('drawerLoggedIn'),lo=document.getElementById('drawerLoggedOut');
+    const am=document.getElementById('drawerAuthMenu'),gm=document.getElementById('drawerGuestMenu');
+    if(!li)return;
+    if(userData){
+      li.style.display='block';lo.style.display='none';am.style.display='block';gm.style.display='none';
+      const a=document.getElementById('drawerAvatar'),n=document.getElementById('drawerName'),em=document.getElementById('drawerEmail');
+      if(a)a.textContent=(userData.name||'?').substring(0,2).toUpperCase();
+      if(n)n.textContent=userData.name||'User';
+      if(em)em.textContent=userData.email||'';
+    }else{li.style.display='none';lo.style.display='block';am.style.display='none';gm.style.display='block';}
+  }
+
+  updateDrawer(null);
+  refreshCartBadge();
+
+  /* URL param filter on load */
+  (function(){
+    const p=new URLSearchParams(location.search);
+    const cat=p.get('cat'),sale=p.get('sale');
+    if(cat){const btn=document.querySelector('[data-filter="'+cat+'"]');if(btn)filterProducts(cat,btn);}
+    else if(sale){const btn=document.querySelector('[data-filter="sale"]');if(btn)filterProducts('sale',btn);}
+  })();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const{createClient}=supabase;
+  window._db=createClient('https://agwrykpdhnqycwqwpegj.supabase.co','sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m');
+  const _db=window._db;
+
+  async function buildAndSaveUser(user){
+    let name=user.user_metadata?.full_name||user.email.split('@')[0];
+    try{const{data:p}=await _db.from('profiles').select('full_name').eq('id',user.id).single();if(p?.full_name)name=p.full_name;}catch(e){}
+    const userData={user_id:user.id,email:user.email,name,initials:name.substring(0,2).toUpperCase()};
+    localStorage.setItem('vyneit_user',JSON.stringify(userData));return userData;
+  }
+
+  let _lastUid=null;
+  async function handleSession(session){
+    if(session?.user){
+      if(_lastUid===session.user.id)return;
+      _lastUid=session.user.id;
+      const qn=session.user.user_metadata?.full_name||session.user.email.split('@')[0];
+      updateDrawer({user_id:session.user.id,email:session.user.email,name:qn});
+      const userData=await buildAndSaveUser(session.user);
+      updateDrawer(userData);
+      const{data:rows}=await _db.from('carts').select('*').eq('user_id',session.user.id);
+      if(rows?.length>0){
+        const cart=rows.map(r=>({id:r.item_id,name:r.name,price:r.price,img:r.img,qty:r.qty}));
+        localStorage.setItem('vyneit_cart_'+session.user.id,JSON.stringify(cart));
+      }
+      refreshCartBadge();
+    }else{
+      if(_lastUid===null)return;_lastUid=null;
+      localStorage.removeItem('vyneit_user');updateDrawer(null);refreshCartBadge();
+    }
+  }
+  _db.auth.getSession().then(({data:{session}})=>{handleSession(session);});
+  _db.auth.onAuthStateChange((_e,session)=>{handleSession(session);});
+  function handleDrawerLogout(){
+    if(!confirm('Sign out of VYNEIT?'))return;
+    localStorage.removeItem('vyneit_user');_lastUid=null;
+    _db.auth.signOut().then(()=>{updateDrawer(null);refreshCartBadge();window.location.href='index.html';});
+  }
+</script>
+</body>
+</html>
