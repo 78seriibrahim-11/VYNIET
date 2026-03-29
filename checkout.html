@@ -841,7 +841,7 @@
     const shipping = subtotal >= 999 ? 0 : 79;
     const codFee = activePayMethod==='cod' ? 40 : 0;
     const discounted = subtotal - cartDiscount;
-    const tax = Math.round(subtotal * 0.18);          // tax on pre-discount subtotal (matches cart.html)
+    const tax = Math.round(subtotal * 0.08);          // 8% tax on subtotal (matches cart.html)
     const total = discounted + (shipping===0?0:shipping) + tax + codFee;
 
     document.getElementById('summaryCount').textContent = itemCount;
@@ -864,46 +864,48 @@
   let savedAddresses = [];
   let selectedAddressId = null;
 
-  async function loadSavedAddresses(userId){
+  // ── Direct Supabase autofill: called once after auth resolves ──
+  async function autofillFromSupabase(userId){
     try {
-      const { data, error } = await _db.from('addresses').select('*').eq('user_id', userId).order('created_at', {ascending:false});
-      if(error || !data?.length){
-        // Still hide the "Sign in" prompt — user IS logged in
-        const notice = document.querySelector('.guest-address-notice');
-        if(notice) notice.style.display = 'none';
-        return;
-      }
+      const { data, error } = await _db
+        .from('addresses')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if(error){ console.error('[VYNEIT] addresses fetch error:', error); return; }
+      if(!data || !data.length){ console.log('[VYNEIT] No saved addresses found for user'); return; }
+
       savedAddresses = data;
+
+      // Show saved address card panel
       renderSavedAddresses();
-      document.getElementById('addressColumnWrap').style.display='block';
-      document.getElementById('guestAddressWrap').style.display='none';
-    } catch(e){}
+      document.getElementById('addressColumnWrap').style.display = 'block';
+      // guestAddressWrap stays visible — form inputs live there
+
+      // Auto-select and fill first address
+      const first = data[0];
+      selectedAddressId = first.id;
+
+      // Fill every form field directly
+      safeSet('addr1',     first.line1);
+      safeSet('addr2',     first.line2);
+      safeSet('city',      first.city);
+      safeSet('state',     first.state);
+      safeSet('pincode',   first.pincode);
+      safeSet('phone',     first.phone);
+      const nameParts = (first.full_name || '').split(' ');
+      safeSet('firstName', nameParts[0]);
+      safeSet('lastName',  nameParts.slice(1).join(' '));
+
+      console.log('[VYNEIT] Address autofilled from Supabase:', first.city);
+    } catch(e){ console.error('[VYNEIT] autofillFromSupabase exception:', e); }
   }
 
-  function renderSavedAddresses(){
-    const list = document.getElementById('savedAddressList');
-    if(!savedAddresses.length){
-      list.innerHTML = `<div class="address-empty"><div class="address-empty-icon">📍</div><p>No saved addresses yet.<br>Fill in the form below to add one.</p></div>`;
-      return;
-    }
-    list.innerHTML = savedAddresses.map((addr, i) => `
-      <div class="address-card${i===0?' selected':''}" id="addrCard_${addr.id}" onclick="selectAddress('${addr.id}')">
-        <div class="address-radio"></div>
-        <div class="address-info">
-          <div class="address-name">${addr.full_name || ''}</div>
-          <span class="address-tag">${addr.tag || 'Home'}</span>
-          <div class="address-line">${addr.line1||''}${addr.line2?', '+addr.line2:''}</div>
-          <div class="address-line">${addr.city||''}, ${addr.state||''} – ${addr.pincode||''}</div>
-          <div class="address-phone">📞 ${addr.phone||''}</div>
-          <div class="address-actions">
-            <button class="address-action-btn" onclick="event.stopPropagation();editAddress('${addr.id}')">Edit</button>
-          </div>
-        </div>
-      </div>
-    `).join('') + `<button class="add-address-btn" onclick="showNewAddressForm()">+ Add New Address</button>`;
-
-    // Select first by default
-    if(savedAddresses.length) selectAddress(savedAddresses[0].id, false);
+  async function loadSavedAddresses(userId){
+    // Kept for compatibility; actual autofill is done by autofillFromSupabase()
+    const notice = document.querySelector('.guest-address-notice');
+    if(notice) notice.style.display = 'none';
   }
 
   function selectAddress(id, scroll=true){
@@ -1062,20 +1064,10 @@
       safeSet('firstName', parts[0]);
       safeSet('lastName', parts.slice(1).join(' '));
       if(userData.phone) safeSet('phone', userData.phone);
-      // Autofill address fields from profile (only if form not already filled)
-      const addr1El = document.getElementById('addr1');
-      if(addr1El && !addr1El.value){
-        if(userData.addr1)   safeSet('addr1',   userData.addr1);
-        if(userData.addr2)   safeSet('addr2',   userData.addr2);
-        if(userData.city)    safeSet('city',    userData.city);
-        if(userData.state)   safeSet('state',   userData.state);
-        if(userData.pincode) safeSet('pincode', userData.pincode);
-      }
       // Hide sign-in notice — user is already logged in
       const signInNotice = document.querySelector('.guest-address-notice');
       if(signInNotice) signInNotice.style.display = 'none';
-      // Load saved addresses — user_id matches cart.html convention
-      if(userData.user_id) loadSavedAddresses(userData.user_id);
+      // Address autofill is handled by autofillFromSupabase() called from handleSession
     } else {
       loggedInEl.style.display='none'; loggedOutEl.style.display='block';
       authMenu.style.display='none';   guestMenu.style.display='block';
@@ -1086,21 +1078,12 @@
   async function buildAndSaveUser(user){
     let name = user.user_metadata?.full_name || user.email.split('@')[0];
     let phone = user.user_metadata?.phone || '';
-    const profileAddr = { addr1:'', addr2:'', city:'', state:'', pincode:'' };
     try {
-      const { data: p } = await _db.from('profiles').select('full_name, phone, address_line1, address_line2, city, state, pincode').eq('id',user.id).single();
-      if(p?.full_name) name = p.full_name;
-      if(p?.phone) phone = p.phone;
-      // Capture address fields from profile for autofill
-      Object.assign(profileAddr, {
-        addr1:   p?.address_line1 || '',
-        addr2:   p?.address_line2 || '',
-        city:    p?.city          || '',
-        state:   p?.state         || '',
-        pincode: p?.pincode       || '',
-      });
+      const { data: p } = await _db.from('profiles').select('full_name, phone').eq('id', user.id).single();
+      if(p?.full_name) name  = p.full_name;
+      if(p?.phone)     phone = p.phone;
     } catch(e){}
-    const userData = { user_id: user.id, email: user.email, name, phone, ...profileAddr, initials: name.substring(0,2).toUpperCase() };
+    const userData = { user_id: user.id, email: user.email, name, phone, initials: name.substring(0,2).toUpperCase() };
     localStorage.setItem('vyneit_user', JSON.stringify(userData));
     return userData;
   }
@@ -1117,11 +1100,14 @@
       updateDrawer({ user_id: session.user.id, email: session.user.email,
         name: session.user.user_metadata?.full_name || session.user.email.split('@')[0] });
 
-      // Fetch full profile (name + phone) in background
+      // Fetch full profile (name + phone) then update drawer
       const userData = await buildAndSaveUser(session.user);
       updateDrawer(userData);
 
-      // Now reload cart from Supabase with the confirmed userId
+      // ── Single, direct autofill from Supabase addresses table ──
+      autofillFromSupabase(session.user.id);
+
+      // Reload cart
       loadCart(session.user.id);
 
     } else {
