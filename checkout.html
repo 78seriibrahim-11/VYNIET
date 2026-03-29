@@ -841,7 +841,7 @@
     const shipping = subtotal >= 999 ? 0 : 79;
     const codFee = activePayMethod==='cod' ? 40 : 0;
     const discounted = subtotal - cartDiscount;
-    const tax = Math.round(discounted * 0.18);
+    const tax = Math.round(subtotal * 0.18);          // tax on pre-discount subtotal (matches cart.html)
     const total = discounted + (shipping===0?0:shipping) + tax + codFee;
 
     document.getElementById('summaryCount').textContent = itemCount;
@@ -867,7 +867,12 @@
   async function loadSavedAddresses(userId){
     try {
       const { data, error } = await _db.from('addresses').select('*').eq('user_id', userId).order('created_at', {ascending:false});
-      if(error || !data?.length) return;
+      if(error || !data?.length){
+        // Still hide the "Sign in" prompt — user IS logged in
+        const notice = document.querySelector('.guest-address-notice');
+        if(notice) notice.style.display = 'none';
+        return;
+      }
       savedAddresses = data;
       renderSavedAddresses();
       document.getElementById('addressColumnWrap').style.display='block';
@@ -1057,6 +1062,15 @@
       safeSet('firstName', parts[0]);
       safeSet('lastName', parts.slice(1).join(' '));
       if(userData.phone) safeSet('phone', userData.phone);
+      // Autofill address fields from profile (only if form not already filled)
+      const addr1El = document.getElementById('addr1');
+      if(addr1El && !addr1El.value){
+        if(userData.addr1)   safeSet('addr1',   userData.addr1);
+        if(userData.addr2)   safeSet('addr2',   userData.addr2);
+        if(userData.city)    safeSet('city',    userData.city);
+        if(userData.state)   safeSet('state',   userData.state);
+        if(userData.pincode) safeSet('pincode', userData.pincode);
+      }
       // Hide sign-in notice — user is already logged in
       const signInNotice = document.querySelector('.guest-address-notice');
       if(signInNotice) signInNotice.style.display = 'none';
@@ -1072,12 +1086,21 @@
   async function buildAndSaveUser(user){
     let name = user.user_metadata?.full_name || user.email.split('@')[0];
     let phone = user.user_metadata?.phone || '';
+    const profileAddr = { addr1:'', addr2:'', city:'', state:'', pincode:'' };
     try {
-      const { data: p } = await _db.from('profiles').select('full_name, phone').eq('id',user.id).single();
+      const { data: p } = await _db.from('profiles').select('full_name, phone, address_line1, address_line2, city, state, pincode').eq('id',user.id).single();
       if(p?.full_name) name = p.full_name;
       if(p?.phone) phone = p.phone;
+      // Capture address fields from profile for autofill
+      Object.assign(profileAddr, {
+        addr1:   p?.address_line1 || '',
+        addr2:   p?.address_line2 || '',
+        city:    p?.city          || '',
+        state:   p?.state         || '',
+        pincode: p?.pincode       || '',
+      });
     } catch(e){}
-    const userData = { user_id: user.id, email: user.email, name, phone, initials: name.substring(0,2).toUpperCase() };
+    const userData = { user_id: user.id, email: user.email, name, phone, ...profileAddr, initials: name.substring(0,2).toUpperCase() };
     localStorage.setItem('vyneit_user', JSON.stringify(userData));
     return userData;
   }
