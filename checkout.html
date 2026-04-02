@@ -1096,22 +1096,11 @@
         theme: { color: '#102C26' },
         handler: async function(response){
           // ── PAYMENT SUCCESSFUL ──────────────────────────────────
-          // response.razorpay_payment_id  → save this to your DB
-          // response.razorpay_order_id    → verify on backend
-          // response.razorpay_signature   → verify on backend
           console.log('[VYNEIT] Payment successful:', response);
-
-          // Clear cart + coupon
-          const _u = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-          localStorage.removeItem(getCartKey(_u));
-          localStorage.removeItem('vyneit_cart');
-          for(const k of ['vyneit_applied_coupon','vyneit_coupon','vyneit_discount','vyneit_promo'])
-            localStorage.removeItem(k);
-
-          // Show success
-          const orderId = '#VYN-' + Math.floor(100000 + Math.random()*900000);
-          document.getElementById('successOrderId').textContent = orderId;
-          document.getElementById('successOverlay').classList.add('show');
+          const orderNum = '#VYN-' + Math.floor(100000 + Math.random()*900000);
+          await saveOrderToSupabase(orderNum, 'Online (Razorpay)', response.razorpay_payment_id);
+          clearCartAndCoupon();
+          showSuccess(orderNum);
         },
         modal: {
           ondismiss: function(){
@@ -1151,22 +1140,62 @@
       btn.innerHTML = '<span style="animation:spin .7s linear infinite;display:inline-block">⏳</span> Placing order…';
 
       await new Promise(r=>setTimeout(r,1200));
-
-      // Clear cart + coupon
-      const _u = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-      localStorage.removeItem(getCartKey(_u));
-      localStorage.removeItem('vyneit_cart');
-      for(const k of ['vyneit_applied_coupon','vyneit_coupon','vyneit_discount','vyneit_promo'])
-        localStorage.removeItem(k);
-
-      const orderId = '#VYN-' + Math.floor(100000+Math.random()*900000);
-      document.getElementById('successOrderId').textContent = orderId;
-      document.getElementById('successOverlay').classList.add('show');
+      const orderNum = '#VYN-' + Math.floor(100000+Math.random()*900000);
+      await saveOrderToSupabase(orderNum, 'COD', null);
+      clearCartAndCoupon();
+      showSuccess(orderNum);
     }
   }
 
-  // ── INIT: Load cart immediately from localStorage (never stays blank) ──
-  loadCart(null);
+  // ── SAVE ORDER TO SUPABASE ───────────────────────────────────
+  // Called after successful payment (Razorpay or COD)
+  async function saveOrderToSupabase(orderNum, paymentMethod, razorpayPaymentId){
+    if(!window._db) return;
+    const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+    if(!user?.user_id) return;
+
+    const subtotal  = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
+    const shipping  = subtotal >= 999 ? 0 : 79;
+    const tax       = Math.round(subtotal * 0.08);
+    const codFee    = paymentMethod === 'COD' ? 40 : 0;
+    const total     = (subtotal - cartDiscount) + shipping + tax + codFee;
+
+    const addr = document.getElementById('addr1')?.value || '';
+    const city  = document.getElementById('city')?.value  || '';
+
+    await window._db.from('orders').insert({
+      user_id:         user.user_id,
+      order_number:    orderNum,
+      status:          'Confirmed',
+      total:           total,
+      subtotal:        subtotal,
+      discount:        cartDiscount,
+      shipping:        shipping,
+      tax:             tax,
+      cod_fee:         codFee,
+      payment_method:  paymentMethod,
+      razorpay_id:     razorpayPaymentId || null,
+      items:           JSON.stringify(cartItems),
+      items_count:     cartItems.reduce((s,i)=>s+(i.qty||1),0),
+      address:         addr + (city ? ', '+city : ''),
+      coupon_code:     cartCoupon?.code || null,
+    });
+  }
+
+  // ── CLEAR CART HELPER ─────────────────────────────────────────
+  function clearCartAndCoupon(){
+    const _u = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+    localStorage.removeItem(getCartKey(_u));
+    localStorage.removeItem('vyneit_cart');
+    for(const k of ['vyneit_applied_coupon','vyneit_coupon','vyneit_discount','vyneit_promo'])
+      localStorage.removeItem(k);
+  }
+
+  // ── SHOW SUCCESS ──────────────────────────────────────────────
+  function showSuccess(orderNum){
+    document.getElementById('successOrderId').textContent = orderNum;
+    document.getElementById('successOverlay').classList.add('show');
+  }
 
   // Add spin keyframe
   const st = document.createElement('style');
