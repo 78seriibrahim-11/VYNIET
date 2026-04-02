@@ -237,23 +237,48 @@
 
     /* RESPONSIVE */
     @media(max-width:960px){
-      nav{padding:0 16px}
-      .nav-logo{font-size:22px}
-      .breadcrumb{padding:14px 16px}
+      nav{padding:0 12px}
+      .nav-logo{font-size:20px}
+      .breadcrumb{padding:12px 16px;font-size:12px;flex-wrap:wrap;gap:6px}
       .checkout-steps{padding:0 16px}
-      .checkout-page{grid-template-columns:1fr;padding:32px 16px 80px;gap:28px}
-      .checkout-right{position:static}
+      .steps-inner{padding:12px 0}
+      .checkout-page{grid-template-columns:1fr;padding:24px 16px 80px;gap:20px}
+      .checkout-right{position:static;order:999}
       .form-grid{grid-template-columns:1fr}
       .form-group.span2{grid-column:span 1}
-      .card-row{grid-template-columns:1fr 1fr}
+      .section-body{padding:20px 16px}
+      .section-head{padding:16px 16px}
+      .summary-box{padding:20px 16px}
+      .summary-total .total-value{font-size:28px}
+      .upi-row{flex-direction:column}
+      .upi-verify-btn{width:100%}
     }
     @media(max-width:480px){
-      .checkout-page{padding:20px 12px 80px}
-      .section-body{padding:20px}
-      .summary-box{padding:20px 16px}
-      .steps-inner{gap:0;overflow-x:auto}
-      .step-sep{max-width:30px;margin:0 8px}
-      .step{font-size:10px}
+      html,body{overflow-x:hidden;max-width:100vw}
+      nav{padding:0 10px;height:56px}
+      .nav-logo{font-size:18px}
+      .cart-pill{padding:8px 12px !important;font-size:11px}
+      .breadcrumb{padding:10px 12px;font-size:11px}
+      .checkout-steps{padding:0 12px}
+      .step{font-size:10px;gap:6px}
+      .step-sep{max-width:20px;margin:0 4px}
+      .step-num{width:22px;height:22px;font-size:10px}
+      .checkout-page{padding:16px 12px 80px;gap:16px}
+      .section-body{padding:16px 12px}
+      .section-head{padding:14px 12px}
+      .section-num{width:24px;height:24px;font-size:11px}
+      .section-title{font-size:17px}
+      .form-input,.form-select{padding:11px 12px;font-size:14px}
+      .summary-box{padding:16px 12px}
+      .summary-title{font-size:20px}
+      .summary-item-img{width:44px;height:54px}
+      .summary-total .total-value{font-size:26px}
+      .place-order-btn{padding:15px;font-size:13px}
+      .success-box{padding:40px 24px}
+      .success-box h2{font-size:28px}
+      .success-icon{font-size:52px}
+      .address-card{padding:12px}
+      .address-column .address-col-head{padding:12px 14px}
     }
   </style>
 </head>
@@ -479,116 +504,49 @@
       <div class="section-head">
         <div class="section-head-left">
           <div class="section-num">3</div>
-          <div class="section-title">Payment Method</div>
+          <div class="section-title">Payment</div>
         </div>
       </div>
       <div class="section-body">
 
-        <div class="payment-options">
+        <!-- Payment method toggle -->
+        <div class="payment-options" style="margin-bottom:20px">
 
-          <!-- Credit / Debit Card -->
-          <div class="pay-option selected" id="payCard" onclick="selectPay('card')">
+          <!-- Razorpay (online) -->
+          <div class="pay-option selected" id="payRazorpay" onclick="selectPay('razorpay')">
             <div class="pay-radio"></div>
             <div>
-              <div class="pay-label">Credit / Debit Card</div>
-              <div class="pay-desc">Visa, Mastercard, RuPay</div>
+              <div class="pay-label">Pay Online</div>
+              <div class="pay-desc">Cards · UPI · Net Banking · Wallets — via Razorpay</div>
             </div>
             <div class="pay-icons">
-              <span class="pay-icon">VISA</span>
-              <span class="pay-icon">MC</span>
-              <span class="pay-icon" style="color:#00457C;">RP</span>
-            </div>
-          </div>
-          <div class="pay-detail-panel active" id="panelCard">
-            <div class="form-group" style="display:flex;flex-direction:column;gap:7px">
-              <label class="form-label">Card Number <span class="req">*</span></label>
-              <input class="form-input" id="cardNum" type="text" placeholder="1234  5678  9012  3456" maxlength="19" oninput="fmtCard(this)"/>
-            </div>
-            <div class="card-row">
-              <div class="form-group">
-                <label class="form-label">Expiry <span class="req">*</span></label>
-                <input class="form-input" id="cardExp" type="text" placeholder="MM / YY" maxlength="7" oninput="fmtExp(this)"/>
-              </div>
-              <div class="form-group">
-                <label class="form-label">CVV <span class="req">*</span></label>
-                <input class="form-input" id="cardCvv" type="password" placeholder="•••" maxlength="4"/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Cardholder Name <span class="req">*</span></label>
-              <input class="form-input" id="cardName" type="text" placeholder="ARJUN SHARMA"/>
+              <span class="pay-icon" style="font-size:13px;letter-spacing:0;color:#3395FF;font-weight:800">Rₚ</span>
             </div>
           </div>
 
-          <!-- UPI -->
-          <div class="pay-option" id="payUpi" onclick="selectPay('upi')">
-            <div class="pay-radio"></div>
-            <div>
-              <div class="pay-label">UPI</div>
-              <div class="pay-desc">GPay, PhonePe, Paytm, BHIM</div>
-            </div>
-            <div class="pay-icons">
-              <span class="pay-icon" style="color:#0B7B3E">G</span>
-              <span class="pay-icon" style="color:#5F259F">P</span>
-            </div>
-          </div>
-          <div class="pay-detail-panel" id="panelUpi">
-            <div class="form-group">
-              <label class="form-label">UPI ID <span class="req">*</span></label>
-              <div class="upi-row">
-                <input class="form-input" id="upiId" type="text" placeholder="yourname@upi" style="border-right:none"/>
-                <button class="upi-verify-btn" onclick="verifyUpi()">Verify</button>
-              </div>
-              <div class="field-hint" id="upiHint"></div>
-            </div>
-          </div>
-
-          <!-- Net Banking -->
-          <div class="pay-option" id="payNet" onclick="selectPay('net')">
-            <div class="pay-radio"></div>
-            <div>
-              <div class="pay-label">Net Banking</div>
-              <div class="pay-desc">All major Indian banks supported</div>
-            </div>
-          </div>
-          <div class="pay-detail-panel" id="panelNet">
-            <div class="form-group">
-              <label class="form-label">Select Bank <span class="req">*</span></label>
-              <select class="form-input form-select" id="bankSelect">
-                <option value="">Choose your bank</option>
-                <option>State Bank of India</option>
-                <option>HDFC Bank</option>
-                <option>ICICI Bank</option>
-                <option>Axis Bank</option>
-                <option>Kotak Mahindra Bank</option>
-                <option>Punjab National Bank</option>
-                <option>Bank of Baroda</option>
-                <option>Canara Bank</option>
-                <option>Yes Bank</option>
-                <option>IndusInd Bank</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Cash on Delivery -->
+          <!-- COD -->
           <div class="pay-option" id="payCod" onclick="selectPay('cod')">
             <div class="pay-radio"></div>
             <div>
               <div class="pay-label">Cash on Delivery</div>
               <div class="pay-desc">Pay when your order arrives · ₹40 COD fee applies</div>
             </div>
-            <div class="pay-icons">
-              <span class="pay-icon">💵</span>
-            </div>
+            <div class="pay-icons"><span class="pay-icon">💵</span></div>
           </div>
           <div class="pay-detail-panel" id="panelCod">
             <div style="font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:flex-start">
               <span>ℹ️</span>
-              <div>A COD handling fee of <b style="color:var(--black)">₹40</b> will be added to your order. Please keep the exact amount ready at the time of delivery.</div>
+              <div>A COD handling fee of <b style="color:var(--black)">₹40</b> will be added. Please keep the exact amount ready at delivery.</div>
             </div>
           </div>
 
-        </div><!-- /payment-options -->
+        </div>
+
+        <!-- Razorpay info notice (shown when online selected) -->
+        <div id="razorpayNotice" style="background:rgba(51,149,255,.07);border:1px solid rgba(51,149,255,.2);padding:14px 16px;display:flex;gap:10px;align-items:center;margin-bottom:8px;font-size:13px;color:var(--black)">
+          <span style="font-size:20px">🔒</span>
+          <div>You'll be redirected to a secure <b>Razorpay</b> payment page. Your payment is protected by 256-bit SSL encryption.</div>
+        </div>
 
         <!-- Order note -->
         <div class="form-group" style="margin-top:8px">
@@ -639,7 +597,7 @@
         <span class="label">COD Fee</span>
         <span class="value">₹40</span>
       </div>
-      <div class="summary-row">
+      <div class="summary-row" id="shippingRow">
         <span class="label">Shipping</span>
         <span class="value free" id="summaryShipping">FREE</span>
       </div>
@@ -656,8 +614,7 @@
       </div>
 
       <button class="place-order-btn" id="placeOrderBtn" onclick="placeOrder()">
-        <svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-        Place Order
+        🔒 Proceed to Payment
       </button>
 
       <div class="secure-badges">
@@ -724,19 +681,28 @@
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
 
   // ── PAYMENT SELECTOR ────────────────────────────────────────
-  let activePayMethod = 'card';
+  let activePayMethod = 'razorpay';
   function selectPay(method){
     activePayMethod = method;
-    ['card','upi','net','cod'].forEach(m=>{
-      document.getElementById('pay'+m.charAt(0).toUpperCase()+m.slice(1)).classList.toggle('selected', m===method);
-      document.getElementById('panel'+m.charAt(0).toUpperCase()+m.slice(1)).classList.toggle('active', m===method);
+    ['razorpay','cod'].forEach(m=>{
+      const btn = document.getElementById('pay'+m.charAt(0).toUpperCase()+m.slice(1));
+      if(btn) btn.classList.toggle('selected', m===method);
     });
-    // COD fee row
+    const codPanel = document.getElementById('panelCod');
+    if(codPanel) codPanel.classList.toggle('active', method==='cod');
+    const notice = document.getElementById('razorpayNotice');
+    if(notice) notice.style.display = method==='razorpay' ? 'flex' : 'none';
+    // Show/hide COD fee row in summary
     document.getElementById('codRow').style.display = method==='cod' ? 'flex' : 'none';
+    // Update Place Order button label
+    const btn = document.getElementById('placeOrderBtn');
+    btn.innerHTML = method === 'razorpay'
+      ? '🔒 Proceed to Payment'
+      : `<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg> Place Order (COD)`;
     updateSummary();
   }
 
-  // ── CARD FORMATTING ─────────────────────────────────────────
+  // ── CARD FORMATTING (kept for future use) ───────────────────
   function fmtCard(el){
     let v = el.value.replace(/\D/g,'').substring(0,16);
     el.value = v.replace(/(.{4})/g,'$1  ').trim();
@@ -745,14 +711,6 @@
     let v = el.value.replace(/\D/g,'');
     if(v.length>=2) v = v.substring(0,2)+' / '+v.substring(2,4);
     el.value = v;
-  }
-
-  // ── UPI VERIFY ──────────────────────────────────────────────
-  function verifyUpi(){
-    const id = document.getElementById('upiId').value.trim();
-    const hint = document.getElementById('upiHint');
-    if(!id.includes('@')){ hint.textContent='⚠ Please enter a valid UPI ID (e.g. name@upi)'; hint.style.color='var(--red)'; return; }
-    hint.textContent='✓ UPI ID looks valid'; hint.style.color='var(--green)';
   }
 
   // ── PRICE SANITIZER ─────────────────────────────────────────
@@ -802,17 +760,35 @@
       cartItems = localData;
     }
 
-    // Read coupon — cart.html may store the amount under different field names
-    const couponData = JSON.parse(localStorage.getItem('vyneit_applied_coupon') || 'null');
+    // ── Read coupon: try every possible key cart.html may use ──
+    const _couponKeys = ['vyneit_applied_coupon','vyneit_coupon','vyneit_discount','vyneit_promo'];
+    let couponData = null;
+    for(const k of _couponKeys){
+      const raw = localStorage.getItem(k);
+      if(raw){ try{ couponData = JSON.parse(raw); break; }catch(e){} }
+    }
     if(couponData){
-      // Support discount / amount / savings / value — whichever cart.html uses
-      cartDiscount = parsePrice(couponData.discount || couponData.amount || couponData.savings || couponData.value || 0);
-      // If only a percent is stored, calculate the rupee amount from subtotal
+      cartDiscount = parsePrice(
+        couponData.discount  ?? couponData.amount  ?? couponData.savings ??
+        couponData.value     ?? couponData.off      ?? 0
+      );
+      // percent-only coupon: calculate rupee amount from subtotal
       if(!cartDiscount && couponData.percent){
         const rawSub = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
         cartDiscount = Math.round(rawSub * couponData.percent / 100);
       }
       cartCoupon = couponData;
+    }
+    // ── Supabase fallback: some carts store discount on the cart row itself ──
+    if(!cartDiscount && userId && window._db){
+      try{
+        const { data: cr } = await window._db
+          .from('carts').select('coupon_code,discount,coupon_discount').eq('user_id',userId).limit(1);
+        if(cr && cr[0]){
+          const dbD = parsePrice(cr[0].discount || cr[0].coupon_discount || 0);
+          if(dbD){ cartDiscount = dbD; cartCoupon = { code: cr[0].coupon_code||'Coupon', discount: dbD }; }
+        }
+      }catch(e){}
     }
     renderSummaryItems();
     updateSummary();
@@ -856,8 +832,14 @@
 
     document.getElementById('summaryCount').textContent = itemCount;
     document.getElementById('summarySubtotal').textContent = '₹'+subtotal.toLocaleString('en-IN');
-    document.getElementById('summaryShipping').textContent = shipping===0 ? 'FREE' : '₹'+shipping;
-    document.getElementById('summaryShipping').className = 'value'+(shipping===0?' free':'');
+    const shippingRow = document.getElementById('shippingRow');
+    if(shipping === 0){
+      if(shippingRow) shippingRow.style.display = 'none';
+    } else {
+      if(shippingRow) shippingRow.style.display = 'flex';
+      document.getElementById('summaryShipping').textContent = '₹' + shipping;
+      document.getElementById('summaryShipping').className   = 'value';
+    }
     document.getElementById('summaryTax').textContent = '₹'+tax.toLocaleString('en-IN');
     document.getElementById('summaryTotal').textContent = '₹'+total.toLocaleString('en-IN');
 
@@ -882,99 +864,75 @@
 
   // ── Direct Supabase autofill: called once after auth resolves ──
   async function autofillFromSupabase(userId){
-    console.log('[VYNEIT] autofillFromSupabase called, userId:', userId);
     let filled = false;
 
-    // ── STRATEGY 1: addresses table with exact UUID match ──
+    // ── ALWAYS fetch profile first for name/email/phone ──────────
+    let profile = null;
+    try {
+      const { data: p } = await _db.from('profiles').select('*').eq('id', userId).single();
+      profile = p;
+      // Fill contact fields from profile immediately
+      if(profile){
+        if(profile.full_name){
+          const parts = profile.full_name.split(' ');
+          safeSet('firstName', parts[0] || '');
+          safeSet('lastName',  parts.slice(1).join(' ') || '');
+        }
+        if(profile.phone) safeSet('phone', profile.phone);
+        if(profile.email) safeSet('email', profile.email);
+      }
+    } catch(e){}
+
+    // ── STRATEGY 1: addresses table (exact UUID) ──────────────────
     try {
       const { data, error } = await _db
-        .from('addresses')
-        .select('*')
+        .from('addresses').select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
-
-      console.log('[VYNEIT] addresses query result:', { data, error });
 
       if(!error && data && data.length > 0){
         savedAddresses = data;
         renderSavedAddresses();
         document.getElementById('addressColumnWrap').style.display = 'block';
-
-        const first = data[0];
-        selectedAddressId = first.id;
-        _fillAddressFields(first);
+        selectedAddressId = data[0].id;
+        _fillAddressFields(data[0]);
         filled = true;
-        console.log('[VYNEIT] ✅ Address autofilled from addresses table:', first.city);
       }
-    } catch(e){
-      console.error('[VYNEIT] addresses query exception:', e);
-    }
+    } catch(e){}
 
-    // ── STRATEGY 2: addresses table with string cast (UUID/text mismatch fix) ──
+    // ── STRATEGY 2: addresses table (string cast — UUID/text mismatch) ──
     if(!filled){
       try {
         const { data, error } = await _db
-          .from('addresses')
-          .select('*')
-          .eq('user_id', String(userId))
-          .limit(5);
-
-        console.log('[VYNEIT] addresses string-cast query:', { data, error });
+          .from('addresses').select('*')
+          .eq('user_id', String(userId)).limit(5);
 
         if(!error && data && data.length > 0){
           savedAddresses = data;
           renderSavedAddresses();
           document.getElementById('addressColumnWrap').style.display = 'block';
-          const first = data[0];
-          selectedAddressId = first.id;
-          _fillAddressFields(first);
+          selectedAddressId = data[0].id;
+          _fillAddressFields(data[0]);
           filled = true;
-          console.log('[VYNEIT] ✅ Address autofilled via string cast:', first.city);
         }
-      } catch(e){
-        console.error('[VYNEIT] String-cast query exception:', e);
-      }
+      } catch(e){}
     }
 
-    // ── STRATEGY 3: profiles table fallback ──
-    if(!filled){
-      try {
-        const { data: profile, error: pErr } = await _db
-          .from('profiles')
-          .select('*')
-          .eq('id', userId)
-          .single();
-
-        console.log('[VYNEIT] profiles fallback:', { profile, pErr });
-
-        if(!pErr && profile){
-          // Fill whatever address fields the profile has
-          const addrFields = {
-            line1:   profile.address || profile.addr1 || profile.line1 || profile.address_line1 || '',
-            line2:   profile.addr2 || profile.line2 || profile.address_line2 || '',
-            city:    profile.city || '',
-            state:   profile.state || '',
-            pincode: profile.pincode || profile.pin || profile.zip || '',
-            phone:   profile.phone || '',
-            full_name: profile.full_name || ''
-          };
-          if(addrFields.city || addrFields.line1){
-            _fillAddressFields(addrFields);
-            filled = true;
-            console.log('[VYNEIT] ✅ Address partially filled from profiles table');
-          }
-        }
-      } catch(e){
-        console.error('[VYNEIT] profiles fallback exception:', e);
+    // ── STRATEGY 3: profile address fields as last resort ─────────
+    if(!filled && profile){
+      const addrFields = {
+        full_name: profile.full_name || '',
+        line1:   profile.address || profile.addr1 || profile.line1 || profile.address_line1 || '',
+        line2:   profile.addr2  || profile.line2  || profile.address_line2 || '',
+        city:    profile.city    || '',
+        state:   profile.state   || '',
+        pincode: profile.pincode || profile.pin || profile.zip || '',
+        phone:   profile.phone   || ''
+      };
+      if(addrFields.city || addrFields.line1){
+        _fillAddressFields(addrFields);
+        filled = true;
       }
-    }
-
-    if(!filled){
-      console.warn('[VYNEIT] ⚠ No address found in addresses or profiles table for userId:', userId,
-        '\nCheck: 1) Does the addresses table have rows for this user?',
-        '\n2) Is user_id column type UUID (not TEXT)? Run: SELECT pg_typeof(user_id) FROM addresses LIMIT 1;',
-        '\n3) Does the RLS SELECT policy use: auth.uid() = user_id  (not a text comparison)?'
-      );
     }
   }
 
@@ -1072,23 +1030,6 @@
       document.getElementById('pincode').classList.add('error');
       alert('Please enter a valid 6-digit PIN code.'); return false;
     }
-
-    if(activePayMethod==='card'){
-      const num = document.getElementById('cardNum').value.replace(/\s/g,'');
-      if(num.length < 16){ alert('Please enter a valid 16-digit card number.'); return false; }
-      const exp = document.getElementById('cardExp').value;
-      if(!exp.includes('/')){ alert('Please enter card expiry (MM/YY).'); return false; }
-      const cvv = document.getElementById('cardCvv').value;
-      if(cvv.length < 3){ alert('Please enter a valid CVV.'); return false; }
-    }
-    if(activePayMethod==='upi'){
-      const upi = document.getElementById('upiId').value.trim();
-      if(!upi.includes('@')){ alert('Please enter a valid UPI ID.'); return false; }
-    }
-    if(activePayMethod==='net'){
-      const bank = document.getElementById('bankSelect').value;
-      if(!bank){ alert('Please select your bank.'); return false; }
-    }
     return true;
   }
 
@@ -1097,24 +1038,131 @@
     if(!cartItems.length){ alert('Your cart is empty!'); window.location.href='cart.html'; return; }
     if(!validateForm()) return;
 
-    const btn = document.getElementById('placeOrderBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span style="animation:spin .7s linear infinite;display:inline-block">⏳</span> Processing…';
+    if(activePayMethod === 'razorpay'){
+      // ─────────────────────────────────────────────────────────────
+      // RAZORPAY INTEGRATION
+      // To activate: replace 'YOUR_RAZORPAY_KEY_ID' below with your
+      // live or test key from https://dashboard.razorpay.com/
+      // Also wire up a backend endpoint to create a Razorpay Order ID
+      // and replace the dummy order_id below with the real one.
+      // ─────────────────────────────────────────────────────────────
+      const RAZORPAY_KEY_ID = 'YOUR_RAZORPAY_KEY_ID'; // ← ADD YOUR KEY HERE
 
-    // Simulate processing
-    await new Promise(r=>setTimeout(r,1800));
+      if(RAZORPAY_KEY_ID === 'YOUR_RAZORPAY_KEY_ID'){
+        alert('Razorpay is not yet configured.\nAdd your key in checkout.html and set up a backend order endpoint.');
+        return;
+      }
 
-    // Clear the correct cart key (user-specific or guest)
-    const _user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-    const _cartKey = getCartKey(_user);
-    localStorage.removeItem(_cartKey);
-    localStorage.removeItem('vyneit_cart'); // legacy fallback
-    localStorage.removeItem('vyneit_applied_coupon');
+      // Load Razorpay script dynamically if not already loaded
+      if(!window.Razorpay){
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          s.onload = resolve;
+          s.onerror = () => reject(new Error('Razorpay script failed to load'));
+          document.head.appendChild(s);
+        });
+      }
 
-    // Show success
-    const orderId = '#VYN-' + Math.floor(100000+Math.random()*900000);
-    document.getElementById('successOrderId').textContent = orderId;
-    document.getElementById('successOverlay').classList.add('show');
+      const user   = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+      const subtotal = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
+      const shipping = subtotal >= 999 ? 0 : 79;
+      const tax = Math.round(subtotal * 0.08);
+      const total = (subtotal - cartDiscount) + shipping + tax;
+      const totalPaise = Math.round(total * 100); // Razorpay uses paise
+
+      // ── TODO: Replace this with a real backend call ──────────────
+      // Your backend should create a Razorpay order and return an order_id
+      // Example: const { order_id } = await fetch('/api/create-order', { method:'POST', body: JSON.stringify({ amount: totalPaise }) }).then(r=>r.json());
+      // For now we pass amount directly (test mode only — live mode REQUIRES a backend order_id)
+      // ────────────────────────────────────────────────────────────
+
+      const options = {
+        key: RAZORPAY_KEY_ID,                     // ← Your Razorpay Key ID
+        amount: totalPaise,                        // Amount in paise
+        currency: 'INR',
+        name: 'VYNEIT',
+        description: `Order of ${cartItems.length} item(s)`,
+        // order_id: 'order_XXXXX',               // ← Add backend-generated order_id here (required for production)
+        prefill: {
+          name:  (document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value).trim(),
+          email: document.getElementById('email').value,
+          contact: document.getElementById('phone').value
+        },
+        notes: {
+          address: document.getElementById('addr1').value + ', ' + document.getElementById('city').value,
+          coupon: cartCoupon?.code || ''
+        },
+        theme: { color: '#102C26' },
+        handler: async function(response){
+          // ── PAYMENT SUCCESSFUL ──────────────────────────────────
+          // response.razorpay_payment_id  → save this to your DB
+          // response.razorpay_order_id    → verify on backend
+          // response.razorpay_signature   → verify on backend
+          console.log('[VYNEIT] Payment successful:', response);
+
+          // Clear cart + coupon
+          const _u = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+          localStorage.removeItem(getCartKey(_u));
+          localStorage.removeItem('vyneit_cart');
+          for(const k of ['vyneit_applied_coupon','vyneit_coupon','vyneit_discount','vyneit_promo'])
+            localStorage.removeItem(k);
+
+          // Show success
+          const orderId = '#VYN-' + Math.floor(100000 + Math.random()*900000);
+          document.getElementById('successOrderId').textContent = orderId;
+          document.getElementById('successOverlay').classList.add('show');
+        },
+        modal: {
+          ondismiss: function(){
+            // ── PAYMENT FAILED / CANCELLED ──────────────────────
+            // Order is NOT placed — user stays on checkout page
+            alert('Payment was cancelled. Your order has not been placed. Please try again.');
+            document.getElementById('placeOrderBtn').disabled = false;
+            selectPay('razorpay'); // reset button label
+          }
+        }
+      };
+
+      const btn = document.getElementById('placeOrderBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Opening payment…';
+
+      try {
+        const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function(resp){
+          // ── PAYMENT FAILED ──────────────────────────────────
+          console.error('[VYNEIT] Payment failed:', resp.error);
+          alert('Payment failed: ' + (resp.error.description || 'Please try again.'));
+          btn.disabled = false;
+          selectPay('razorpay');
+        });
+        rzp.open();
+      } catch(err){
+        alert('Could not open payment. Please try again.');
+        btn.disabled = false;
+        selectPay('razorpay');
+      }
+
+    } else {
+      // ── COD FLOW ─────────────────────────────────────────────
+      const btn = document.getElementById('placeOrderBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span style="animation:spin .7s linear infinite;display:inline-block">⏳</span> Placing order…';
+
+      await new Promise(r=>setTimeout(r,1200));
+
+      // Clear cart + coupon
+      const _u = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+      localStorage.removeItem(getCartKey(_u));
+      localStorage.removeItem('vyneit_cart');
+      for(const k of ['vyneit_applied_coupon','vyneit_coupon','vyneit_discount','vyneit_promo'])
+        localStorage.removeItem(k);
+
+      const orderId = '#VYN-' + Math.floor(100000+Math.random()*900000);
+      document.getElementById('successOrderId').textContent = orderId;
+      document.getElementById('successOverlay').classList.add('show');
+    }
   }
 
   // ── INIT: Load cart immediately from localStorage (never stays blank) ──
