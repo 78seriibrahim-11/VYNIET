@@ -285,9 +285,9 @@
       <a class="drawer-item" href="account.html#address" onclick="localStorage.setItem('acPanel','address')"><span class="drawer-item-icon">📍</span> Addresses <span class="drawer-item-arrow">›</span></a>
       <div class="drawer-divider"></div>
       <div class="drawer-section-label">Support</div>
-      <a class="drawer-item" href="#"><span class="drawer-item-icon">🔄</span> Returns & Refunds <span class="drawer-item-arrow">›</span></a>
-      <a class="drawer-item" href="#"><span class="drawer-item-icon">🚚</span> Track My Order <span class="drawer-item-arrow">›</span></a>
-      <a class="drawer-item" href="#"><span class="drawer-item-icon">💬</span> Contact Support <span class="drawer-item-arrow">›</span></a>
+      <a class="drawer-item" href="returns-refunds.html"><span class="drawer-item-icon">🔄</span> Returns & Refunds <span class="drawer-item-arrow">›</span></a>
+      <a class="drawer-item" href="track-order.html"><span class="drawer-item-icon">🚚</span> Track My Order <span class="drawer-item-arrow">›</span></a>
+      <a class="drawer-item" href="contact-support.html"><span class="drawer-item-icon">💬</span> Contact Support <span class="drawer-item-arrow">›</span></a>
       <div class="drawer-divider"></div>
       <button class="drawer-item drawer-logout" onclick="handleDrawerLogout()"><span class="drawer-item-icon">🚪</span> Sign Out</button>
     </div>
@@ -802,8 +802,18 @@
       cartItems = localData;
     }
 
+    // Read coupon — cart.html may store the amount under different field names
     const couponData = JSON.parse(localStorage.getItem('vyneit_applied_coupon') || 'null');
-    if(couponData){ cartDiscount = couponData.discount || 0; cartCoupon = couponData; }
+    if(couponData){
+      // Support discount / amount / savings / value — whichever cart.html uses
+      cartDiscount = parsePrice(couponData.discount || couponData.amount || couponData.savings || couponData.value || 0);
+      // If only a percent is stored, calculate the rupee amount from subtotal
+      if(!cartDiscount && couponData.percent){
+        const rawSub = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
+        cartDiscount = Math.round(rawSub * couponData.percent / 100);
+      }
+      cartCoupon = couponData;
+    }
     renderSummaryItems();
     updateSummary();
     updateCartBadge();
@@ -851,12 +861,18 @@
     document.getElementById('summaryTax').textContent = '₹'+tax.toLocaleString('en-IN');
     document.getElementById('summaryTotal').textContent = '₹'+total.toLocaleString('en-IN');
 
+    const strip = document.getElementById('couponStrip');
     if(cartDiscount > 0){
       document.getElementById('discountRow').style.display='flex';
       document.getElementById('summaryDiscount').textContent = '−₹'+cartDiscount.toLocaleString('en-IN');
-      const strip = document.getElementById('couponStrip');
+      // Force-show strip — remove inline style so CSS .show class or inline flex both work
+      strip.removeAttribute('style');
       strip.style.display='flex';
-      document.getElementById('couponStripText').textContent = (cartCoupon?.code||'Coupon')+' applied — ₹'+cartDiscount+' off!';
+      const couponLabel = cartCoupon?.code || cartCoupon?.coupon || 'Coupon';
+      const pctLabel = cartCoupon?.percent ? ' ('+cartCoupon.percent+'% off)' : '';
+      document.getElementById('couponStripText').textContent = couponLabel + pctLabel + ' — saves ₹'+cartDiscount.toLocaleString('en-IN')+'!';
+    } else {
+      strip.style.display='none';
     }
   }
 
@@ -866,6 +882,10 @@
 
   // ── Direct Supabase autofill: called once after auth resolves ──
   async function autofillFromSupabase(userId){
+    console.log('[VYNEIT] autofillFromSupabase called, userId:', userId);
+    let filled = false;
+
+    // ── STRATEGY 1: addresses table with exact UUID match ──
     try {
       const { data, error } = await _db
         .from('addresses')
@@ -873,33 +893,104 @@
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
-      if(error){ console.error('[VYNEIT] addresses fetch error:', error); return; }
-      if(!data || !data.length){ console.log('[VYNEIT] No saved addresses found for user'); return; }
+      console.log('[VYNEIT] addresses query result:', { data, error });
 
-      savedAddresses = data;
+      if(!error && data && data.length > 0){
+        savedAddresses = data;
+        renderSavedAddresses();
+        document.getElementById('addressColumnWrap').style.display = 'block';
 
-      // Show saved address card panel
-      renderSavedAddresses();
-      document.getElementById('addressColumnWrap').style.display = 'block';
-      // guestAddressWrap stays visible — form inputs live there
+        const first = data[0];
+        selectedAddressId = first.id;
+        _fillAddressFields(first);
+        filled = true;
+        console.log('[VYNEIT] ✅ Address autofilled from addresses table:', first.city);
+      }
+    } catch(e){
+      console.error('[VYNEIT] addresses query exception:', e);
+    }
 
-      // Auto-select and fill first address
-      const first = data[0];
-      selectedAddressId = first.id;
+    // ── STRATEGY 2: addresses table with string cast (UUID/text mismatch fix) ──
+    if(!filled){
+      try {
+        const { data, error } = await _db
+          .from('addresses')
+          .select('*')
+          .eq('user_id', String(userId))
+          .limit(5);
 
-      // Fill every form field directly
-      safeSet('addr1',     first.line1);
-      safeSet('addr2',     first.line2);
-      safeSet('city',      first.city);
-      safeSet('state',     first.state);
-      safeSet('pincode',   first.pincode);
-      safeSet('phone',     first.phone);
-      const nameParts = (first.full_name || '').split(' ');
-      safeSet('firstName', nameParts[0]);
-      safeSet('lastName',  nameParts.slice(1).join(' '));
+        console.log('[VYNEIT] addresses string-cast query:', { data, error });
 
-      console.log('[VYNEIT] Address autofilled from Supabase:', first.city);
-    } catch(e){ console.error('[VYNEIT] autofillFromSupabase exception:', e); }
+        if(!error && data && data.length > 0){
+          savedAddresses = data;
+          renderSavedAddresses();
+          document.getElementById('addressColumnWrap').style.display = 'block';
+          const first = data[0];
+          selectedAddressId = first.id;
+          _fillAddressFields(first);
+          filled = true;
+          console.log('[VYNEIT] ✅ Address autofilled via string cast:', first.city);
+        }
+      } catch(e){
+        console.error('[VYNEIT] String-cast query exception:', e);
+      }
+    }
+
+    // ── STRATEGY 3: profiles table fallback ──
+    if(!filled){
+      try {
+        const { data: profile, error: pErr } = await _db
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+        console.log('[VYNEIT] profiles fallback:', { profile, pErr });
+
+        if(!pErr && profile){
+          // Fill whatever address fields the profile has
+          const addrFields = {
+            line1:   profile.address || profile.addr1 || profile.line1 || profile.address_line1 || '',
+            line2:   profile.addr2 || profile.line2 || profile.address_line2 || '',
+            city:    profile.city || '',
+            state:   profile.state || '',
+            pincode: profile.pincode || profile.pin || profile.zip || '',
+            phone:   profile.phone || '',
+            full_name: profile.full_name || ''
+          };
+          if(addrFields.city || addrFields.line1){
+            _fillAddressFields(addrFields);
+            filled = true;
+            console.log('[VYNEIT] ✅ Address partially filled from profiles table');
+          }
+        }
+      } catch(e){
+        console.error('[VYNEIT] profiles fallback exception:', e);
+      }
+    }
+
+    if(!filled){
+      console.warn('[VYNEIT] ⚠ No address found in addresses or profiles table for userId:', userId,
+        '\nCheck: 1) Does the addresses table have rows for this user?',
+        '\n2) Is user_id column type UUID (not TEXT)? Run: SELECT pg_typeof(user_id) FROM addresses LIMIT 1;',
+        '\n3) Does the RLS SELECT policy use: auth.uid() = user_id  (not a text comparison)?'
+      );
+    }
+  }
+
+  // Helper: fill form fields from an address object
+  function _fillAddressFields(addr){
+    safeSet('addr1',     addr.line1   || addr.address_line1 || addr.address || '');
+    safeSet('addr2',     addr.line2   || addr.address_line2 || '');
+    safeSet('city',      addr.city    || '');
+    safeSet('state',     addr.state   || '');
+    safeSet('pincode',   addr.pincode || addr.pin || addr.zip || '');
+    safeSet('phone',     addr.phone   || '');
+    if(addr.full_name){
+      const parts = addr.full_name.split(' ');
+      safeSet('firstName', parts[0] || '');
+      safeSet('lastName',  parts.slice(1).join(' ') || '');
+    }
   }
 
   async function loadSavedAddresses(userId){
@@ -1013,8 +1104,11 @@
     // Simulate processing
     await new Promise(r=>setTimeout(r,1800));
 
-    // Clear cart
-    localStorage.removeItem('vyneit_cart');
+    // Clear the correct cart key (user-specific or guest)
+    const _user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+    const _cartKey = getCartKey(_user);
+    localStorage.removeItem(_cartKey);
+    localStorage.removeItem('vyneit_cart'); // legacy fallback
     localStorage.removeItem('vyneit_applied_coupon');
 
     // Show success
