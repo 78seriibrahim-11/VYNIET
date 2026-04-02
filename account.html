@@ -102,12 +102,67 @@
     .orders-table{width:100%;border-collapse:collapse}
     .orders-table th{text-align:left;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:10px 14px;background:var(--cream);border-bottom:1px solid var(--border)}
     .orders-table td{padding:14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
-    .orders-table tr:hover td{background:rgba(247,231,206,.3)}
-    .order-status{display:inline-block;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .orders-table tr:hover td{background:rgba(247,231,206,.3);cursor:pointer}
+    .order-status{display:inline-block;padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:2px}
     .status-delivered{background:#e8f5ee;color:#1a5c30}
-    .status-shipped{background:#e8f0fe;color:#1a3a8f}
-    .status-processing{background:#fff3e0;color:#8a4500}
+    .status-dispatched,.status-shipped{background:#e8f0fe;color:#1a3a8f}
+    .status-processing,.status-confirmed,.status-pending{background:#fff3e0;color:#8a4500}
+    .status-out\ for\ delivery,.status-out_for_delivery{background:#e3f2fd;color:#0d47a1}
+    .status-cancelled{background:#fdecea;color:#c0392b}
+    .status-packed{background:#f3e5f5;color:#6a1b9a}
     .order-id{font-family:'DM Sans',sans-serif;font-weight:700;color:var(--accent)}
+    .view-order-link{font-size:11px;color:var(--black);font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--black);padding-bottom:1px;white-space:nowrap}
+
+    /* ORDER DETAIL VIEW */
+    .order-detail{display:none}
+    .order-detail.active{display:block;animation:fadeUp .3s ease both}
+    .order-back-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.04em;margin-bottom:24px;background:none;border:none;padding:0;transition:color .2s}
+    .order-back-btn:hover{color:var(--black)}
+    .order-detail-head{background:var(--black);padding:28px 32px;margin-bottom:0}
+    .order-detail-id{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);letter-spacing:.08em;margin-bottom:6px}
+    .order-detail-meta{display:flex;gap:24px;flex-wrap:wrap}
+    .odm-item{display:flex;flex-direction:column;gap:3px}
+    .odm-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,242,225,.4)}
+    .odm-value{font-size:14px;font-weight:600;color:var(--white)}
+
+    /* STATUS TRACKER (Flipkart style) */
+    .tracker-wrap{background:#fff;border:1px solid var(--border);padding:32px;margin-bottom:0}
+    .tracker-title{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:28px}
+    .tracker{display:flex;align-items:flex-start;gap:0;position:relative;overflow-x:auto;padding-bottom:4px}
+    .tracker-step{display:flex;flex-direction:column;align-items:center;flex:1;min-width:80px;position:relative;z-index:1}
+    .tracker-step::before{content:'';position:absolute;top:16px;left:50%;width:100%;height:3px;background:var(--border);z-index:0}
+    .tracker-step:last-child::before{display:none}
+    .tracker-dot{width:34px;height:34px;border-radius:50%;border:3px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:14px;position:relative;z-index:2;flex-shrink:0;transition:all .3s}
+    .tracker-step.done .tracker-dot{background:var(--green);border-color:var(--green);color:var(--white)}
+    .tracker-step.done::before{background:var(--green)}
+    .tracker-step.active .tracker-dot{background:var(--black);border-color:var(--black);color:var(--white);box-shadow:0 0 0 5px rgba(16,44,38,.12)}
+    .tracker-step.cancelled .tracker-dot{background:var(--red);border-color:var(--red);color:var(--white)}
+    .tracker-label{font-size:11px;font-weight:600;color:var(--muted);margin-top:10px;text-align:center;line-height:1.3;letter-spacing:.02em}
+    .tracker-step.done .tracker-label,.tracker-step.active .tracker-label{color:var(--black);font-weight:700}
+    .tracker-date{font-size:10px;color:var(--muted);margin-top:3px;text-align:center}
+
+    /* ORDER ITEMS + SUMMARY */
+    .order-items-box{background:#fff;border:1px solid var(--border);border-top:none;padding:24px 32px}
+    .oi-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+    .oi-row:last-child{border-bottom:none}
+    .oi-img{width:56px;height:68px;object-fit:cover;background:var(--cream);border:1px solid var(--border);flex-shrink:0}
+    .oi-info{flex:1;min-width:0}
+    .oi-name{font-size:14px;font-weight:600;color:var(--black);margin-bottom:3px}
+    .oi-meta{font-size:12px;color:var(--muted)}
+    .oi-price{font-size:14px;font-weight:700;color:var(--black);flex-shrink:0}
+
+    .order-totals{background:var(--cream);border:1px solid var(--border);border-top:none;padding:20px 32px}
+    .ot-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0}
+    .ot-row .lbl{color:var(--muted)}
+    .ot-total{display:flex;justify-content:space-between;font-size:16px;font-weight:700;padding-top:12px;margin-top:8px;border-top:1.5px solid var(--border);color:var(--black)}
+
+    /* CANCEL BUTTON */
+    .cancel-section{background:#fff;border:1px solid var(--border);border-top:none;padding:20px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .cancel-note{font-size:12px;color:var(--muted);line-height:1.5;max-width:360px}
+    .cancel-btn{background:none;border:1.5px solid var(--red);color:var(--red);padding:10px 24px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:all .2s;white-space:nowrap}
+    .cancel-btn:hover{background:var(--red);color:#fff}
+    .cancel-btn:disabled{opacity:.4;cursor:not-allowed}
+    .cancelled-notice{font-size:13px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:6px}
 
     /* EMPTY ORDERS */
     .empty-orders{text-align:center;padding:60px 20px}
@@ -234,15 +289,58 @@
 
     <!-- Orders Panel -->
     <div class="panel" id="panel-orders">
-      <div class="panel-header">
-        <h2 class="panel-title">My <em>Orders</em></h2>
+      <!-- Orders List View -->
+      <div id="ordersListView">
+        <div class="panel-header">
+          <h2 class="panel-title">My <em>Orders</em></h2>
+        </div>
+        <div id="ordersContent">
+          <div class="empty-orders">
+            <div class="empty-icon">📦</div>
+            <h3>No orders yet</h3>
+            <p>Looks like you haven't placed any orders. Start shopping!</p>
+            <button class="shop-now-btn" onclick="window.location.href='collections.html'">Browse Collections →</button>
+          </div>
+        </div>
       </div>
-      <div id="ordersContent">
-        <div class="empty-orders">
-          <div class="empty-icon">📦</div>
-          <h3>No orders yet</h3>
-          <p>Looks like you haven't placed any orders. Start shopping!</p>
-          <button class="shop-now-btn" onclick="window.location.href='collections.html'">Browse Collections →</button>
+
+      <!-- Order Detail View (hidden until order clicked) -->
+      <div class="order-detail" id="orderDetailView">
+        <button class="order-back-btn" onclick="closeOrderDetail()">← Back to Orders</button>
+
+        <!-- Order header bar -->
+        <div class="order-detail-head">
+          <div class="order-detail-id" id="detailOrderId">#VYN-000000</div>
+          <div class="order-detail-meta">
+            <div class="odm-item"><span class="odm-label">Date</span><span class="odm-value" id="detailDate">—</span></div>
+            <div class="odm-item"><span class="odm-label">Total</span><span class="odm-value" id="detailTotal">—</span></div>
+            <div class="odm-item"><span class="odm-label">Payment</span><span class="odm-value" id="detailPayment">—</span></div>
+            <div class="odm-item"><span class="odm-label">Items</span><span class="odm-value" id="detailItemCount">—</span></div>
+          </div>
+        </div>
+
+        <!-- Status tracker -->
+        <div class="tracker-wrap">
+          <div class="tracker-title">Order Status</div>
+          <div class="tracker" id="orderTracker">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Items list -->
+        <div class="order-items-box" id="orderItemsList">
+          <!-- Injected by JS -->
+        </div>
+
+        <!-- Price breakdown -->
+        <div class="order-totals" id="orderTotals">
+          <!-- Injected by JS -->
+        </div>
+
+        <!-- Cancel section -->
+        <div class="cancel-section" id="cancelSection">
+          <div class="cancel-note" id="cancelNote">You can cancel this order before it is dispatched. Once shipped, cancellations are not possible.</div>
+          <button class="cancel-btn" id="cancelBtn" onclick="cancelOrder()">Cancel Order</button>
         </div>
       </div>
     </div>
@@ -451,13 +549,7 @@
       document.getElementById('addrPhone').value   = savedAddr.phone   || ''
     }
 
-    // Load orders count
-    const { count } = await db
-      .from('orders')
-      .select('*', { count:'exact', head:true })
-      .eq('user_id', currentUser.id)
-
-    document.getElementById('totalOrders').textContent = count || 0
+    // Load orders (also updates totalOrders count)
     loadOrders()
   }
 
@@ -469,32 +561,194 @@
       .eq('user_id', currentUser.id)
       .order('created_at', { ascending: false })
 
+    document.getElementById('totalOrders').textContent = orders?.length || 0
+
     if(!orders || orders.length === 0) return
 
-    const html = `
+    const statusClass = s => {
+      const m = {'delivered':'delivered','dispatched':'dispatched','shipped':'dispatched',
+        'out for delivery':'dispatched','packed':'packed','confirmed':'processing',
+        'processing':'processing','pending':'processing','cancelled':'cancelled'}
+      return 'status-'+(m[(s||'processing').toLowerCase()]||'processing')
+    }
+
+    const rows = orders.map(o => {
+      const orderNum = o.order_number || ('#VYN-'+o.id.substring(0,8).toUpperCase())
+      const status   = o.status || 'Processing'
+      const date     = new Date(o.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+      return `
+        <tr onclick="openOrderDetail('${o.id}')" style="cursor:pointer">
+          <td><span class="order-id">${orderNum}</span></td>
+          <td>${date}</td>
+          <td>${o.items_count || (o.items ? JSON.parse(o.items||'[]').length : 1)} item(s)</td>
+          <td style="font-weight:700">₹${Number(o.total||0).toLocaleString('en-IN')}</td>
+          <td><span class="order-status ${statusClass(status)}">${status}</span></td>
+          <td><span class="view-order-link">View →</span></td>
+        </tr>`
+    }).join('')
+
+    document.getElementById('ordersContent').innerHTML = `
       <table class="orders-table">
         <thead>
           <tr>
-            <th>Order ID</th>
-            <th>Date</th>
-            <th>Items</th>
-            <th>Total</th>
-            <th>Status</th>
+            <th>Order ID</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th></th>
           </tr>
         </thead>
-        <tbody>
-          ${orders.map(o=>`
-            <tr>
-              <td><span class="order-id">#${o.id.substring(0,8).toUpperCase()}</span></td>
-              <td>${new Date(o.created_at).toLocaleDateString('en-IN')}</td>
-              <td>${o.items_count || 1} item(s)</td>
-              <td>₹${o.total || 0}</td>
-              <td><span class="order-status status-${(o.status||'processing').toLowerCase()}">${o.status || 'Processing'}</span></td>
-            </tr>
-          `).join('')}
-        </tbody>
+        <tbody>${rows}</tbody>
       </table>`
-    document.getElementById('ordersContent').innerHTML = html
+  }
+
+  // ── Active order ref (for cancel) ──────────────────────────
+  let _activeOrder = null
+
+  // ── Status tracker config ──────────────────────────────────
+  const TRACKER_STEPS = [
+    { key:'confirmed',        label:'Order\nConfirmed',     icon:'✓' },
+    { key:'packed',           label:'Packed',               icon:'📦' },
+    { key:'dispatched',       label:'Dispatched',           icon:'🚚' },
+    { key:'out for delivery', label:'Out for\nDelivery',    icon:'🏠' },
+    { key:'delivered',        label:'Delivered',            icon:'🎉' },
+  ]
+  const STEP_ORDER = ['confirmed','packed','dispatched','out for delivery','delivered']
+
+  function getStepIndex(status){
+    const s = (status||'').toLowerCase()
+    if(s==='cancelled') return -1
+    if(s==='processing'||s==='pending') return 0
+    const idx = STEP_ORDER.indexOf(s)
+    return idx >= 0 ? idx : 0
+  }
+
+  // ── Open Order Detail ──────────────────────────────────────
+  async function openOrderDetail(orderId){
+    // Fetch fresh order data
+    const { data: o } = await db.from('orders').select('*').eq('id', orderId).single()
+    if(!o) return
+    _activeOrder = o
+
+    const orderNum  = o.order_number || ('#VYN-'+o.id.substring(0,8).toUpperCase())
+    const status    = o.status || 'Processing'
+    const date      = new Date(o.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+    const total     = Number(o.total || 0)
+    const items     = (() => { try{ return JSON.parse(o.items||'[]') }catch(e){ return [] } })()
+    const isCancelled = status.toLowerCase() === 'cancelled'
+
+    // Header
+    document.getElementById('detailOrderId').textContent  = orderNum
+    document.getElementById('detailDate').textContent     = date
+    document.getElementById('detailTotal').textContent    = '₹'+total.toLocaleString('en-IN')
+    document.getElementById('detailPayment').textContent  = o.payment_method || 'Online'
+    document.getElementById('detailItemCount').textContent= (items.length || o.items_count || 1)+' item(s)'
+
+    // Tracker
+    const stepIdx = getStepIndex(status)
+    let trackerHTML = ''
+
+    if(isCancelled){
+      trackerHTML = `
+        <div class="tracker-step cancelled" style="flex:none;min-width:120px">
+          <div class="tracker-dot">✕</div>
+          <div class="tracker-label" style="color:var(--red)">Order Cancelled</div>
+          <div class="tracker-date">${date}</div>
+        </div>`
+    } else {
+      trackerHTML = TRACKER_STEPS.map((step, i) => {
+        const isDone   = i < stepIdx
+        const isActive = i === stepIdx
+        const cls = isDone ? 'done' : isActive ? 'active' : ''
+        const dateLabel = isActive ? date : (isDone ? '✓' : '')
+        return `
+          <div class="tracker-step ${cls}">
+            <div class="tracker-dot">${isDone ? '✓' : step.icon}</div>
+            <div class="tracker-label">${step.label.replace('\n','<br>')}</div>
+            <div class="tracker-date">${dateLabel}</div>
+          </div>`
+      }).join('')
+    }
+    document.getElementById('orderTracker').innerHTML = trackerHTML
+
+    // Items list
+    let itemsHTML = ''
+    if(items.length > 0){
+      itemsHTML = items.map(item => `
+        <div class="oi-row">
+          <img class="oi-img" src="${item.img||'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=80&auto=format'}" alt="${item.name||'Item'}"/>
+          <div class="oi-info">
+            <div class="oi-name">${item.name||'VYNEIT T-Shirt'}</div>
+            <div class="oi-meta">Qty: ${item.qty||1}${item.size?' · Size: '+item.size:''}${item.color?' · '+item.color:''}</div>
+          </div>
+          <div class="oi-price">₹${(Number(item.price||0)*(item.qty||1)).toLocaleString('en-IN')}</div>
+        </div>`).join('')
+    } else {
+      itemsHTML = `<div class="oi-row"><div class="oi-info"><div class="oi-name">Order items</div><div class="oi-meta">Details not available</div></div><div class="oi-price">₹${total.toLocaleString('en-IN')}</div></div>`
+    }
+    document.getElementById('orderItemsList').innerHTML = itemsHTML
+
+    // Price breakdown
+    const subtotal  = Number(o.subtotal || total)
+    const discount  = Number(o.discount || 0)
+    const shipping  = Number(o.shipping || 0)
+    const tax       = Number(o.tax || 0)
+    const codFee    = Number(o.cod_fee || 0)
+    document.getElementById('orderTotals').innerHTML = `
+      <div class="ot-row"><span class="lbl">Subtotal</span><span>₹${subtotal.toLocaleString('en-IN')}</span></div>
+      ${discount > 0 ? `<div class="ot-row"><span class="lbl">Discount</span><span style="color:var(--green)">−₹${discount.toLocaleString('en-IN')}</span></div>` : ''}
+      <div class="ot-row"><span class="lbl">Shipping</span><span>${shipping === 0 ? 'FREE' : '₹'+shipping}</span></div>
+      ${tax > 0 ? `<div class="ot-row"><span class="lbl">Tax</span><span>₹${tax.toLocaleString('en-IN')}</span></div>` : ''}
+      ${codFee > 0 ? `<div class="ot-row"><span class="lbl">COD Fee</span><span>₹${codFee}</span></div>` : ''}
+      <div class="ot-total"><span>Total Paid</span><span>₹${total.toLocaleString('en-IN')}</span></div>`
+
+    // Cancel section
+    const cancelSection = document.getElementById('cancelSection')
+    const cancelBtn     = document.getElementById('cancelBtn')
+    const cancelNote    = document.getElementById('cancelNote')
+    const canCancel     = ['confirmed','processing','pending','packed'].includes(status.toLowerCase())
+
+    if(isCancelled){
+      cancelSection.innerHTML = `<div class="cancelled-notice">✕ This order has been cancelled.</div>`
+    } else if(canCancel){
+      cancelNote.textContent = 'You can cancel this order before it is dispatched. Once shipped, cancellation is not possible.'
+      cancelBtn.disabled = false
+      cancelBtn.textContent = 'Cancel Order'
+    } else {
+      cancelNote.textContent = 'This order cannot be cancelled as it has already been dispatched.'
+      cancelBtn.disabled = true
+    }
+
+    // Show detail, hide list
+    document.getElementById('ordersListView').style.display = 'none'
+    document.getElementById('orderDetailView').classList.add('active')
+  }
+
+  function closeOrderDetail(){
+    document.getElementById('orderDetailView').classList.remove('active')
+    document.getElementById('ordersListView').style.display = 'block'
+    _activeOrder = null
+  }
+
+  // ── Cancel Order ───────────────────────────────────────────
+  async function cancelOrder(){
+    if(!_activeOrder) return
+    if(!confirm('Are you sure you want to cancel this order? This cannot be undone.')) return
+
+    const btn = document.getElementById('cancelBtn')
+    btn.textContent = 'Cancelling…'
+    btn.disabled = true
+
+    const { error } = await db
+      .from('orders')
+      .update({ status: 'Cancelled' })
+      .eq('id', _activeOrder.id)
+
+    if(error){
+      btn.textContent = 'Cancel Order'
+      btn.disabled = false
+      alert('Could not cancel order: ' + error.message)
+    } else {
+      // Re-open with fresh data
+      await openOrderDetail(_activeOrder.id)
+      await loadOrders()
+    }
   }
 
   // ── Panel Switch ───────────────────────────────────────────
