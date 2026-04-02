@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VYNEIT — Track My Order</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #102C26;
+      --white: #FFF2E1;
+      --cream: #F7E7CE;
+      --accent: #A79277;
+      --accent-dark: #8a7460;
+      --text-muted: #5a7a73;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'DM Sans', sans-serif;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    .cursor {
+      width: 10px; height: 10px;
+      background: var(--black);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--black);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.18s ease;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--black);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px;
+      height: 64px;
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: var(--white);
+      letter-spacing: 3px;
+      text-decoration: none;
+    }
+    .nav-right { display: flex; align-items: center; gap: 24px; }
+    .nav-link {
+      color: var(--white); font-size: 13px; font-weight: 400;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      text-decoration: none; opacity: 0.75; transition: opacity 0.2s;
+    }
+    .nav-link:hover { opacity: 1; }
+    .cart-btn {
+      background: var(--accent); color: var(--black);
+      font-family: 'DM Sans', sans-serif; font-size: 12px;
+      font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      padding: 9px 20px; border: none; cursor: none;
+      transition: background 0.2s; text-decoration: none;
+    }
+    .cart-btn:hover { background: var(--cream); }
+
+    /* BREADCRUMB */
+    .breadcrumb {
+      padding: 18px 48px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(16,44,38,0.08);
+    }
+    .breadcrumb a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+    .breadcrumb a:hover { color: var(--black); }
+    .breadcrumb span { color: var(--black); font-weight: 500; }
+    .bc-sep { opacity: 0.4; }
+
+    /* HERO */
+    .page-hero {
+      background: var(--black); padding: 80px 48px 60px;
+      position: relative; overflow: hidden;
+    }
+    .page-hero::before {
+      content: 'TRACK';
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 200px; color: rgba(255,242,225,0.04);
+      position: absolute; right: -10px; bottom: -20px;
+      letter-spacing: -4px; line-height: 1; pointer-events: none;
+    }
+    .page-hero-tag { display: inline-block; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+    .page-hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(36px, 5vw, 64px); color: var(--white); line-height: 1.1; max-width: 600px; }
+    .page-hero h1 em { font-style: italic; color: var(--accent); }
+    .page-hero p { margin-top: 20px; font-size: 15px; color: rgba(255,242,225,0.6); max-width: 480px; line-height: 1.7; }
+
+    /* MAIN */
+    .main-wrap { max-width: 1100px; margin: 0 auto; padding: 72px 48px; }
+
+    /* TRACKER FORM */
+    .tracker-box {
+      background: var(--cream);
+      padding: 52px;
+      margin-bottom: 72px;
+      position: relative;
+    }
+    .tracker-box::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 52px;
+      width: 64px; height: 3px;
+      background: var(--accent);
+    }
+    .tracker-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+    .tracker-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--black); margin-bottom: 6px; }
+    .tracker-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
+
+    .tracker-form { display: flex; gap: 0; max-width: 580px; }
+    .tracker-input {
+      flex: 1;
+      padding: 14px 20px;
+      border: 2px solid rgba(16,44,38,0.15);
+      background: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--black);
+      outline: none;
+      transition: border-color 0.2s;
+      cursor: none;
+    }
+    .tracker-input:focus { border-color: var(--black); }
+    .tracker-input::placeholder { color: var(--text-muted); }
+    .tracker-submit {
+      background: var(--black); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-size: 12px;
+      font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      padding: 14px 28px; border: none; cursor: none;
+      transition: background 0.2s; white-space: nowrap;
+    }
+    .tracker-submit:hover { background: var(--accent-dark); }
+
+    /* RESULT BOX (hidden by default) */
+    .result-box {
+      display: none;
+      margin-top: 32px;
+      border: 2px solid var(--black);
+      padding: 28px;
+      background: var(--white);
+    }
+    .result-box.show { display: block; }
+    .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .result-order { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--black); letter-spacing: 2px; }
+    .result-status {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; padding: 6px 14px;
+      background: var(--black); color: var(--white);
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+    /* TIMELINE */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-step { display: flex; gap: 18px; padding-bottom: 24px; position: relative; }
+    .tl-step:last-child { padding-bottom: 0; }
+    .tl-left { display: flex; flex-direction: column; align-items: center; }
+    .tl-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid var(--black); background: var(--white);
+      flex-shrink: 0; z-index: 1;
+    }
+    .tl-dot.done { background: var(--black); }
+    .tl-dot.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px rgba(167,146,119,0.2); }
+    .tl-line { flex: 1; width: 2px; background: rgba(16,44,38,0.12); margin-top: 4px; }
+    .tl-step:last-child .tl-line { display: none; }
+    .tl-content { padding-top: 0; }
+    .tl-event { font-size: 14px; font-weight: 500; color: var(--black); margin-bottom: 3px; }
+    .tl-event.muted { color: var(--text-muted); font-weight: 400; }
+    .tl-date { font-size: 12px; color: var(--text-muted); letter-spacing: 0.5px; }
+
+    /* STATUS CARDS */
+    .status-overview {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-bottom: 72px;
+    }
+    .so-card { background: var(--cream); padding: 28px 22px; text-align: center; }
+    .so-icon { font-size: 26px; margin-bottom: 12px; }
+    .so-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .so-value { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--black); }
+
+    /* SECTION */
+    .section-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+    .section-title { font-family: 'DM Serif Display', serif; font-size: clamp(28px, 3vw, 40px); color: var(--black); margin-bottom: 32px; }
+    .section-title em { font-style: italic; color: var(--accent); }
+
+    /* FAQ */
+    .accordion { border-top: 1px solid rgba(16,44,38,0.1); margin-bottom: 72px; }
+    .acc-item { border-bottom: 1px solid rgba(16,44,38,0.1); }
+    .acc-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; cursor: none; gap: 16px; }
+    .acc-header:hover .acc-q { color: var(--accent); }
+    .acc-q { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--black); transition: color 0.2s; }
+    .acc-icon {
+      width: 32px; height: 32px;
+      border: 1.5px solid rgba(16,44,38,0.2);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all 0.2s; font-size: 16px; color: var(--black);
+    }
+    .acc-item.open .acc-icon { background: var(--black); color: var(--white); border-color: var(--black); transform: rotate(45deg); }
+    .acc-body { display: none; padding: 0 0 22px; font-size: 14px; color: var(--text-muted); line-height: 1.75; max-width: 700px; }
+    .acc-item.open .acc-body { display: block; }
+
+    /* ERROR MSG */
+    .err-msg { display: none; margin-top: 16px; font-size: 13px; color: #c0392b; font-weight: 500; }
+    .err-msg.show { display: block; }
+
+    /* CTA */
+    .cta-banner {
+      background: var(--black); padding: 52px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 32px; flex-wrap: wrap;
+    }
+    .cta-text h3 { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--white); margin-bottom: 8px; }
+    .cta-text p { font-size: 14px; color: rgba(255,242,225,0.55); }
+    .cta-btn {
+      background: var(--accent); color: var(--black);
+      font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      padding: 14px 32px; border: none; cursor: none;
+      text-decoration: none; white-space: nowrap; transition: background 0.2s;
+    }
+    .cta-btn:hover { background: var(--cream); }
+
+    footer {
+      background: var(--black); color: rgba(255,242,225,0.4);
+      text-align: center; padding: 24px 48px; font-size: 12px;
+      letter-spacing: 1.5px; border-top: 1px solid rgba(255,242,225,0.06);
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .breadcrumb { padding: 14px 20px; }
+      .page-hero { padding: 52px 20px 44px; }
+      .main-wrap { padding: 48px 20px; }
+      .tracker-box { padding: 32px 20px; }
+      .tracker-form { flex-direction: column; }
+      .tracker-submit { width: 100%; }
+      .status-overview { grid-template-columns: repeat(2, 1fr); }
+      .cta-banner { padding: 36px 20px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo">VYNEIT</a>
+    <div class="nav-right">
+      <a href="collections.html" class="nav-link">Shop</a>
+      <a href="account.html" class="nav-link">Account</a>
+      <a href="cart.html" class="cart-btn">🛒 Cart</a>
+    </div>
+  </nav>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span class="bc-sep">›</span>
+    <span>Track My Order</span>
+  </div>
+
+  <section class="page-hero">
+    <div class="page-hero-tag">Shipping</div>
+    <h1>Track Your <em>Order</em></h1>
+    <p>Real-time updates on every step of your delivery — from our hands to yours.</p>
+  </section>
+
+  <div class="main-wrap">
+
+    <!-- TRACKER FORM -->
+    <div class="tracker-box">
+      <div class="tracker-label">Order Tracker</div>
+      <div class="tracker-title">Where's My Order?</div>
+      <div class="tracker-sub">Enter your order ID (found in your confirmation email) to get real-time shipping updates.</div>
+      <div class="tracker-form">
+        <input type="text" class="tracker-input" id="orderInput" placeholder="e.g. VYN-20250412-4821" />
+        <button class="tracker-submit" onclick="trackOrder()">Track Order</button>
+      </div>
+      <div class="err-msg" id="errMsg">⚠ No order found with that ID. Please double-check and try again.</div>
+      <!-- RESULT -->
+      <div class="result-box" id="resultBox">
+        <div class="result-header">
+          <div class="result-order" id="resultId">VYN-20250412-4821</div>
+          <div class="result-status"><span class="status-dot"></span> In Transit</div>
+        </div>
+        <div class="timeline">
+          <div class="tl-step">
+            <div class="tl-left"><div class="tl-dot done"></div><div class="tl-line"></div></div>
+            <div class="tl-content">
+              <div class="tl-event">Order Placed</div>
+              <div class="tl-date">Apr 12, 2025 · 10:34 AM</div>
+            </div>
+          </div>
+          <div class="tl-step">
+            <div class="tl-left"><div class="tl-dot done"></div><div class="tl-line"></div></div>
+            <div class="tl-content">
+              <div class="tl-event">Payment Confirmed</div>
+              <div class="tl-date">Apr 12, 2025 · 10:36 AM</div>
+            </div>
+          </div>
+          <div class="tl-step">
+            <div class="tl-left"><div class="tl-dot done"></div><div class="tl-line"></div></div>
+            <div class="tl-content">
+              <div class="tl-event">Packed &amp; Dispatched from Warehouse</div>
+              <div class="tl-date">Apr 13, 2025 · 2:20 PM</div>
+            </div>
+          </div>
+          <div class="tl-step">
+            <div class="tl-left"><div class="tl-dot active"></div><div class="tl-line"></div></div>
+            <div class="tl-content">
+              <div class="tl-event">In Transit — Delhi Hub</div>
+              <div class="tl-date">Apr 14, 2025 · 8:10 AM</div>
+            </div>
+          </div>
+          <div class="tl-step">
+            <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+            <div class="tl-content">
+              <div class="tl-event tl-event muted">Out for Delivery</div>
+              <div class="tl-date">Expected Apr 15, 2025</div>
+            </div>
+          </div>
+          <div class="tl-step">
+            <div class="tl-left"><div class="tl-dot"></div></div>
+            <div class="tl-content">
+              <div class="tl-event tl-event muted">Delivered</div>
+              <div class="tl-date">Expected Apr 15, 2025</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHIPPING OVERVIEW CARDS -->
+    <div class="section-label">Delivery Info</div>
+    <div class="section-title">Standard <em>Shipping Times</em></div>
+
+    <div class="status-overview" style="margin-bottom: 72px;">
+      <div class="so-card">
+        <div class="so-icon">⚡</div>
+        <div class="so-label">Processing</div>
+        <div class="so-value">1–2 days</div>
+      </div>
+      <div class="so-card">
+        <div class="so-icon">📦</div>
+        <div class="so-label">Standard Delivery</div>
+        <div class="so-value">4–7 days</div>
+      </div>
+      <div class="so-card">
+        <div class="so-icon">🚀</div>
+        <div class="so-label">Express Delivery</div>
+        <div class="so-value">1–3 days</div>
+      </div>
+      <div class="so-card">
+        <div class="so-icon">🌏</div>
+        <div class="so-label">International</div>
+        <div class="so-value">10–18 days</div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="section-label">Questions</div>
+    <div class="section-title">Shipping <em>FAQs</em></div>
+
+    <div class="accordion">
+      <div class="acc-item open">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <div class="acc-q">When will I receive my tracking number?</div>
+          <div class="acc-icon">+</div>
+        </div>
+        <div class="acc-body">Your tracking number is emailed to you as soon as your order is dispatched from our warehouse — typically within 1–2 business days of placing your order. Check your spam folder if you haven't received it.</div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <div class="acc-q">My tracking shows no updates for several days. What do I do?</div>
+          <div class="acc-icon">+</div>
+        </div>
+        <div class="acc-body">Tracking updates can sometimes be delayed by 24–48 hours at transit hubs. If there are no updates for more than 4 business days, please contact our support team and we'll investigate with our logistics partner immediately.</div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <div class="acc-q">Can I change my delivery address after placing the order?</div>
+          <div class="acc-icon">+</div>
+        </div>
+        <div class="acc-body">Address changes can be made within 12 hours of placing your order, before it enters processing. After that, we cannot redirect the shipment. Contact us immediately if you need to change your address.</div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <div class="acc-q">What happens if I miss my delivery?</div>
+          <div class="acc-icon">+</div>
+        </div>
+        <div class="acc-body">The courier will typically make 2 additional attempts and may leave the package with a neighbour or at a nearby collection point. If all attempts fail, the package will be returned to us and we'll reach out to re-arrange delivery at no extra cost.</div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <div class="acc-q">Do you ship internationally?</div>
+          <div class="acc-icon">+</div>
+        </div>
+        <div class="acc-body">Yes! We currently ship to 30+ countries. International orders may be subject to import duties and taxes which are the responsibility of the customer. Delivery typically takes 10–18 business days. Check our shipping page for a full list of countries.</div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <div class="acc-q">Is free shipping available?</div>
+          <div class="acc-icon">+</div>
+        </div>
+        <div class="acc-body">Yes — free standard shipping on all orders over ₹1,499 within India. Express and international shipping rates are calculated at checkout based on your location and package weight.</div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <div class="acc-q">What if my package is marked delivered but I didn't receive it?</div>
+          <div class="acc-icon">+</div>
+        </div>
+        <div class="acc-body">First, check with neighbours and any shared mailroom areas. If still not found, contact us within 3 days of the marked delivery date. We'll file a claim with the carrier and either reship your order or issue a full refund.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-banner">
+    <div class="cta-text">
+      <h3>Need more help?</h3>
+      <p>Our team is ready to assist with any shipping concern.</p>
+    </div>
+    <a href="contact-support.html" class="cta-btn">Contact Support</a>
+  </div>
+
+  <footer>© 2025 VYNEIT. All rights reserved.</footer>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      setTimeout(() => {
+        ring.style.left = e.clientX + 'px';
+        ring.style.top = e.clientY + 'px';
+      }, 60);
+    });
+
+    function toggleAcc(header) {
+      header.closest('.acc-item').classList.toggle('open');
+    }
+
+    function trackOrder() {
+      const val = document.getElementById('orderInput').value.trim();
+      const result = document.getElementById('resultBox');
+      const err = document.getElementById('errMsg');
+      const resultId = document.getElementById('resultId');
+
+      if (!val) {
+        err.classList.add('show');
+        result.classList.remove('show');
+        err.textContent = '⚠ Please enter your order ID to continue.';
+        return;
+      }
+
+      // Demo: any VYN- prefixed ID shows result, else error
+      if (val.toUpperCase().startsWith('VYN-') && val.length >= 8) {
+        err.classList.remove('show');
+        resultId.textContent = val.toUpperCase();
+        result.classList.add('show');
+        result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        result.classList.remove('show');
+        err.classList.add('show');
+        err.textContent = '⚠ No order found with that ID. Please double-check and try again.';
+      }
+    }
+
+    document.getElementById('orderInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') trackOrder();
+    });
+  </script>
+</body>
+</html>
