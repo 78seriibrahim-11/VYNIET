@@ -595,7 +595,7 @@
       </div>
       <div class="summary-row" id="codRow" style="display:none">
         <span class="label">COD Fee</span>
-        <span class="value">₹40</span>
+        <span class="value">₹0</span>
       </div>
       <div class="summary-row" id="shippingRow">
         <span class="label">Shipping</span>
@@ -1161,9 +1161,9 @@
 
   // ── SAVE ORDER TO SUPABASE ───────────────────────────────────
   async function saveOrderToSupabase(orderNum, paymentMethod, razorpayPaymentId){
-    if(!window._db) return null;
+    if(!window._db) throw new Error("Database not initialized");
     const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-    if(!user?.user_id) return null;
+  if(!user?.user_id) throw new Error("User not logged in");
 
     // Financials
     const subtotal = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1), 0);
@@ -1340,6 +1340,26 @@
       window.location.href='index.html';
     });
   }
+  try {
+  console.log("Starting order...");
+
+  const orderNum = '#VYN-' + Math.floor(100000 + Math.random()*900000);
+
+  const res = await saveOrderToSupabase(orderNum, 'Cash on Delivery', null);
+
+  console.log("Order saved:", res);
+
+  clearCartAndCoupon();
+  showSuccess(orderNum);
+
+} catch(err){
+  console.error('[VYNEIT] Order failed:', err);
+
+  btn.disabled = false;
+  btn.innerHTML = '📦 Place Order (COD)';
+
+  alert(err.message || 'Something went wrong. Please try again.');
+}
 </script>
 </body>
 </html>
