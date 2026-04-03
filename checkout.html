@@ -513,7 +513,7 @@
         <div class="payment-options" style="margin-bottom:20px">
 
           <!-- Razorpay (online) -->
-          <div class="pay-option selected" id="payRazorpay" onclick="selectPay('razorpay')">
+          <div class="pay-option" id="payRazorpay" onclick="selectPay('razorpay')">
             <div class="pay-radio"></div>
             <div>
               <div class="pay-label">Pay Online</div>
@@ -525,7 +525,7 @@
           </div>
 
           <!-- COD -->
-          <div class="pay-option" id="payCod" onclick="selectPay('cod')">
+          <div class="pay-option selected" id="payCod" onclick="selectPay('cod')">
             <div class="pay-radio"></div>
             <div>
               <div class="pay-label">Cash on Delivery</div>
@@ -533,7 +533,7 @@
             </div>
             <div class="pay-icons"><span class="pay-icon">💵</span></div>
           </div>
-          <div class="pay-detail-panel" id="panelCod">
+          <div class="pay-detail-panel active" id="panelCod">
             <div style="font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:flex-start">
               <span>ℹ️</span>
               <div>A COD handling fee of <b style="color:var(--black)">₹40</b> will be added. Please keep the exact amount ready at delivery.</div>
@@ -614,7 +614,7 @@
       </div>
 
       <button class="place-order-btn" id="placeOrderBtn" onclick="placeOrder()">
-        🔒 Proceed to Payment
+        📦 Place Order (COD)
       </button>
 
       <div class="secure-badges">
@@ -681,7 +681,9 @@
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
 
   // ── PAYMENT SELECTOR ────────────────────────────────────────
-  let activePayMethod = 'razorpay';
+  // ⚠️  Razorpay not configured yet — COD is default
+  // When you have your Razorpay key, change this to 'razorpay'
+  let activePayMethod = 'cod';
   function selectPay(method){
     activePayMethod = method;
     ['razorpay','cod'].forEach(m=>{
@@ -692,15 +694,15 @@
     if(codPanel) codPanel.classList.toggle('active', method==='cod');
     const notice = document.getElementById('razorpayNotice');
     if(notice) notice.style.display = method==='razorpay' ? 'flex' : 'none';
-    // Show/hide COD fee row in summary
     document.getElementById('codRow').style.display = method==='cod' ? 'flex' : 'none';
-    // Update Place Order button label
     const btn = document.getElementById('placeOrderBtn');
     btn.innerHTML = method === 'razorpay'
       ? '🔒 Proceed to Payment'
-      : `<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg> Place Order (COD)`;
+      : '📦 Place Order (COD)';
     updateSummary();
   }
+  // Set COD as selected on page load
+  document.addEventListener('DOMContentLoaded', () => selectPay('cod'));
 
   // ── CARD FORMATTING (kept for future use) ───────────────────
   function fmtCard(el){
@@ -1056,21 +1058,22 @@
     if(!validateForm()) return;
 
     if(activePayMethod === 'razorpay'){
-      // ─────────────────────────────────────────────────────────────
-      // RAZORPAY INTEGRATION
-      // To activate: replace 'YOUR_RAZORPAY_KEY_ID' below with your
-      // live or test key from https://dashboard.razorpay.com/
-      // Also wire up a backend endpoint to create a Razorpay Order ID
-      // and replace the dummy order_id below with the real one.
-      // ─────────────────────────────────────────────────────────────
-      const RAZORPAY_KEY_ID = 'YOUR_RAZORPAY_KEY_ID'; // ← ADD YOUR KEY HERE
+      // ─────────────────────────────────────────────────────────────────
+      // TODO: Add your Razorpay Key ID here to enable online payments
+      // Get it from: https://dashboard.razorpay.com/ → Settings → API Keys
+      // ─────────────────────────────────────────────────────────────────
+      const RAZORPAY_KEY_ID = 'YOUR_RAZORPAY_KEY_ID'; // ← PASTE YOUR KEY HERE
 
       if(RAZORPAY_KEY_ID === 'YOUR_RAZORPAY_KEY_ID'){
-        alert('Razorpay is not yet configured.\nAdd your key in checkout.html and set up a backend order endpoint.');
+        // Razorpay not configured — switch to COD automatically
+        if(confirm('Online payment is not configured yet.\n\nSwitch to Cash on Delivery instead?')){
+          selectPay('cod');
+          placeOrder(); // retry with COD
+        }
         return;
       }
 
-      // Load Razorpay script dynamically if not already loaded
+      // Load Razorpay script dynamically
       if(!window.Razorpay){
         await new Promise((resolve, reject) => {
           const s = document.createElement('script');
@@ -1081,39 +1084,30 @@
         });
       }
 
-      const user   = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-      const subtotal = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
-      const shipping = subtotal >= 999 ? 0 : 79;
-      const tax = Math.round(subtotal * 0.08);
-      const total = (subtotal - cartDiscount) + shipping + tax;
-      const totalPaise = Math.round(total * 100); // Razorpay uses paise
-
-      // ── TODO: Replace this with a real backend call ──────────────
-      // Your backend should create a Razorpay order and return an order_id
-      // Example: const { order_id } = await fetch('/api/create-order', { method:'POST', body: JSON.stringify({ amount: totalPaise }) }).then(r=>r.json());
-      // For now we pass amount directly (test mode only — live mode REQUIRES a backend order_id)
-      // ────────────────────────────────────────────────────────────
+      const subtotal   = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
+      const shipping   = subtotal >= 999 ? 0 : 79;
+      const tax        = Math.round(subtotal * 0.08);
+      const total      = (subtotal - cartDiscount) + shipping + tax;
+      const totalPaise = Math.round(total * 100);
 
       const options = {
-        key: RAZORPAY_KEY_ID,                     // ← Your Razorpay Key ID
-        amount: totalPaise,                        // Amount in paise
+        key:      RAZORPAY_KEY_ID,
+        amount:   totalPaise,
         currency: 'INR',
-        name: 'VYNEIT',
+        name:     'VYNEIT',
         description: `Order of ${cartItems.length} item(s)`,
-        // order_id: 'order_XXXXX',               // ← Add backend-generated order_id here (required for production)
+        // order_id: '', // ← Add backend-generated Razorpay order_id here for production
         prefill: {
-          name:  (document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value).trim(),
-          email: document.getElementById('email').value,
+          name:    (document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value).trim(),
+          email:   document.getElementById('email').value,
           contact: document.getElementById('phone').value
         },
         notes: {
           address: document.getElementById('addr1').value + ', ' + document.getElementById('city').value,
-          coupon: cartCoupon?.code || ''
+          coupon:  cartCoupon?.code || ''
         },
         theme: { color: '#102C26' },
         handler: async function(response){
-          // ── PAYMENT SUCCESSFUL ──────────────────────────────────
-          console.log('[VYNEIT] Payment successful:', response);
           const orderNum = '#VYN-' + Math.floor(100000 + Math.random()*900000);
           await saveOrderToSupabase(orderNum, 'Online (Razorpay)', response.razorpay_payment_id);
           clearCartAndCoupon();
@@ -1121,11 +1115,9 @@
         },
         modal: {
           ondismiss: function(){
-            // ── PAYMENT FAILED / CANCELLED ──────────────────────
-            // Order is NOT placed — user stays on checkout page
-            alert('Payment was cancelled. Your order has not been placed. Please try again.');
+            alert('Payment cancelled. Your order has not been placed.');
             document.getElementById('placeOrderBtn').disabled = false;
-            selectPay('razorpay'); // reset button label
+            selectPay('razorpay');
           }
         }
       };
@@ -1133,34 +1125,37 @@
       const btn = document.getElementById('placeOrderBtn');
       btn.disabled = true;
       btn.textContent = '⏳ Opening payment…';
-
       try {
         const rzp = new window.Razorpay(options);
         rzp.on('payment.failed', function(resp){
-          // ── PAYMENT FAILED ──────────────────────────────────
-          console.error('[VYNEIT] Payment failed:', resp.error);
-          alert('Payment failed: ' + (resp.error.description || 'Please try again.'));
+          alert('Payment failed: ' + (resp.error?.description || 'Please try again.'));
           btn.disabled = false;
           selectPay('razorpay');
         });
         rzp.open();
       } catch(err){
-        alert('Could not open payment. Please try again.');
+        alert('Could not open payment gateway. Please try again.');
         btn.disabled = false;
         selectPay('razorpay');
       }
 
     } else {
-      // ── COD FLOW ─────────────────────────────────────────────
+      // ── COD FLOW ───────────────────────────────────────────
       const btn = document.getElementById('placeOrderBtn');
       btn.disabled = true;
       btn.innerHTML = '<span style="animation:spin .7s linear infinite;display:inline-block">⏳</span> Placing order…';
 
-      await new Promise(r=>setTimeout(r,1200));
-      const orderNum = '#VYN-' + Math.floor(100000+Math.random()*900000);
-      await saveOrderToSupabase(orderNum, 'COD', null);
-      clearCartAndCoupon();
-      showSuccess(orderNum);
+      try {
+        const orderNum = '#VYN-' + Math.floor(100000 + Math.random()*900000);
+        await saveOrderToSupabase(orderNum, 'Cash on Delivery', null);
+        clearCartAndCoupon();
+        showSuccess(orderNum);
+      } catch(err){
+        console.error('[VYNEIT] Order failed:', err);
+        btn.disabled = false;
+        btn.innerHTML = '📦 Place Order (COD)';
+        alert('Something went wrong. Please try again.');
+      }
     }
   }
 
