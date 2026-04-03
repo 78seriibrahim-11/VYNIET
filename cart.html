@@ -797,9 +797,22 @@
     btn.style.background='var(--accent)';
     btn.disabled=true;
     saveCart();
-    setTimeout(()=>{
-      window.location.href='checkout.html';
-    },600);
+
+    // ── Save coupon to localStorage so checkout.html can read it ──
+    if(promoApplied && activeCoupon){
+      const discAmt = Math.round(subtotal() * activeCoupon.discount / 100);
+      localStorage.setItem('vyneit_applied_coupon', JSON.stringify({
+        code:     activeCoupon.code,
+        percent:  activeCoupon.discount,  // e.g. 31
+        discount: discAmt,                // rupee amount e.g. 619
+        amount:   discAmt,
+        savings:  discAmt
+      }));
+    } else {
+      localStorage.removeItem('vyneit_applied_coupon');
+    }
+
+    setTimeout(()=>{ window.location.href='checkout.html'; }, 600);
   }
 
   // Shake animation
