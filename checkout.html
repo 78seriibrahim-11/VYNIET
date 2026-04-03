@@ -731,14 +731,33 @@
   let cartCoupon = null;
 
   // ── LOAD CART ────────────────────────────────────────────────
-  // Immediately tries localStorage, then upgrades from Supabase when ready
   async function loadCart(userId){
-    // Always start with localStorage so the cart never stays blank
-    const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-    const localKey = getCartKey(user);
-    const localData = JSON.parse(localStorage.getItem(localKey) || '[]');
 
-    // If Supabase is ready and we have a userId, fetch from DB
+    // ── Step 1: Read from localStorage ───────────────────────
+    // Scan ALL vyneit_cart_* keys — picks whichever has data,
+    // so it works before auth resolves without guessing the key.
+    const user     = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+    const exactKey = getCartKey(user);
+    let localData  = JSON.parse(localStorage.getItem(exactKey) || '[]');
+
+    if(!localData.length){
+      // Scan every key in localStorage for any cart data
+      for(let i = 0; i < localStorage.length; i++){
+        const k = localStorage.key(i);
+        if(k && k.startsWith('vyneit_cart_') && k !== 'vyneit_cart_guest'){
+          try{
+            const d = JSON.parse(localStorage.getItem(k) || '[]');
+            if(d.length){ localData = d; break; }
+          }catch(e){}
+        }
+      }
+      // Final fallback: guest cart
+      if(!localData.length){
+        try{ localData = JSON.parse(localStorage.getItem('vyneit_cart_guest') || '[]'); }catch(e){}
+      }
+    }
+
+    // ── Step 2: Upgrade from Supabase when logged in ──────────
     if(userId && window._db){
       try {
         const { data: rows, error } = await window._db
@@ -749,12 +768,10 @@
             img: r.img, qty: r.qty, size: r.size, color: r.color
           }));
         } else {
-          // Supabase returned empty — use localStorage as fallback
           cartItems = localData;
         }
       } catch(e){
-        console.error('[VYNEIT] Cart fetch error:', e);
-        cartItems = localData; // fall back to localStorage on error
+        cartItems = localData;
       }
     } else {
       cartItems = localData;
