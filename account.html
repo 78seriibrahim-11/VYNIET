@@ -621,32 +621,46 @@
 
   // ── Open Order Detail ──────────────────────────────────────
   async function openOrderDetail(orderId){
-    // Fetch fresh order data
-    const { data: o } = await db.from('orders').select('*').eq('id', orderId).single()
-    if(!o) return
+    const { data: o, error } = await db.from('orders').select('*').eq('id', orderId).single()
+    if(error || !o) return
     _activeOrder = o
 
-    const orderNum  = o.order_number || ('#VYN-'+o.id.substring(0,8).toUpperCase())
-    const status    = o.status || 'Processing'
-    const date      = new Date(o.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
-    const total     = Number(o.total || 0)
-    const items     = (() => { try{ return JSON.parse(o.items||'[]') }catch(e){ return [] } })()
+    const orderNum    = o.order_number || ('#VYN-' + o.id.substring(0,8).toUpperCase())
+    const status      = o.status || 'Confirmed'
+    const date        = new Date(o.created_at).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})
+    const total       = Number(o.total || 0)
     const isCancelled = status.toLowerCase() === 'cancelled'
 
-    // Header
-    document.getElementById('detailOrderId').textContent  = orderNum
-    document.getElementById('detailDate').textContent     = date
-    document.getElementById('detailTotal').textContent    = '₹'+total.toLocaleString('en-IN')
-    document.getElementById('detailPayment').textContent  = o.payment_method || 'Online'
-    document.getElementById('detailItemCount').textContent= (items.length || o.items_count || 1)+' item(s)'
+    // Parse items — handles both JSONB array (new) and JSON string (old)
+    let items = []
+    if(Array.isArray(o.items)){
+      items = o.items
+    } else if(typeof o.items === 'string'){
+      try{ items = JSON.parse(o.items) }catch(e){ items = [] }
+    }
 
-    // Tracker
+    // Parse delivery address — handles both JSONB object and plain text
+    let addr = null
+    if(o.delivery_address && typeof o.delivery_address === 'object'){
+      addr = o.delivery_address
+    } else if(o.delivery_address && typeof o.delivery_address === 'string'){
+      try{ addr = JSON.parse(o.delivery_address) }catch(e){ addr = null }
+    }
+
+    // ── Header ──────────────────────────────────────────────
+    document.getElementById('detailOrderId').textContent   = orderNum
+    document.getElementById('detailDate').textContent      = date
+    document.getElementById('detailTotal').textContent     = '₹' + total.toLocaleString('en-IN')
+    document.getElementById('detailPayment').textContent   = o.payment_method || 'Online'
+    document.getElementById('detailItemCount').textContent = (items.length || o.items_count || 1) + ' item(s)'
+
+    // ── Status Tracker ───────────────────────────────────────
     const stepIdx = getStepIndex(status)
     let trackerHTML = ''
 
     if(isCancelled){
       trackerHTML = `
-        <div class="tracker-step cancelled" style="flex:none;min-width:120px">
+        <div class="tracker-step cancelled" style="flex:none;min-width:140px">
           <div class="tracker-dot">✕</div>
           <div class="tracker-label" style="color:var(--red)">Order Cancelled</div>
           <div class="tracker-date">${date}</div>
@@ -655,69 +669,101 @@
       trackerHTML = TRACKER_STEPS.map((step, i) => {
         const isDone   = i < stepIdx
         const isActive = i === stepIdx
-        const cls = isDone ? 'done' : isActive ? 'active' : ''
-        const dateLabel = isActive ? date : (isDone ? '✓' : '')
+        const cls      = isDone ? 'done' : isActive ? 'active' : ''
+        const dateStr  = isActive ? date : isDone ? '✓' : ''
         return `
           <div class="tracker-step ${cls}">
             <div class="tracker-dot">${isDone ? '✓' : step.icon}</div>
             <div class="tracker-label">${step.label.replace('\n','<br>')}</div>
-            <div class="tracker-date">${dateLabel}</div>
+            <div class="tracker-date">${dateStr}</div>
           </div>`
       }).join('')
     }
     document.getElementById('orderTracker').innerHTML = trackerHTML
 
-    // Items list
+    // ── Items List ───────────────────────────────────────────
     let itemsHTML = ''
     if(items.length > 0){
       itemsHTML = items.map(item => `
         <div class="oi-row">
-          <img class="oi-img" src="${item.img||'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=80&auto=format'}" alt="${item.name||'Item'}"/>
+          <img class="oi-img"
+            src="${item.img || 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=80&auto=format'}"
+            alt="${item.name || 'Item'}"
+            onerror="this.src='https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=80&auto=format'"/>
           <div class="oi-info">
-            <div class="oi-name">${item.name||'VYNEIT T-Shirt'}</div>
-            <div class="oi-meta">Qty: ${item.qty||1}${item.size?' · Size: '+item.size:''}${item.color?' · '+item.color:''}</div>
+            <div class="oi-name">${item.name || 'VYNEIT T-Shirt'}</div>
+            <div class="oi-meta">
+              Qty: ${item.qty || 1}
+              ${item.size  ? ' &nbsp;·&nbsp; Size: '  + item.size  : ''}
+              ${item.color ? ' &nbsp;·&nbsp; '        + item.color : ''}
+            </div>
           </div>
-          <div class="oi-price">₹${(Number(item.price||0)*(item.qty||1)).toLocaleString('en-IN')}</div>
+          <div class="oi-price">₹${(Number(item.price || 0) * (item.qty || 1)).toLocaleString('en-IN')}</div>
         </div>`).join('')
     } else {
-      itemsHTML = `<div class="oi-row"><div class="oi-info"><div class="oi-name">Order items</div><div class="oi-meta">Details not available</div></div><div class="oi-price">₹${total.toLocaleString('en-IN')}</div></div>`
+      itemsHTML = `
+        <div class="oi-row">
+          <div class="oi-info">
+            <div class="oi-name">Order items</div>
+            <div class="oi-meta">Item details not available for this order</div>
+          </div>
+          <div class="oi-price">₹${total.toLocaleString('en-IN')}</div>
+        </div>`
     }
-    document.getElementById('orderItemsList').innerHTML = itemsHTML
 
-    // Price breakdown
-    const subtotal  = Number(o.subtotal || total)
-    const discount  = Number(o.discount || 0)
-    const shipping  = Number(o.shipping || 0)
-    const tax       = Number(o.tax || 0)
-    const codFee    = Number(o.cod_fee || 0)
+    // ── Delivery Address Block ───────────────────────────────
+    let addrHTML = ''
+    if(addr){
+      addrHTML = `
+        <div class="oi-row" style="flex-direction:column;align-items:flex-start;gap:6px;background:rgba(247,231,206,.25)">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">📍 Delivered To</div>
+          <div style="font-size:14px;font-weight:600;color:var(--black)">${addr.name || ''}</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">
+            ${addr.line1 || ''}${addr.line2 ? ', ' + addr.line2 : ''}<br>
+            ${addr.city || ''}${addr.state ? ', ' + addr.state : ''}${addr.pincode ? ' - ' + addr.pincode : ''}
+          </div>
+          ${addr.phone ? `<div style="font-size:12px;color:var(--muted)">📞 ${addr.phone}</div>` : ''}
+        </div>`
+    }
+
+    document.getElementById('orderItemsList').innerHTML = itemsHTML + addrHTML
+
+    // ── Price Breakdown ──────────────────────────────────────
+    const subtotal = Number(o.subtotal || total)
+    const discount = Number(o.discount || 0)
+    const shipping = Number(o.shipping || 0)
+    const tax      = Number(o.tax      || 0)
+    const codFee   = Number(o.cod_fee  || 0)
+
     document.getElementById('orderTotals').innerHTML = `
       <div class="ot-row"><span class="lbl">Subtotal</span><span>₹${subtotal.toLocaleString('en-IN')}</span></div>
-      ${discount > 0 ? `<div class="ot-row"><span class="lbl">Discount</span><span style="color:var(--green)">−₹${discount.toLocaleString('en-IN')}</span></div>` : ''}
-      <div class="ot-row"><span class="lbl">Shipping</span><span>${shipping === 0 ? 'FREE' : '₹'+shipping}</span></div>
-      ${tax > 0 ? `<div class="ot-row"><span class="lbl">Tax</span><span>₹${tax.toLocaleString('en-IN')}</span></div>` : ''}
+      ${discount > 0 ? `<div class="ot-row"><span class="lbl">Discount${o.coupon_code ? ' (' + o.coupon_code + ')' : ''}</span><span style="color:var(--green)">−₹${discount.toLocaleString('en-IN')}</span></div>` : ''}
+      <div class="ot-row"><span class="lbl">Shipping</span><span>${shipping === 0 ? '<span style="color:var(--green);font-weight:700">FREE</span>' : '₹' + shipping}</span></div>
+      ${tax > 0    ? `<div class="ot-row"><span class="lbl">Tax (GST)</span><span>₹${tax.toLocaleString('en-IN')}</span></div>` : ''}
       ${codFee > 0 ? `<div class="ot-row"><span class="lbl">COD Fee</span><span>₹${codFee}</span></div>` : ''}
-      <div class="ot-total"><span>Total Paid</span><span>₹${total.toLocaleString('en-IN')}</span></div>`
+      <div class="ot-total"><span>Total Paid</span><span>₹${total.toLocaleString('en-IN')}</span></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">Payment: ${o.payment_method || 'Online'}${o.razorpay_id ? ' · Ref: ' + o.razorpay_id.substring(0,16) + '…' : ''}</div>`
 
-    // Cancel section
+    // ── Cancel Section ───────────────────────────────────────
     const cancelSection = document.getElementById('cancelSection')
-    const cancelBtn     = document.getElementById('cancelBtn')
-    const cancelNote    = document.getElementById('cancelNote')
-    const canCancel     = ['confirmed','processing','pending','packed'].includes(status.toLowerCase())
+    const canCancel = ['confirmed','processing','pending','packed'].includes(status.toLowerCase())
 
     if(isCancelled){
       cancelSection.innerHTML = `<div class="cancelled-notice">✕ This order has been cancelled.</div>`
     } else if(canCancel){
-      cancelNote.textContent = 'You can cancel this order before it is dispatched. Once shipped, cancellation is not possible.'
-      cancelBtn.disabled = false
-      cancelBtn.textContent = 'Cancel Order'
+      cancelSection.innerHTML = `
+        <div class="cancel-note">You can cancel before dispatch. Once shipped, cancellation is not possible.</div>
+        <button class="cancel-btn" id="cancelBtn" onclick="cancelOrder()">Cancel Order</button>`
     } else {
-      cancelNote.textContent = 'This order cannot be cancelled as it has already been dispatched.'
-      cancelBtn.disabled = true
+      cancelSection.innerHTML = `
+        <div class="cancel-note">This order cannot be cancelled — it has already been dispatched.</div>
+        <button class="cancel-btn" disabled style="opacity:.4;cursor:not-allowed">Cancel Order</button>`
     }
 
-    // Show detail, hide list
+    // Show detail view
     document.getElementById('ordersListView').style.display = 'none'
     document.getElementById('orderDetailView').classList.add('active')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function closeOrderDetail(){
