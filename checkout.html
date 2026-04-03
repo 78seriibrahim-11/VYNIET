@@ -1165,38 +1165,55 @@
   }
 
   // ── SAVE ORDER TO SUPABASE ───────────────────────────────────
-  // Called after successful payment (Razorpay or COD)
   async function saveOrderToSupabase(orderNum, paymentMethod, razorpayPaymentId){
-    if(!window._db) return;
+    if(!window._db) return null;
     const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-    if(!user?.user_id) return;
+    if(!user?.user_id) return null;
 
-    const subtotal  = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
-    const shipping  = subtotal >= 999 ? 0 : 79;
-    const tax       = Math.round(subtotal * 0.08);
-    const codFee    = paymentMethod === 'COD' ? 40 : 0;
-    const total     = (subtotal - cartDiscount) + shipping + tax + codFee;
+    // Financials
+    const subtotal = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1), 0);
+    const shipping = subtotal >= 999 ? 0 : 79;
+    const tax      = Math.round(subtotal * 0.08);
+    const codFee   = activePayMethod === 'cod' ? 40 : 0;
+    const total    = (subtotal - cartDiscount) + shipping + tax + codFee;
 
-    const addr = document.getElementById('addr1')?.value || '';
-    const city  = document.getElementById('city')?.value  || '';
+    // Full delivery address
+    const deliveryAddress = {
+      name:    (document.getElementById('firstName')?.value || '') + ' ' + (document.getElementById('lastName')?.value || ''),
+      phone:   document.getElementById('phone')?.value    || '',
+      line1:   document.getElementById('addr1')?.value    || '',
+      line2:   document.getElementById('addr2')?.value    || '',
+      city:    document.getElementById('city')?.value     || '',
+      state:   document.getElementById('state')?.value    || '',
+      pincode: document.getElementById('pincode')?.value  || '',
+    };
+    const addressText = [deliveryAddress.line1, deliveryAddress.line2, deliveryAddress.city, deliveryAddress.state, deliveryAddress.pincode]
+      .filter(Boolean).join(', ');
 
-    await window._db.from('orders').insert({
-      user_id:         user.user_id,
-      order_number:    orderNum,
-      status:          'Confirmed',
-      total:           total,
-      subtotal:        subtotal,
-      discount:        cartDiscount,
-      shipping:        shipping,
-      tax:             tax,
-      cod_fee:         codFee,
-      payment_method:  paymentMethod,
-      razorpay_id:     razorpayPaymentId || null,
-      items:           JSON.stringify(cartItems),
-      items_count:     cartItems.reduce((s,i)=>s+(i.qty||1),0),
-      address:         addr + (city ? ', '+city : ''),
-      coupon_code:     cartCoupon?.code || null,
-    });
+    const orderRow = {
+      user_id:          user.user_id,
+      order_number:     orderNum,
+      status:           'Confirmed',
+      total:            total,
+      subtotal:         subtotal,
+      discount:         cartDiscount || 0,
+      shipping:         shipping,
+      tax:              tax,
+      cod_fee:          codFee,
+      payment_method:   paymentMethod,
+      razorpay_id:      razorpayPaymentId || null,
+      coupon_code:      cartCoupon?.code  || null,
+      items:            cartItems,               // saved as JSONB array directly
+      items_count:      cartItems.reduce((s,i)=>s+(i.qty||1), 0),
+      delivery_address: deliveryAddress,         // saved as JSONB object
+      address_text:     addressText,
+      order_notes:      document.getElementById('orderNote')?.value || null,
+    };
+
+    const { data, error } = await window._db.from('orders').insert(orderRow).select().single();
+    if(error) console.error('[VYNEIT] Order save error:', error);
+    else console.log('[VYNEIT] ✅ Order saved:', data?.id);
+    return data;
   }
 
   // ── CLEAR CART HELPER ─────────────────────────────────────────
