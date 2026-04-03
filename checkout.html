@@ -1340,26 +1340,7 @@
       window.location.href='index.html';
     });
   }
-  try {
-  console.log("Starting order...");
-
-  const orderNum = '#VYN-' + Math.floor(100000 + Math.random()*900000);
-
-  const res = await saveOrderToSupabase(orderNum, 'Cash on Delivery', null);
-
-  console.log("Order saved:", res);
-
-  clearCartAndCoupon();
-  showSuccess(orderNum);
-
-} catch(err){
-  console.error('[VYNEIT] Order failed:', err);
-
-  btn.disabled = false;
-  btn.innerHTML = '📦 Place Order (COD)';
-
-  alert(err.message || 'Something went wrong. Please try again.');
-}
+  
 </script>
 </body>
 </html>
