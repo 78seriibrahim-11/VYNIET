@@ -1214,6 +1214,10 @@
     document.getElementById('successOverlay').classList.add('show');
   }
 
+  // ── INIT: Render cart from localStorage immediately so page never looks blank ──
+  // Auth resolves shortly after and upgrades to Supabase data via loadCart(userId)
+  loadCart(null);
+
   // Add spin keyframe
   const st = document.createElement('style');
   st.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
