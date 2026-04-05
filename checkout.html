@@ -323,9 +323,9 @@
       <a class="drawer-item" href="cart.html"><span class="drawer-item-icon">🛍</span> My Cart <span class="drawer-item-arrow">›</span></a>
       <div class="drawer-divider"></div>
       <div class="drawer-section-label">Info</div>
-      <a class="drawer-item" href="#"><span class="drawer-item-icon">📏</span> Size Guide <span class="drawer-item-arrow">›</span></a>
-      <a class="drawer-item" href="#"><span class="drawer-item-icon">🚚</span> Shipping Info <span class="drawer-item-arrow">›</span></a>
-      <a class="drawer-item" href="#"><span class="drawer-item-icon">🔄</span> Returns & Refunds <span class="drawer-item-arrow">›</span></a>
+      <a class="drawer-item" href="collections.html"><span class="drawer-item-icon">📏</span> Size Guide <span class="drawer-item-arrow">›</span></a>
+      <a class="drawer-item" href="track-order.html"><span class="drawer-item-icon">🚚</span> Shipping Info <span class="drawer-item-arrow">›</span></a>
+      <a class="drawer-item" href="returns-refunds.html"><span class="drawer-item-icon">🔄</span> Returns & Refunds <span class="drawer-item-arrow">›</span></a>
       <a class="drawer-item" href="privacy-policy.html"><span class="drawer-item-icon">📄</span> Privacy Policy <span class="drawer-item-arrow">›</span></a>
     </div>
   </div>
@@ -649,7 +649,7 @@
 <!-- Mini Footer -->
 <div class="mini-footer">
   © 2025 VYNEIT. All rights reserved.
-  <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a>
+  <a href="privacy-policy.html">Privacy</a><a href="privacy-policy.html">Terms</a><a href="contact-support.html">Contact</a>
 </div>
 
 <script>
@@ -1161,9 +1161,19 @@
 
   // ── SAVE ORDER TO SUPABASE ───────────────────────────────────
   async function saveOrderToSupabase(orderNum, paymentMethod, razorpayPaymentId){
-    if(!window._db) throw new Error("Database not initialized");
+    // Guest fallback — save order to localStorage so it's not lost
     const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-  if(!user?.user_id) throw new Error("User not logged in");
+    if(!window._db || !user?.user_id){
+      const guestOrder = {
+        order_number: orderNum, status: 'Confirmed',
+        payment_method: paymentMethod, created_at: new Date().toISOString(),
+        items: cartItems, total: cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0) - cartDiscount
+      };
+      const prev = JSON.parse(localStorage.getItem('vyneit_guest_orders') || '[]');
+      prev.unshift(guestOrder);
+      localStorage.setItem('vyneit_guest_orders', JSON.stringify(prev));
+      return guestOrder;
+    }
 
     // Financials
     const subtotal = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1), 0);
