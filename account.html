@@ -551,6 +551,14 @@
 
     // Load orders (also updates totalOrders count)
     loadOrders()
+
+    // ── Deep-link: switch to panel from drawer links (e.g. account.html#orders) ──
+    const targetPanel = localStorage.getItem('acPanel') || window.location.hash.replace('#','')
+    if(targetPanel && document.getElementById('panel-'+targetPanel)){
+      const link = document.querySelector(`.sidebar-nav a[onclick*="'${targetPanel}'"]`)
+      showPanel(targetPanel, link, null)
+      localStorage.removeItem('acPanel')
+    }
   }
 
   // ── Load Orders ────────────────────────────────────────────
