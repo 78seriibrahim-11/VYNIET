@@ -967,7 +967,7 @@ async function loadDashboard(){
 
     // Stats
     const revenue  = orders.filter(o=>o.payment_status==='Paid').reduce((s,o)=>s+(o.total_price||0),0)
-    const pending  = orders.filter(o=>o.order_status==='Pending').length
+    const pending  = orders.filter(o=>o.status==='Pending').length
 
     setEl('statRevenue',  '₹' + revenue.toLocaleString('en-IN'))
     setEl('statOrders',   orders.length)
@@ -983,7 +983,7 @@ async function loadDashboard(){
         <td><span style="font-weight:700;color:var(--accent)">#${(o.id||'').substring(0,8).toUpperCase()}</span></td>
         <td>${o.customer_name||'—'}</td>
         <td>₹${(o.total_price||0).toLocaleString('en-IN')}</td>
-        <td>${statusBadge(o.order_status)}</td>
+        <td>${statusBadge(o.status)}</td>
       </tr>`).join('') : '<tr><td colspan="4" class="empty-row">No orders yet</td></tr>'
 
     // Sales chart
@@ -1040,7 +1040,7 @@ function buildSalesChart(orders, days){
 
 function buildStatusChart(orders){
   const statuses = ['Pending','Processing','Shipped','Delivered','Cancelled']
-  const counts   = statuses.map(s => orders.filter(o=>o.order_status===s).length)
+  const counts   = statuses.map(s => orders.filter(o=>o.status===s).length)
   const colors   = ['#e67e22','#3498db','#9b59b6','#2ecc71','#e74c3c']
 
   if(statusChart) statusChart.destroy()
@@ -1090,7 +1090,7 @@ function renderOrders(orders){
       <td style="max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${formatProducts(o.products)}</td>
       <td><b>₹${(o.total_price||0).toLocaleString('en-IN')}</b></td>
       <td>${payBadge(o.payment_status)}</td>
-      <td>${statusBadge(o.order_status)}</td>
+      <td>${statusBadge(o.status)}</td>
       <td style="white-space:nowrap">${fmtDate(o.created_at)}</td>
       <td>
         <button class="action-btn" onclick="openOrderModal('${o.id}')">View</button>
@@ -1110,7 +1110,7 @@ function filterOrders(q){
 }
 
 function filterOrdersByStatus(status){
-  renderOrders(status==='all' ? allOrders : allOrders.filter(o=>o.order_status===status))
+  renderOrders(status==='all' ? allOrders : allOrders.filter(o=>o.status===status))
 }
 
 async function openOrderModal(id){
@@ -1144,7 +1144,7 @@ async function openOrderModal(id){
       <div>
         <label>Update Status</label>
         <select class="status-select" id="modalStatus" onchange="updateOrderStatus('${order.id}',this.value)">
-          ${['Pending','Processing','Shipped','Delivered','Cancelled'].map(s=>`<option ${order.order_status===s?'selected':''}>${s}</option>`).join('')}
+          ${['Pending','Processing','Shipped','Delivered','Cancelled'].map(s=>`<option ${order.status===s?'selected':''}>${s}</option>`).join('')}
         </select>
       </div>
       <div>
@@ -1158,7 +1158,7 @@ async function openOrderModal(id){
 }
 
 async function updateOrderStatus(id, status){
-  const { error } = await db.from('orders').update({ order_status: status }).eq('id', id)
+  const { error } = await db.from('orders').update({ status: status }).eq('id', id)
   if(error) return toast('Error: ' + error.message, 'error')
   toast(`Order marked as ${status}`, 'success')
   await loadOrders()
@@ -1327,7 +1327,7 @@ async function viewCustomerOrders(email){
       <div style="display:flex;justify-content:space-between;padding:10px;background:var(--cream);margin-bottom:8px;font-size:13px">
         <span>#${(o.id||'').substring(0,8).toUpperCase()}</span>
         <span>₹${(o.total_price||0).toLocaleString('en-IN')}</span>
-        <span>${statusBadge(o.order_status)}</span>
+        <span>${statusBadge(o.status)}</span>
         <span>${fmtDate(o.created_at)}</span>
       </div>`).join('') : '<div class="empty-row">No orders for this customer</div>'}
   `
