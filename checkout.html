@@ -636,14 +636,29 @@
 <!-- SUCCESS OVERLAY -->
 <div class="success-overlay" id="successOverlay">
   <div class="success-box">
-    <span class="success-icon">🎉</span>
-    <h2>Order <em>Placed!</em></h2>
+    <span class="success-icon">✅</span>
+    <h2>Order <em>Confirmed!</em></h2>
     <p>Thank you for shopping with VYNEIT.<br>Your order is confirmed and we're getting it ready.</p>
     <div class="success-order-id" id="successOrderId">#VYN-000000</div>
-    <p style="font-size:13px;color:var(--muted)">A confirmation email has been sent to your inbox.</p>
-    <br/>
-    <button class="success-btn" onclick="window.location.href='index.html'">← Continue Shopping</button>
+    <div id="successMeta" style="font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.7"></div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
+      <button class="success-btn" onclick="localStorage.setItem('acPanel','orders');window.location.href='account.html'" style="background:var(--black)">
+        📦 View My Orders
+      </button>
+      <button class="success-btn" onclick="window.location.href='index.html'" style="background:var(--accent)">
+        ← Continue Shopping
+      </button>
+    </div>
   </div>
+</div>
+
+<!-- ERROR TOAST -->
+<div id="errorToast" style="
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(120px);
+  background:#c0392b;color:white;padding:16px 28px;font-size:14px;font-weight:600;
+  border-radius:4px;z-index:9999;transition:transform .4s ease;max-width:90vw;text-align:center;
+  box-shadow:0 8px 32px rgba(0,0,0,.25)">
+  ⚠️ <span id="errorToastMsg">Something went wrong</span>
 </div>
 
 <!-- Mini Footer -->
@@ -1145,29 +1160,67 @@
       btn.disabled = true;
       btn.innerHTML = '<span style="animation:spin .7s linear infinite;display:inline-block">⏳</span> Placing order…';
 
+      const orderNum = '#VYN-' + Math.floor(100000 + Math.random()*900000);
+      let savedOrder = null;
+
       try {
-        const orderNum = '#VYN-' + Math.floor(100000 + Math.random()*900000);
-        await saveOrderToSupabase(orderNum, 'Cash on Delivery', null);
-        clearCartAndCoupon();
-        showSuccess(orderNum);
+        savedOrder = await saveOrderToSupabase(orderNum, 'Cash on Delivery', null);
       } catch(err){
-        console.error('[VYNEIT] Order failed:', err);
+        console.error('[VYNEIT] Order save failed:', err);
+        // Show error toast with real error message
+        showErrorToast('Order failed: ' + (err.message || 'Database error. Please try again.'));
         btn.disabled = false;
         btn.innerHTML = '📦 Place Order (COD)';
-        alert('Something went wrong. Please try again.');
+        return;
       }
+
+      // ── SUCCESS ───────────────────────────────────────────
+      clearCartAndCoupon();
+
+      // Calculate totals for display
+      const sub    = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
+      const ship   = sub >= 999 ? 0 : 79;
+      const tax    = Math.round(sub * 0.08);
+      const total  = (sub - cartDiscount) + ship + tax + 40; // +40 COD fee
+
+      // Fill success overlay
+      document.getElementById('successOrderId').textContent = orderNum;
+      document.getElementById('successMeta').innerHTML = `
+        <b style="color:var(--black)">₹${total.toLocaleString('en-IN')}</b> · Cash on Delivery
+        <br>Estimated delivery: <b>4–7 business days</b>
+        <br>Track your order in <a href="account.html" style="color:var(--accent);font-weight:700">My Account → Orders</a>
+      `;
+
+      document.getElementById('successOverlay').classList.add('show');
     }
   }
 
   // ── SAVE ORDER TO SUPABASE ───────────────────────────────────
   async function saveOrderToSupabase(orderNum, paymentMethod, razorpayPaymentId){
-    // Guest fallback — save order to localStorage so it's not lost
-    const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-    if(!window._db || !user?.user_id){
+
+    // ── Get LIVE session from Supabase (NOT from localStorage) ──
+    // localStorage user can be stale; live session guarantees RLS auth.uid() matches
+    let userId = null;
+    if(window._db){
+      try {
+        const { data: { session } } = await window._db.auth.getSession();
+        if(session?.user?.id) userId = session.user.id;
+      } catch(e){}
+    }
+
+    // Fallback: try localStorage if Supabase session unavailable
+    if(!userId){
+      const lsUser = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+      userId = lsUser?.user_id || null;
+    }
+
+    // Guest fallback — save to localStorage so order isn't lost
+    if(!window._db || !userId){
       const guestOrder = {
         order_number: orderNum, status: 'Confirmed',
         payment_method: paymentMethod, created_at: new Date().toISOString(),
-        items: cartItems, total: cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0) - cartDiscount
+        items: cartItems,
+        total: cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0) - cartDiscount
       };
       const prev = JSON.parse(localStorage.getItem('vyneit_guest_orders') || '[]');
       prev.unshift(guestOrder);
@@ -1182,9 +1235,9 @@
     const codFee   = activePayMethod === 'cod' ? 40 : 0;
     const total    = (subtotal - cartDiscount) + shipping + tax + codFee;
 
-    // Full delivery address
+    // Delivery address
     const deliveryAddress = {
-      name:    (document.getElementById('firstName')?.value || '') + ' ' + (document.getElementById('lastName')?.value || ''),
+      name:    ((document.getElementById('firstName')?.value || '') + ' ' + (document.getElementById('lastName')?.value || '')).trim(),
       phone:   document.getElementById('phone')?.value    || '',
       line1:   document.getElementById('addr1')?.value    || '',
       line2:   document.getElementById('addr2')?.value    || '',
@@ -1196,7 +1249,7 @@
       .filter(Boolean).join(', ');
 
     const orderRow = {
-      user_id:          user.user_id,
+      user_id:          userId,
       order_number:     orderNum,
       status:           'Confirmed',
       total:            total,
@@ -1208,16 +1261,25 @@
       payment_method:   paymentMethod,
       razorpay_id:      razorpayPaymentId || null,
       coupon_code:      cartCoupon?.code  || null,
-      items:            cartItems,               // saved as JSONB array directly
+      items:            cartItems,
       items_count:      cartItems.reduce((s,i)=>s+(i.qty||1), 0),
-      delivery_address: deliveryAddress,         // saved as JSONB object
+      delivery_address: deliveryAddress,
       address_text:     addressText,
       order_notes:      document.getElementById('orderNote')?.value || null,
     };
 
     const { data, error } = await window._db.from('orders').insert(orderRow).select().single();
-    if(error) console.error('[VYNEIT] Order save error:', error);
-    else console.log('[VYNEIT] ✅ Order saved:', data?.id);
+    if(error){
+      console.error('[VYNEIT] Order save error:', error);
+      // Throw with a clear, human-readable message
+      throw new Error(
+        error.code === '42501'  ? 'Permission denied. Please make sure you are logged in.' :
+        error.code === '42P01'  ? 'Orders table not found. Please contact support.' :
+        error.code === 'PGRST'  ? 'Database connection error. Try again.' :
+        (error.message || 'Could not save order. Try again.')
+      );
+    }
+    console.log('[VYNEIT] ✅ Order saved to Supabase:', data?.id);
     return data;
   }
 
@@ -1230,10 +1292,12 @@
       localStorage.removeItem(k);
   }
 
-  // ── SHOW SUCCESS ──────────────────────────────────────────────
-  function showSuccess(orderNum){
-    document.getElementById('successOrderId').textContent = orderNum;
-    document.getElementById('successOverlay').classList.add('show');
+  // ── ERROR TOAST ───────────────────────────────────────────────
+  function showErrorToast(msg){
+    const toast = document.getElementById('errorToast');
+    document.getElementById('errorToastMsg').textContent = msg;
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    setTimeout(() => { toast.style.transform = 'translateX(-50%) translateY(120px)'; }, 5000);
   }
 
   // ── INIT: Render cart from localStorage immediately so page never looks blank ──
@@ -1288,12 +1352,13 @@
     }
   }
 
-  // Stores user_id (not id) to match cart.html so getCartKey() works
   async function buildAndSaveUser(user){
     let name = user.user_metadata?.full_name || user.email.split('@')[0];
     let phone = user.user_metadata?.phone || '';
     try {
-      const { data: p } = await _db.from('profiles').select('full_name, phone').eq('id', user.id).single();
+      // profiles table uses 'users_profile' as the UUID column (not 'id')
+      const { data: p } = await _db.from('profiles').select('full_name, phone')
+        .eq('users_profile', user.id).single();
       if(p?.full_name) name  = p.full_name;
       if(p?.phone)     phone = p.phone;
     } catch(e){}
