@@ -709,7 +709,7 @@
     if(codPanel) codPanel.classList.toggle('active', method==='cod');
     const notice = document.getElementById('razorpayNotice');
     if(notice) notice.style.display = method==='razorpay' ? 'flex' : 'none';
-    document.getElementById('codRow').style.display = method==='cod' ? 'flex' : 'none';
+    document.getElementById('codRow').querySelector('.value').textContent = method==='cod' ? '₹40' : '';
     const btn = document.getElementById('placeOrderBtn');
     btn.innerHTML = method === 'razorpay'
       ? '🔒 Proceed to Payment'
