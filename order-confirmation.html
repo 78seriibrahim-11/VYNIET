@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VYNEIT — Order Confirmed!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --black:#102C26;--white:#FFF2E1;--cream:#F7E7CE;
+      --accent:#A79277;--accent2:#8a7560;--muted:#7a6e62;
+      --border:#e0d4be;--green:#2e7d4f;--red:#c0392b;
+    }
+    body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--black);cursor:none;overflow-x:hidden}
+    a{text-decoration:none;color:inherit}
+    button{font-family:'DM Sans',sans-serif;cursor:none}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:var(--cream)}
+    ::-webkit-scrollbar-thumb{background:var(--accent)}
+
+    /* CURSOR */
+    .cursor{width:12px;height:12px;background:var(--accent);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+    .cursor-ring{width:36px;height:36px;border:1.5px solid var(--black);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .2s}
+    body:has(a:hover) .cursor,body:has(button:hover) .cursor{width:20px;height:20px}
+    body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring{width:52px;height:52px;border-color:var(--accent)}
+
+    /* NAV */
+    nav{background:var(--white);border-bottom:1px solid var(--border);height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;position:sticky;top:0;z-index:100}
+    .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.08em;color:var(--black)}
+    .nav-logo span{color:var(--accent)}
+
+    /* BREADCRUMB */
+    .breadcrumb{background:var(--cream);border-bottom:1px solid var(--border);padding:14px 48px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+    .breadcrumb a{color:var(--muted);transition:color .2s}
+    .breadcrumb a:hover{color:var(--accent)}
+    .breadcrumb span{color:var(--border)}
+    .breadcrumb .current{color:var(--black);font-weight:600}
+
+    /* STEPS */
+    .checkout-steps{background:var(--cream);border-bottom:1px solid var(--border);padding:0 48px}
+    .steps-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;padding:16px 0}
+    .step{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    .step.done{color:var(--green)}
+    .step-num{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:var(--white)}
+    .step.done .step-num{border-color:var(--green);background:var(--green);color:var(--white)}
+    .step-sep{flex:1;height:1px;background:var(--green);margin:0 14px;max-width:60px}
+
+    /* PAGE */
+    .page{max-width:900px;margin:0 auto;padding:64px 48px 100px}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+    @keyframes checkPulse{0%,100%{box-shadow:0 0 0 0 rgba(46,125,79,.3)}50%{box-shadow:0 0 0 16px rgba(46,125,79,0)}}
+
+    /* HERO */
+    .confirm-hero{text-align:center;padding:48px 0 52px;animation:fadeUp .5s ease both}
+    .check-circle{width:88px;height:88px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:40px;animation:popIn .5s ease both, checkPulse 2s ease 0.5s 3;flex-shrink:0}
+    .confirm-hero h1{font-family:'DM Serif Display',serif;font-size:52px;line-height:1;margin-bottom:12px}
+    .confirm-hero h1 em{font-style:italic;color:var(--accent)}
+    .confirm-hero p{font-size:15px;color:var(--muted);font-weight:300;line-height:1.7;max-width:480px;margin:0 auto 20px}
+    .order-num-chip{display:inline-block;background:var(--black);color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;padding:10px 28px;margin-bottom:8px}
+
+    /* CONTENT GRID */
+    .confirm-grid{display:grid;grid-template-columns:1fr 360px;gap:28px;margin-top:48px;align-items:start;animation:fadeUp .5s .15s ease both}
+
+    /* CARDS */
+    .conf-card{background:#fff;border:1px solid var(--border);overflow:hidden;margin-bottom:20px}
+    .conf-card-head{display:flex;align-items:center;gap:10px;padding:16px 22px;background:var(--cream);border-bottom:1px solid var(--border)}
+    .conf-card-icon{font-size:18px}
+    .conf-card-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--black)}
+    .conf-card-body{padding:20px 22px}
+
+    /* ITEMS */
+    .item-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+    .item-row:last-child{border-bottom:none}
+    .item-img{width:52px;height:64px;object-fit:cover;background:var(--cream);border:1px solid var(--border);flex-shrink:0}
+    .item-info{flex:1;min-width:0}
+    .item-name{font-size:14px;font-weight:600;color:var(--black);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .item-meta{font-size:12px;color:var(--muted)}
+    .item-price{font-size:14px;font-weight:700;color:var(--black);flex-shrink:0}
+    .item-qty-badge{display:inline-block;background:var(--black);color:var(--white);font-size:10px;font-weight:700;padding:1px 7px;margin-left:6px;vertical-align:middle}
+
+    /* TOTALS */
+    .total-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0}
+    .total-row .lbl{color:var(--muted)}
+    .total-row .val{font-weight:600}
+    .total-row .val.green{color:var(--green)}
+    .total-row .val.red{color:var(--red)}
+    .grand-total{display:flex;justify-content:space-between;padding-top:14px;margin-top:10px;border-top:1.5px solid var(--border)}
+    .grand-total .lbl{font-family:'DM Serif Display',serif;font-size:20px}
+    .grand-total .val{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.04em}
+
+    /* ADDRESS */
+    .addr-line{font-size:14px;color:var(--black);line-height:1.7}
+    .addr-name{font-size:15px;font-weight:700;margin-bottom:4px}
+    .addr-phone{font-size:13px;color:var(--muted);margin-top:4px}
+
+    /* DELIVERY TIMELINE */
+    .timeline{display:flex;flex-direction:column;gap:0}
+    .tl-step{display:flex;gap:16px;position:relative;padding-bottom:20px}
+    .tl-step:last-child{padding-bottom:0}
+    .tl-step:last-child .tl-line{display:none}
+    .tl-dot-wrap{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:28px}
+    .tl-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;border:2px solid var(--border);background:var(--white)}
+    .tl-dot.done{background:var(--green);border-color:var(--green)}
+    .tl-dot.active{background:var(--black);border-color:var(--black);box-shadow:0 0 0 4px rgba(16,44,38,.1)}
+    .tl-line{width:2px;flex:1;background:var(--border);margin-top:4px}
+    .tl-dot.done ~ .tl-line{background:var(--green)}
+    .tl-content{padding-top:4px}
+    .tl-label{font-size:13px;font-weight:600;color:var(--black);margin-bottom:2px}
+    .tl-desc{font-size:12px;color:var(--muted)}
+
+    /* RIGHT COLUMN */
+    .summary-right{position:sticky;top:96px}
+
+    /* ACTION BUTTONS */
+    .btn-dark{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:var(--black);color:var(--white);border:none;padding:15px;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:background .2s,transform .15s;margin-bottom:10px}
+    .btn-dark:hover{background:var(--accent);transform:translateY(-2px)}
+    .btn-outline{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:none;color:var(--black);border:1.5px solid var(--border);padding:14px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;transition:all .2s;margin-bottom:10px}
+    .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+    /* TRUST BADGES */
+    .trust-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:8px 0}
+    .trust-row span{font-size:16px}
+
+    /* WHATSAPP CTA */
+    .wa-cta{background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.25);padding:14px 16px;display:flex;gap:10px;align-items:center;font-size:13px;color:var(--black);margin-top:16px}
+
+    /* EMPTY STATE */
+    .no-order{text-align:center;padding:80px 0}
+    .no-order h2{font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:12px}
+    .no-order p{color:var(--muted);margin-bottom:24px}
+
+    /* FOOTER */
+    .mini-footer{background:var(--black);color:rgba(255,242,225,.3);text-align:center;padding:24px;font-size:12px;letter-spacing:.06em}
+    .mini-footer a{color:var(--accent);margin:0 8px}
+
+    @media(max-width:900px){
+      nav,.breadcrumb,.checkout-steps{padding-left:16px;padding-right:16px}
+      .page{padding:32px 16px 80px}
+      .confirm-hero h1{font-size:36px}
+      .confirm-grid{grid-template-columns:1fr}
+      .summary-right{position:static}
+    }
+    @media(max-width:480px){
+      .confirm-hero h1{font-size:28px}
+      .check-circle{width:72px;height:72px;font-size:32px}
+      .order-num-chip{font-size:18px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">VYNE<span>IT</span></a>
+  <a href="collections.html" style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:color .2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">Continue Shopping →</a>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="index.html">Home</a>
+  <span>›</span>
+  <a href="cart.html">Cart</a>
+  <span>›</span>
+  <a href="checkout.html">Checkout</a>
+  <span>›</span>
+  <span class="current">Order Confirmed</span>
+</div>
+
+<!-- STEPS -->
+<div class="checkout-steps">
+  <div class="steps-inner">
+    <div class="step done"><div class="step-num">✓</div>Cart</div>
+    <div class="step-sep"></div>
+    <div class="step done"><div class="step-num">✓</div>Checkout</div>
+    <div class="step-sep"></div>
+    <div class="step done"><div class="step-num">✓</div>Confirmation</div>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- HERO -->
+  <div class="confirm-hero" id="confirmHero">
+    <div class="check-circle">✓</div>
+    <h1>Order <em>Confirmed!</em></h1>
+    <p>Thank you for shopping with VYNEIT. Your order has been placed and we're getting it ready for you.</p>
+    <div class="order-num-chip" id="heroOrderNum">#VYN-000000</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:6px">A confirmation has been noted in your account.</div>
+  </div>
+
+  <!-- GRID -->
+  <div class="confirm-grid" id="confirmGrid" style="display:none">
+
+    <!-- LEFT: Details -->
+    <div>
+
+      <!-- Order Items -->
+      <div class="conf-card">
+        <div class="conf-card-head">
+          <span class="conf-card-icon">👕</span>
+          <div class="conf-card-title">Items Ordered</div>
+        </div>
+        <div class="conf-card-body" id="itemsList">
+          <!-- injected -->
+        </div>
+      </div>
+
+      <!-- Delivery Address -->
+      <div class="conf-card">
+        <div class="conf-card-head">
+          <span class="conf-card-icon">📍</span>
+          <div class="conf-card-title">Delivery Address</div>
+        </div>
+        <div class="conf-card-body" id="addrBlock">—</div>
+      </div>
+
+      <!-- Delivery Timeline -->
+      <div class="conf-card">
+        <div class="conf-card-head">
+          <span class="conf-card-icon">🚚</span>
+          <div class="conf-card-title">Estimated Delivery Timeline</div>
+        </div>
+        <div class="conf-card-body">
+          <div class="timeline">
+            <div class="tl-step">
+              <div class="tl-dot-wrap">
+                <div class="tl-dot done">✓</div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-content">
+                <div class="tl-label">Order Placed</div>
+                <div class="tl-desc" id="tlDate">—</div>
+              </div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot-wrap">
+                <div class="tl-dot active" style="color:white;font-size:11px">📦</div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-content">
+                <div class="tl-label">Processing & Packing</div>
+                <div class="tl-desc">1–2 business days</div>
+              </div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot-wrap">
+                <div class="tl-dot" style="font-size:11px">🚚</div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-content">
+                <div class="tl-label">Dispatched</div>
+                <div class="tl-desc" id="tlDispatch">—</div>
+              </div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot-wrap">
+                <div class="tl-dot" style="font-size:11px">🎉</div>
+              </div>
+              <div class="tl-content">
+                <div class="tl-label">Delivered</div>
+                <div class="tl-desc" id="tlDelivery">3–5 business days from order</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Info -->
+      <div class="conf-card">
+        <div class="conf-card-head">
+          <span class="conf-card-icon">💳</span>
+          <div class="conf-card-title">Payment</div>
+        </div>
+        <div class="conf-card-body" id="paymentBlock">—</div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Summary + Actions -->
+    <div class="summary-right">
+
+      <!-- Price Breakdown -->
+      <div class="conf-card" style="margin-bottom:20px">
+        <div class="conf-card-head">
+          <span class="conf-card-icon">🧾</span>
+          <div class="conf-card-title">Order Summary</div>
+        </div>
+        <div class="conf-card-body" id="summaryBlock">—</div>
+      </div>
+
+      <!-- Actions -->
+      <button class="btn-dark" onclick="localStorage.setItem('acPanel','orders');window.location.href='account.html'">
+        📦 Track My Order
+      </button>
+      <button class="btn-outline" onclick="window.location.href='collections.html'">
+        ← Continue Shopping
+      </button>
+
+      <!-- Trust badges -->
+      <div style="padding-top:16px;border-top:1px solid var(--border);margin-top:8px">
+        <div class="trust-row"><span>🔒</span> Your data is secure &amp; encrypted</div>
+        <div class="trust-row"><span>↩️</span> Free returns within 30 days</div>
+        <div class="trust-row"><span>📞</span> 24/7 customer support</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EMPTY STATE (if no order data found) -->
+  <div class="no-order" id="noOrderState" style="display:none">
+    <div style="font-size:52px;margin-bottom:16px">📦</div>
+    <h2>No Order Found</h2>
+    <p>We couldn't find your order details. Please check your account for order history.</p>
+    <button class="btn-dark" style="max-width:260px;margin:0 auto" onclick="window.location.href='account.html'">
+      View My Orders →
+    </button>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="mini-footer">
+  © 2025 VYNEIT. All rights reserved.
+  <a href="privacy-policy.html">Privacy</a>
+  <a href="contact-support.html">Contact</a>
+</div>
+
+<script>
+  // ── CURSOR ──────────────────────────────────────────────────
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+  (function loop(){
+    cursor.style.left=mx+'px';cursor.style.top=my+'px';
+    rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+    ring.style.left=rx+'px';ring.style.top=ry+'px';
+    requestAnimationFrame(loop);
+  })();
+
+  // ── HELPERS ─────────────────────────────────────────────────
+  function parsePrice(v){ return parseFloat(String(v||0).replace(/[,₹\s]/g,''))||0; }
+  function fmtMoney(v){ return '₹'+Number(v||0).toLocaleString('en-IN'); }
+  function fmtDate(d){
+    return d ? new Date(d).toLocaleDateString('en-IN',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : '—';
+  }
+  function addDays(d,n){
+    const r=new Date(d); r.setDate(r.getDate()+n); return r;
+  }
+
+  // ── LOAD ORDER ──────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', function(){
+    // Try URL param first, then localStorage
+    const params = new URLSearchParams(window.location.search);
+    const paramOrderNum = params.get('order');
+
+    let order = null;
+    try{ order = JSON.parse(localStorage.getItem('vyneit_last_order')||'null'); }catch(e){}
+
+    // If URL param matches or no data, show fallback
+    if(!order && !paramOrderNum){
+      document.getElementById('confirmHero').style.display = 'none';
+      document.getElementById('noOrderState').style.display = 'block';
+      return;
+    }
+
+    // Override order number from URL if present
+    if(paramOrderNum && order){
+      order.order_number = decodeURIComponent(paramOrderNum);
+    } else if(paramOrderNum && !order){
+      // Minimal display with just order number
+      order = { order_number: decodeURIComponent(paramOrderNum), items:[], created_at: new Date().toISOString() };
+    }
+
+    renderOrder(order);
+  });
+
+  function renderOrder(o){
+    // Hero
+    document.getElementById('heroOrderNum').textContent = o.order_number || '#VYN-000000';
+
+    // Show grid
+    document.getElementById('confirmGrid').style.display = 'grid';
+
+    const items      = Array.isArray(o.items) ? o.items : [];
+    const subtotal   = o.subtotal || items.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
+    const discount   = o.discount   || 0;
+    const shipping   = o.shipping   || 0;
+    const tax        = o.tax        || 0;
+    const codFee     = o.cod_fee    || 0;
+    const total      = o.total      || (subtotal - discount + shipping + tax + codFee);
+    const createdAt  = o.created_at || new Date().toISOString();
+
+    // ── Items ────────────────────────────────────────────────
+    const itemsEl = document.getElementById('itemsList');
+    if(items.length){
+      itemsEl.innerHTML = items.map(it=>`
+        <div class="item-row">
+          <img class="item-img" src="${it.img||'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=80&auto=format'}"
+            alt="${it.name||''}" onerror="this.src='https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=80&auto=format'"/>
+          <div class="item-info">
+            <div class="item-name">${it.name||'VYNEIT T-Shirt'}<span class="item-qty-badge">×${it.qty||1}</span></div>
+            <div class="item-meta">${it.size?'Size: '+it.size:''}${it.color?(it.size?' · ':'')+it.color:''}</div>
+          </div>
+          <div class="item-price">${fmtMoney(parsePrice(it.price)*(it.qty||1))}</div>
+        </div>`).join('');
+    } else {
+      itemsEl.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px 0">Item details not available.</div>';
+    }
+
+    // ── Address ──────────────────────────────────────────────
+    const addr = o.delivery_address || {};
+    const addrEl = document.getElementById('addrBlock');
+    if(addr.line1 || addr.city){
+      addrEl.innerHTML = `
+        <div class="addr-name">${addr.name||''}</div>
+        <div class="addr-line">
+          ${addr.line1||''}${addr.line2?',<br>'+addr.line2:''}
+          <br>${addr.city||''}${addr.state?', '+addr.state:''} – ${addr.pincode||''}
+          <br>India
+        </div>
+        ${addr.phone?`<div class="addr-phone">📞 ${addr.phone}</div>`:''}`;
+    } else if(o.address_text){
+      addrEl.innerHTML = `<div class="addr-line">${o.address_text}</div>`;
+    } else {
+      addrEl.textContent = 'Address not available.';
+    }
+
+    // ── Timeline dates ───────────────────────────────────────
+    const placed   = new Date(createdAt);
+    const dispatch = addDays(placed, 2);
+    const delivery = addDays(placed, 5);
+    const opts     = {weekday:'short',day:'2-digit',month:'short'};
+    document.getElementById('tlDate').textContent     = placed.toLocaleDateString('en-IN',opts);
+    document.getElementById('tlDispatch').textContent = 'By ' + dispatch.toLocaleDateString('en-IN',opts);
+    document.getElementById('tlDelivery').textContent = 'By ' + delivery.toLocaleDateString('en-IN',opts);
+
+    // ── Payment block ────────────────────────────────────────
+    const isCOD = (o.payment_method||'').toLowerCase().includes('cash') || (o.payment_method||'').toLowerCase().includes('cod');
+    document.getElementById('paymentBlock').innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="font-size:28px">${isCOD?'💵':'💳'}</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--black)">${o.payment_method||'Cash on Delivery'}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px">
+            ${isCOD
+              ? 'Pay <b style="color:var(--black)">'+fmtMoney(total)+'</b> when your order arrives. Keep exact change ready.'
+              : 'Payment of <b style="color:var(--black)">'+fmtMoney(total)+'</b> received. Thank you!'}
+          </div>
+          ${o.razorpay_id ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:monospace">Ref: ${o.razorpay_id}</div>` : ''}
+        </div>
+      </div>`;
+
+    // ── Summary ──────────────────────────────────────────────
+    document.getElementById('summaryBlock').innerHTML = `
+      <div class="total-row"><span class="lbl">Subtotal (${items.reduce((s,i)=>s+(i.qty||1),0)||o.items_count||'—'} items)</span><span class="val">${fmtMoney(subtotal)}</span></div>
+      ${discount>0?`<div class="total-row"><span class="lbl">Discount${o.coupon_code?' ('+o.coupon_code+')':''}</span><span class="val red">−${fmtMoney(discount)}</span></div>`:''}
+      <div class="total-row"><span class="lbl">Shipping</span><span class="val ${shipping===0?'green':''}">${shipping===0?'FREE':fmtMoney(shipping)}</span></div>
+      ${tax>0?`<div class="total-row"><span class="lbl">Tax (GST)</span><span class="val">${fmtMoney(tax)}</span></div>`:''}
+      ${codFee>0?`<div class="total-row"><span class="lbl">COD Fee</span><span class="val">${fmtMoney(codFee)}</span></div>`:''}
+      <div class="grand-total">
+        <span class="lbl">Total ${isCOD?'to Pay':'Paid'}</span>
+        <span class="val">${fmtMoney(total)}</span>
+      </div>`;
+  }
+</script>
+</body>
+</html>
