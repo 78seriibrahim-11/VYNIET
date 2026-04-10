@@ -96,7 +96,7 @@
     /* PAGE LAYOUT */
     .checkout-page{max-width:1280px;margin:0 auto;padding:56px 48px 100px;display:grid;grid-template-columns:1fr 400px;gap:48px;align-items:start}
 
-    /* ── SECTION BLOCKS ── */
+    /* SECTION BLOCKS */
     .section-block{background:var(--card);border:1px solid var(--border);margin-bottom:20px;overflow:hidden}
     .section-head{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;border-bottom:1px solid var(--border);background:var(--cream)}
     .section-head-left{display:flex;align-items:center;gap:12px}
@@ -106,7 +106,7 @@
     .section-edit:hover{border-color:var(--accent);color:var(--accent)}
     .section-body{padding:28px}
 
-    /* ── FORM FIELDS ── */
+    /* FORM FIELDS */
     .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     .form-grid.full{grid-template-columns:1fr}
     .form-group{display:flex;flex-direction:column;gap:7px}
@@ -121,7 +121,7 @@
     .form-select:focus{border-color:var(--accent)}
     .field-hint{font-size:11px;color:var(--muted);margin-top:-2px}
 
-    /* ── SAVED ADDRESS CARD ── */
+    /* SAVED ADDRESS CARD */
     .address-column{background:var(--cream);border:1.5px solid var(--border);padding:0;overflow:hidden;margin-bottom:20px}
     .address-col-head{background:var(--black);color:var(--white);padding:16px 22px;display:flex;align-items:center;gap:10px}
     .address-col-icon{font-size:18px}
@@ -151,7 +151,7 @@
     .guest-address-notice{background:rgba(167,146,119,.1);border:1px solid var(--border);padding:14px 18px;margin:0 16px 16px;display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted)}
     .guest-address-notice b{color:var(--black)}
 
-    /* ── PAYMENT ── */
+    /* PAYMENT */
     .payment-options{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
     .pay-option{border:1.5px solid var(--border);padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:none;transition:border-color .2s,background .2s;background:var(--white)}
     .pay-option.selected{border-color:var(--black);background:var(--white)}
@@ -164,13 +164,8 @@
     .pay-icon{height:24px;border:1px solid var(--border);border-radius:3px;padding:2px 6px;background:white;font-size:11px;font-weight:700;color:#555;display:flex;align-items:center}
     .pay-detail-panel{display:none;padding:20px;border-top:1px solid var(--border);background:var(--cream);gap:14px;flex-direction:column}
     .pay-detail-panel.active{display:flex}
-    .card-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .upi-row{display:flex;gap:0}
-    .upi-row .form-input{flex:1}
-    .upi-verify-btn{background:var(--black);color:var(--white);border:none;padding:13px 20px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:background .2s;white-space:nowrap}
-    .upi-verify-btn:hover{background:var(--accent)}
 
-    /* ── ORDER SUMMARY (RIGHT) ── */
+    /* ORDER SUMMARY (RIGHT) */
     .checkout-right{position:sticky;top:96px}
     .summary-box{background:var(--card);border:1px solid var(--border);padding:32px}
     .summary-title{font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:20px;padding-bottom:16px;border-bottom:1.5px solid var(--border);color:var(--black)}
@@ -197,39 +192,21 @@
     .place-order-btn{width:100%;background:var(--black);color:var(--white);border:none;padding:18px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:12px;transition:background .2s,transform .15s;margin-bottom:14px}
     .place-order-btn:hover{background:var(--accent);transform:translateY(-2px)}
     .place-order-btn:disabled{background:var(--border);cursor:not-allowed;transform:none}
-    .place-order-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
     .secure-badges{display:flex;flex-direction:column;gap:8px;padding-top:16px;border-top:1px solid var(--border)}
     .secure-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
     .secure-row span{font-size:16px}
 
-    /* Coupon applied strip */
-    .coupon-strip{display:none;background:rgba(46,125,79,.08);border:1px solid rgba(46,125,79,.25);padding:12px 18px;margin-bottom:12px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green);font-weight:600}
-    .coupon-strip.show{display:flex}
+    /* Coupon strip */
+    .coupon-strip{background:rgba(46,125,79,.08);border:1px solid rgba(46,125,79,.25);padding:12px 18px;margin-bottom:12px;align-items:center;gap:8px;font-size:13px;color:var(--green);font-weight:600}
 
     /* DELIVERY ESTIMATE */
     .delivery-est{background:rgba(167,146,119,.1);border:1px solid var(--border);padding:14px 18px;margin-top:14px;display:flex;gap:10px;align-items:center;font-size:13px;color:var(--black)}
     .delivery-est span{font-size:20px;flex-shrink:0}
     .delivery-est b{color:var(--accent)}
 
-    /* SUCCESS OVERLAY */
-    .success-overlay{position:fixed;inset:0;background:rgba(16,44,38,.92);z-index:9000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
-    .success-overlay.show{opacity:1;pointer-events:all}
-    .success-box{background:var(--white);padding:60px 48px;text-align:center;max-width:480px;width:90%;animation:popUp .4s ease both}
-    @keyframes popUp{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
-    .success-icon{font-size:72px;margin-bottom:20px;display:block}
-    .success-box h2{font-family:'DM Serif Display',serif;font-size:38px;margin-bottom:12px}
-    .success-box h2 em{font-style:italic;color:var(--accent)}
-    .success-box p{color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:8px}
-    .success-order-id{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.08em;color:var(--accent);margin:16px 0 28px}
-    .success-btn{background:var(--black);color:var(--white);border:none;padding:15px 36px;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:background .2s;display:inline-flex;align-items:center;gap:10px}
-    .success-btn:hover{background:var(--accent)}
-
-    /* MINI FOOTER */
-    .mini-footer{background:var(--black);color:rgba(255,242,225,.4);text-align:center;padding:24px;font-size:12px;letter-spacing:.06em}
-    .mini-footer a{color:var(--accent);margin:0 8px}
-
     /* ANIMATIONS */
     @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
     .section-block{animation:fadeIn .4s ease both}
     .section-block:nth-child(2){animation-delay:.08s}
     .section-block:nth-child(3){animation-delay:.16s}
@@ -250,8 +227,6 @@
       .section-head{padding:16px 16px}
       .summary-box{padding:20px 16px}
       .summary-total .total-value{font-size:28px}
-      .upi-row{flex-direction:column}
-      .upi-verify-btn{width:100%}
     }
     @media(max-width:480px){
       html,body{overflow-x:hidden;max-width:100vw}
@@ -274,9 +249,6 @@
       .summary-item-img{width:44px;height:54px}
       .summary-total .total-value{font-size:26px}
       .place-order-btn{padding:15px;font-size:13px}
-      .success-box{padding:40px 24px}
-      .success-box h2{font-size:28px}
-      .success-icon{font-size:52px}
       .address-card{padding:12px}
       .address-column .address-col-head{padding:12px 14px}
     }
@@ -323,7 +295,6 @@
       <a class="drawer-item" href="cart.html"><span class="drawer-item-icon">🛍</span> My Cart <span class="drawer-item-arrow">›</span></a>
       <div class="drawer-divider"></div>
       <div class="drawer-section-label">Info</div>
-      <a class="drawer-item" href="collections.html"><span class="drawer-item-icon">📏</span> Size Guide <span class="drawer-item-arrow">›</span></a>
       <a class="drawer-item" href="track-order.html"><span class="drawer-item-icon">🚚</span> Shipping Info <span class="drawer-item-arrow">›</span></a>
       <a class="drawer-item" href="returns-refunds.html"><span class="drawer-item-icon">🔄</span> Returns & Refunds <span class="drawer-item-arrow">›</span></a>
       <a class="drawer-item" href="privacy-policy.html"><span class="drawer-item-icon">📄</span> Privacy Policy <span class="drawer-item-arrow">›</span></a>
@@ -359,20 +330,11 @@
 <!-- CHECKOUT STEPS -->
 <div class="checkout-steps">
   <div class="steps-inner">
-    <div class="step done">
-      <div class="step-num">✓</div>
-      Cart
-    </div>
+    <div class="step done"><div class="step-num">✓</div>Cart</div>
     <div class="step-sep"></div>
-    <div class="step active">
-      <div class="step-num">2</div>
-      Checkout
-    </div>
+    <div class="step active"><div class="step-num">2</div>Checkout</div>
     <div class="step-sep"></div>
-    <div class="step">
-      <div class="step-num">3</div>
-      Confirmation
-    </div>
+    <div class="step"><div class="step-num">3</div>Confirmation</div>
   </div>
 </div>
 
@@ -382,7 +344,7 @@
   <!-- LEFT COLUMN -->
   <div class="checkout-left">
 
-    <!-- ── SECTION 1: CONTACT ── -->
+    <!-- SECTION 1: CONTACT -->
     <div class="section-block">
       <div class="section-head">
         <div class="section-head-left">
@@ -412,7 +374,7 @@
       </div>
     </div>
 
-    <!-- ── SECTION 2: SAVED ADDRESSES ── -->
+    <!-- SECTION 2: DELIVERY ADDRESS -->
     <div class="section-block" id="savedAddressSection">
       <div class="section-head">
         <div class="section-head-left">
@@ -421,7 +383,7 @@
         </div>
       </div>
 
-      <!-- Saved Addresses Column (shown when logged in) -->
+      <!-- Saved Addresses (logged-in) -->
       <div id="addressColumnWrap" style="display:none">
         <div class="address-column" style="border:none;border-bottom:1px solid var(--border);border-radius:0">
           <div class="address-col-head">
@@ -431,24 +393,19 @@
               <div class="address-col-sub">Select a saved address or add a new one</div>
             </div>
           </div>
-          <div class="address-list" id="savedAddressList">
-            <!-- Addresses injected by JS -->
-          </div>
+          <div class="address-list" id="savedAddressList"></div>
         </div>
-
         <div class="section-body" style="padding-top:20px">
           <div style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px">
             <span style="flex:1;height:1px;background:var(--border);display:block"></span>
             Or enter a new address
             <span style="flex:1;height:1px;background:var(--border);display:block"></span>
           </div>
-          <div id="newAddressForm">
-            <!-- same form fields below -->
-          </div>
+          <div id="newAddressForm"></div>
         </div>
       </div>
 
-      <!-- Full form (for guests or no saved addresses) -->
+      <!-- Guest address form -->
       <div class="section-body" id="guestAddressWrap">
         <div class="guest-address-notice" style="padding:12px 0;margin:0 0 18px;background:none;border:none;border-bottom:1px solid var(--border)">
           <span>💡</span>
@@ -499,7 +456,7 @@
       </div>
     </div>
 
-    <!-- ── SECTION 3: PAYMENT ── -->
+    <!-- SECTION 3: PAYMENT -->
     <div class="section-block">
       <div class="section-head">
         <div class="section-head-left">
@@ -508,11 +465,8 @@
         </div>
       </div>
       <div class="section-body">
-
-        <!-- Payment method toggle -->
         <div class="payment-options" style="margin-bottom:20px">
-
-          <!-- Razorpay (online) -->
+          <!-- Razorpay -->
           <div class="pay-option" id="payRazorpay" onclick="selectPay('razorpay')">
             <div class="pay-radio"></div>
             <div>
@@ -523,7 +477,6 @@
               <span class="pay-icon" style="font-size:13px;letter-spacing:0;color:#3395FF;font-weight:800">Rₚ</span>
             </div>
           </div>
-
           <!-- COD -->
           <div class="pay-option selected" id="payCod" onclick="selectPay('cod')">
             <div class="pay-radio"></div>
@@ -539,11 +492,10 @@
               <div>A COD handling fee of <b style="color:var(--black)">₹40</b> will be added. Please keep the exact amount ready at delivery.</div>
             </div>
           </div>
-
         </div>
 
-        <!-- Razorpay info notice (shown when online selected) -->
-        <div id="razorpayNotice" style="background:rgba(51,149,255,.07);border:1px solid rgba(51,149,255,.2);padding:14px 16px;display:flex;gap:10px;align-items:center;margin-bottom:8px;font-size:13px;color:var(--black)">
+        <!-- Razorpay notice -->
+        <div id="razorpayNotice" style="display:none;background:rgba(51,149,255,.07);border:1px solid rgba(51,149,255,.2);padding:14px 16px;gap:10px;align-items:center;margin-bottom:8px;font-size:13px;color:var(--black)">
           <span style="font-size:20px">🔒</span>
           <div>You'll be redirected to a secure <b>Razorpay</b> payment page. Your payment is protected by 256-bit SSL encryption.</div>
         </div>
@@ -553,32 +505,27 @@
           <label class="form-label">Order Notes <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
           <textarea class="form-input" id="orderNote" rows="3" placeholder="Any special instructions for delivery…" style="resize:vertical;min-height:80px"></textarea>
         </div>
-
       </div>
     </div>
 
-    <!-- Back to cart link -->
     <div style="margin-top:4px">
       <a href="cart.html" style="font-size:13px;color:var(--muted);font-weight:500;letter-spacing:.04em;display:inline-flex;align-items:center;gap:6px;transition:color .2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">
         ← Back to Cart
       </a>
     </div>
-
   </div><!-- /checkout-left -->
 
   <!-- RIGHT COLUMN: Order Summary -->
   <div class="checkout-right">
-
     <div class="summary-box">
       <div class="summary-title">Order Summary</div>
 
-      <!-- Cart items -->
       <div class="summary-items" id="summaryItems">
         <div style="text-align:center;padding:20px 0;color:var(--muted);font-size:13px">Loading cart…</div>
       </div>
 
-      <!-- Applied coupon strip -->
-      <div class="coupon-strip" id="couponStrip" style="display:none">
+      <!-- Coupon strip -->
+      <div id="couponStrip" style="display:none;background:rgba(46,125,79,.08);border:1px solid rgba(46,125,79,.25);padding:12px 18px;margin-bottom:12px;display:none;align-items:center;gap:8px;font-size:13px;color:var(--green);font-weight:600">
         <span>🏷️</span>
         <span id="couponStripText">Coupon applied</span>
       </div>
@@ -593,16 +540,16 @@
         <span class="label">Discount</span>
         <span class="value discount" id="summaryDiscount">−₹0</span>
       </div>
-      <div class="summary-row" id="codRow" style="display:none">
+      <div class="summary-row" id="codRow" style="display:flex">
         <span class="label">COD Fee</span>
-        <span class="value">₹0</span>
+        <span class="value" id="codFeeVal">₹40</span>
       </div>
       <div class="summary-row" id="shippingRow">
         <span class="label">Shipping</span>
         <span class="value free" id="summaryShipping">FREE</span>
       </div>
       <div class="summary-row">
-        <span class="label">Estimated Tax (18%)</span>
+        <span class="label">Tax (8%)</span>
         <span class="value" id="summaryTax">₹0</span>
       </div>
 
@@ -628,43 +575,16 @@
       <span>🚚</span>
       <div>Estimated delivery: <b>3–5 business days</b> after order confirmation</div>
     </div>
-
   </div><!-- /checkout-right -->
 
 </div><!-- /checkout-page -->
 
-<!-- SUCCESS OVERLAY -->
-<div class="success-overlay" id="successOverlay">
-  <div class="success-box">
-    <span class="success-icon">✅</span>
-    <h2>Order <em>Confirmed!</em></h2>
-    <p>Thank you for shopping with VYNEIT.<br>Your order is confirmed and we're getting it ready.</p>
-    <div class="success-order-id" id="successOrderId">#VYN-000000</div>
-    <div id="successMeta" style="font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.7"></div>
-    <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
-      <button class="success-btn" onclick="localStorage.setItem('acPanel','orders');window.location.href='account.html'" style="background:var(--black)">
-        📦 View My Orders
-      </button>
-      <button class="success-btn" onclick="window.location.href='index.html'" style="background:var(--accent)">
-        ← Continue Shopping
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ERROR TOAST -->
-<div id="errorToast" style="
-  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(120px);
-  background:#c0392b;color:white;padding:16px 28px;font-size:14px;font-weight:600;
-  border-radius:4px;z-index:9999;transition:transform .4s ease;max-width:90vw;text-align:center;
-  box-shadow:0 8px 32px rgba(0,0,0,.25)">
-  ⚠️ <span id="errorToastMsg">Something went wrong</span>
-</div>
-
 <!-- Mini Footer -->
-<div class="mini-footer">
+<div style="background:var(--black);color:rgba(255,242,225,.4);text-align:center;padding:24px;font-size:12px;letter-spacing:.06em">
   © 2025 VYNEIT. All rights reserved.
-  <a href="privacy-policy.html">Privacy</a><a href="privacy-policy.html">Terms</a><a href="contact-support.html">Contact</a>
+  <a href="privacy-policy.html" style="color:var(--accent);margin:0 8px">Privacy</a>
+  <a href="privacy-policy.html" style="color:var(--accent);margin:0 8px">Terms</a>
+  <a href="contact-support.html" style="color:var(--accent);margin:0 8px">Contact</a>
 </div>
 
 <script>
@@ -696,41 +616,28 @@
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
 
   // ── PAYMENT SELECTOR ────────────────────────────────────────
-  // ⚠️  Razorpay not configured yet — COD is default
-  // When you have your Razorpay key, change this to 'razorpay'
   let activePayMethod = 'cod';
   function selectPay(method){
     activePayMethod = method;
     ['razorpay','cod'].forEach(m=>{
-      const btn = document.getElementById('pay'+m.charAt(0).toUpperCase()+m.slice(1));
-      if(btn) btn.classList.toggle('selected', m===method);
+      const el = document.getElementById('pay'+m.charAt(0).toUpperCase()+m.slice(1));
+      if(el) el.classList.toggle('selected', m===method);
     });
     const codPanel = document.getElementById('panelCod');
     if(codPanel) codPanel.classList.toggle('active', method==='cod');
     const notice = document.getElementById('razorpayNotice');
     if(notice) notice.style.display = method==='razorpay' ? 'flex' : 'none';
-    document.getElementById('codRow').style.display = method==='cod' ? 'flex' : 'none';
-    const codRowEl = document.getElementById('codRow');
-if(codRowEl){ codRowEl.style.display = codFee > 0 ? 'flex' : 'none'; codRowEl.querySelector('.value').textContent = '₹'+codFee; }
+    // COD fee row
+    const codRow = document.getElementById('codRow');
+    const codFeeVal = document.getElementById('codFeeVal');
+    if(codRow) codRow.style.display = method==='cod' ? 'flex' : 'none';
+    if(codFeeVal) codFeeVal.textContent = '₹40';
+    // Button label
     const btn = document.getElementById('placeOrderBtn');
-    btn.innerHTML = method === 'razorpay'
-      ? '🔒 Proceed to Payment'
-      : '📦 Place Order (COD)';
+    if(btn) btn.innerHTML = method==='razorpay' ? '🔒 Proceed to Payment' : '📦 Place Order (COD)';
     updateSummary();
   }
-  // Set COD as selected on page load
   document.addEventListener('DOMContentLoaded', () => selectPay('cod'));
-
-  // ── CARD FORMATTING (kept for future use) ───────────────────
-  function fmtCard(el){
-    let v = el.value.replace(/\D/g,'').substring(0,16);
-    el.value = v.replace(/(.{4})/g,'$1  ').trim();
-  }
-  function fmtExp(el){
-    let v = el.value.replace(/\D/g,'');
-    if(v.length>=2) v = v.substring(0,2)+' / '+v.substring(2,4);
-    el.value = v;
-  }
 
   // ── PRICE SANITIZER ─────────────────────────────────────────
   function parsePrice(val){
@@ -738,65 +645,47 @@ if(codRowEl){ codRowEl.style.display = codFee > 0 ? 'flex' : 'none'; codRowEl.qu
     return parseFloat(String(val||0).replace(/[,₹\s]/g,'')) || 0;
   }
 
-  // ── CART KEY — tries both user_id and id formats ─────────────
+  // ── CART KEY ─────────────────────────────────────────────────
   function getCartKey(user){
-    const uid = (user && (user.user_id || user.id));
+    const uid = user && (user.user_id || user.id);
     return uid ? 'vyneit_cart_' + uid : 'vyneit_cart_guest';
   }
 
   // ── STATE ────────────────────────────────────────────────────
-  let cartItems = [];
+  let cartItems    = [];
   let cartDiscount = 0;
-  let cartCoupon = null;
+  let cartCoupon   = null;
 
   // ── LOAD CART ────────────────────────────────────────────────
   async function loadCart(userId){
-
-    // ── Step 1: Read from localStorage ───────────────────────
-    // Scan ALL vyneit_cart_* keys — picks whichever has data,
-    // so it works before auth resolves without guessing the key.
     const user     = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
     const exactKey = getCartKey(user);
     let localData  = JSON.parse(localStorage.getItem(exactKey) || '[]');
 
     if(!localData.length){
-      // Scan every key in localStorage for any cart data
       for(let i = 0; i < localStorage.length; i++){
         const k = localStorage.key(i);
         if(k && k.startsWith('vyneit_cart_') && k !== 'vyneit_cart_guest'){
-          try{
-            const d = JSON.parse(localStorage.getItem(k) || '[]');
-            if(d.length){ localData = d; break; }
-          }catch(e){}
+          try{ const d = JSON.parse(localStorage.getItem(k)||'[]'); if(d.length){ localData=d; break; } }catch(e){}
         }
       }
-      // Final fallback: guest cart
       if(!localData.length){
-        try{ localData = JSON.parse(localStorage.getItem('vyneit_cart_guest') || '[]'); }catch(e){}
+        try{ localData = JSON.parse(localStorage.getItem('vyneit_cart_guest')||'[]'); }catch(e){}
       }
     }
 
-    // ── Step 2: Upgrade from Supabase when logged in ──────────
     if(userId && window._db){
       try {
-        const { data: rows, error } = await window._db
-          .from('carts').select('*').eq('user_id', userId);
-        if(!error && rows && rows.length > 0){
-          cartItems = rows.map(r=>({
-            id: r.item_id, name: r.name, price: r.price,
-            img: r.img, qty: r.qty, size: r.size, color: r.color
-          }));
-        } else {
-          cartItems = localData;
-        }
-      } catch(e){
-        cartItems = localData;
-      }
+        const { data: rows, error } = await window._db.from('carts').select('*').eq('user_id', userId);
+        cartItems = (!error && rows && rows.length)
+          ? rows.map(r=>({ id:r.item_id, name:r.name, price:r.price, img:r.img, qty:r.qty, size:r.size, color:r.color }))
+          : localData;
+      } catch(e){ cartItems = localData; }
     } else {
       cartItems = localData;
     }
 
-    // ── Read coupon: try every possible key cart.html may use ──
+    // Read coupon
     const _couponKeys = ['vyneit_applied_coupon','vyneit_coupon','vyneit_discount','vyneit_promo'];
     let couponData = null;
     for(const k of _couponKeys){
@@ -804,25 +693,19 @@ if(codRowEl){ codRowEl.style.display = codFee > 0 ? 'flex' : 'none'; codRowEl.qu
       if(raw){ try{ couponData = JSON.parse(raw); break; }catch(e){} }
     }
     if(couponData){
-      cartDiscount = parsePrice(
-        couponData.discount  ?? couponData.amount  ?? couponData.savings ??
-        couponData.value     ?? couponData.off      ?? 0
-      );
-      // percent-only coupon: calculate rupee amount from subtotal
+      cartDiscount = parsePrice(couponData.discount??couponData.amount??couponData.savings??couponData.value??couponData.off??0);
       if(!cartDiscount && couponData.percent){
         const rawSub = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
         cartDiscount = Math.round(rawSub * couponData.percent / 100);
       }
       cartCoupon = couponData;
     }
-    // ── Supabase fallback: some carts store discount on the cart row itself ──
     if(!cartDiscount && userId && window._db){
       try{
-        const { data: cr } = await window._db
-          .from('carts').select('coupon_code,discount,coupon_discount').eq('user_id',userId).limit(1);
+        const { data: cr } = await window._db.from('carts').select('coupon_code,discount,coupon_discount').eq('user_id',userId).limit(1);
         if(cr && cr[0]){
-          const dbD = parsePrice(cr[0].discount || cr[0].coupon_discount || 0);
-          if(dbD){ cartDiscount = dbD; cartCoupon = { code: cr[0].coupon_code||'Coupon', discount: dbD }; }
+          const dbD = parsePrice(cr[0].discount||cr[0].coupon_discount||0);
+          if(dbD){ cartDiscount=dbD; cartCoupon={ code:cr[0].coupon_code||'Coupon', discount:dbD }; }
         }
       }catch(e){}
     }
@@ -832,8 +715,8 @@ if(codRowEl){ codRowEl.style.display = codFee > 0 ? 'flex' : 'none'; codRowEl.qu
   }
 
   function updateCartBadge(){
-    const total = cartItems.reduce((s,i)=>s+(i.qty||1),0);
-    document.getElementById('cartBadge').textContent = total;
+    const el = document.getElementById('cartBadge');
+    if(el) el.textContent = cartItems.reduce((s,i)=>s+(i.qty||1),0);
   }
 
   function renderSummaryItems(){
@@ -850,166 +733,135 @@ if(codRowEl){ codRowEl.style.display = codFee > 0 ? 'flex' : 'none'; codRowEl.qu
         </div>
         <div class="summary-item-info">
           <div class="summary-item-name">${item.name}</div>
-          <div class="summary-item-meta">${item.size ? 'Size: '+item.size : ''}${item.color ? (item.size?' · ':'')+item.color : ''}</div>
+          <div class="summary-item-meta">${item.size?'Size: '+item.size:''}${item.color?(item.size?' · ':'')+item.color:''}</div>
         </div>
         <div class="summary-item-price">₹${(parsePrice(item.price)*(item.qty||1)).toLocaleString('en-IN')}</div>
-      </div>
-    `).join('');
+      </div>`).join('');
   }
 
   function updateSummary(){
-    const subtotal = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
+    const subtotal  = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
     const itemCount = cartItems.reduce((s,i)=>s+(i.qty||1),0);
-    const shipping = subtotal >= 999 ? 0 : 79;
-    const codFee = activePayMethod==='cod' ? 40 : 0;
-    const discounted = subtotal - cartDiscount;
-    const tax = Math.round(subtotal * 0.08);          // 8% tax on subtotal (matches cart.html)
-    const total = discounted + (shipping===0?0:shipping) + tax + codFee;
+    const shipping  = subtotal >= 999 ? 0 : 79;
+    const codFee    = activePayMethod==='cod' ? 40 : 0;
+    const tax       = Math.round(subtotal * 0.08);
+    const total     = (subtotal - cartDiscount) + shipping + tax + codFee;
 
-    document.getElementById('summaryCount').textContent = itemCount;
+    document.getElementById('summaryCount').textContent    = itemCount;
     document.getElementById('summarySubtotal').textContent = '₹'+subtotal.toLocaleString('en-IN');
+    document.getElementById('summaryTax').textContent      = '₹'+tax.toLocaleString('en-IN');
+    document.getElementById('summaryTotal').textContent    = '₹'+total.toLocaleString('en-IN');
+
     const shippingRow = document.getElementById('shippingRow');
     if(shipping === 0){
       if(shippingRow) shippingRow.style.display = 'none';
     } else {
       if(shippingRow) shippingRow.style.display = 'flex';
-      document.getElementById('summaryShipping').textContent = '₹' + shipping;
+      document.getElementById('summaryShipping').textContent = '₹'+shipping;
       document.getElementById('summaryShipping').className   = 'value';
     }
-    document.getElementById('summaryTax').textContent = '₹'+tax.toLocaleString('en-IN');
-    document.getElementById('summaryTotal').textContent = '₹'+total.toLocaleString('en-IN');
 
     const strip = document.getElementById('couponStrip');
     if(cartDiscount > 0){
-      document.getElementById('discountRow').style.display='flex';
+      document.getElementById('discountRow').style.display = 'flex';
       document.getElementById('summaryDiscount').textContent = '−₹'+cartDiscount.toLocaleString('en-IN');
-      // Force-show strip — remove inline style so CSS .show class or inline flex both work
-      strip.removeAttribute('style');
-      strip.style.display='flex';
+      strip.style.display = 'flex';
       const couponLabel = cartCoupon?.code || cartCoupon?.coupon || 'Coupon';
-      const pctLabel = cartCoupon?.percent ? ' ('+cartCoupon.percent+'% off)' : '';
+      const pctLabel    = cartCoupon?.percent ? ' ('+cartCoupon.percent+'% off)' : '';
       document.getElementById('couponStripText').textContent = couponLabel + pctLabel + ' — saves ₹'+cartDiscount.toLocaleString('en-IN')+'!';
     } else {
-      strip.style.display='none';
+      strip.style.display = 'none';
     }
   }
 
-  // ── SAVED ADDRESSES (Supabase) ───────────────────────────────
-  let savedAddresses = [];
+  // ── SAVED ADDRESSES ──────────────────────────────────────────
+  let savedAddresses   = [];
   let selectedAddressId = null;
 
-  // ── Direct Supabase autofill: called once after auth resolves ──
+  function renderSavedAddresses(){
+    const list = document.getElementById('savedAddressList');
+    if(!list || !savedAddresses.length) return;
+    list.innerHTML = savedAddresses.map(addr=>`
+      <div class="address-card ${addr.id===selectedAddressId?'selected':''}" id="addrCard_${addr.id}" onclick="selectAddress('${addr.id}')">
+        <div class="address-radio"></div>
+        <div class="address-info">
+          <div class="address-name">${addr.full_name||''}</div>
+          ${addr.tag?`<div class="address-tag">${addr.tag}</div>`:''}
+          <div class="address-line">${[addr.line1,addr.line2,addr.city,addr.state,addr.pincode].filter(Boolean).join(', ')}</div>
+          ${addr.phone?`<div class="address-phone">📞 ${addr.phone}</div>`:''}
+          <div class="address-actions">
+            <button class="address-action-btn" onclick="event.stopPropagation();editAddress('${addr.id}')">Edit</button>
+          </div>
+        </div>
+      </div>`).join('') +
+      `<button class="add-address-btn" onclick="showNewAddressForm()">+ Add New Address</button>`;
+  }
+
   async function autofillFromSupabase(userId){
     let filled = false;
-
-    // ── ALWAYS fetch profile first for name/email/phone ──────────
     let profile = null;
     try {
       const { data: p } = await _db.from('profiles').select('*').eq('id', userId).single();
       profile = p;
-      // Fill contact fields from profile immediately
       if(profile){
-        if(profile.full_name){
-          const parts = profile.full_name.split(' ');
-          safeSet('firstName', parts[0] || '');
-          safeSet('lastName',  parts.slice(1).join(' ') || '');
-        }
+        if(profile.full_name){ const pts=profile.full_name.split(' '); safeSet('firstName',pts[0]); safeSet('lastName',pts.slice(1).join(' ')); }
         if(profile.phone) safeSet('phone', profile.phone);
         if(profile.email) safeSet('email', profile.email);
       }
     } catch(e){}
 
-    // ── STRATEGY 1: addresses table (exact UUID) ──────────────────
     try {
-      const { data, error } = await _db
-        .from('addresses').select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-
+      const { data, error } = await _db.from('addresses').select('*').eq('user_id', userId).order('created_at',{ascending:false});
       if(!error && data && data.length > 0){
-        savedAddresses = data;
-        renderSavedAddresses();
+        savedAddresses = data; renderSavedAddresses();
         document.getElementById('addressColumnWrap').style.display = 'block';
-        selectedAddressId = data[0].id;
-        _fillAddressFields(data[0]);
-        filled = true;
+        selectedAddressId = data[0].id; _fillAddressFields(data[0]); filled = true;
       }
     } catch(e){}
 
-    // ── STRATEGY 2: addresses table (string cast — UUID/text mismatch) ──
     if(!filled){
       try {
-        const { data, error } = await _db
-          .from('addresses').select('*')
-          .eq('user_id', String(userId)).limit(5);
-
+        const { data, error } = await _db.from('addresses').select('*').eq('user_id', String(userId)).limit(5);
         if(!error && data && data.length > 0){
-          savedAddresses = data;
-          renderSavedAddresses();
+          savedAddresses = data; renderSavedAddresses();
           document.getElementById('addressColumnWrap').style.display = 'block';
-          selectedAddressId = data[0].id;
-          _fillAddressFields(data[0]);
-          filled = true;
+          selectedAddressId = data[0].id; _fillAddressFields(data[0]); filled = true;
         }
       } catch(e){}
     }
 
-    // ── STRATEGY 3: profile address fields as last resort ─────────
     if(!filled && profile){
-      const addrFields = {
-        full_name: profile.full_name || '',
-        line1:   profile.address || profile.addr1 || profile.line1 || profile.address_line1 || '',
-        line2:   profile.addr2  || profile.line2  || profile.address_line2 || '',
-        city:    profile.city    || '',
-        state:   profile.state   || '',
-        pincode: profile.pincode || profile.pin || profile.zip || '',
-        phone:   profile.phone   || ''
+      const af = {
+        full_name: profile.full_name||'',
+        line1: profile.address||profile.addr1||profile.line1||profile.address_line1||'',
+        line2: profile.addr2||profile.line2||profile.address_line2||'',
+        city: profile.city||'', state: profile.state||'',
+        pincode: profile.pincode||profile.pin||profile.zip||'', phone: profile.phone||''
       };
-      if(addrFields.city || addrFields.line1){
-        _fillAddressFields(addrFields);
-        filled = true;
-      }
+      if(af.city||af.line1){ _fillAddressFields(af); }
     }
   }
 
-  // Helper: fill form fields from an address object
   function _fillAddressFields(addr){
-    safeSet('addr1',     addr.line1   || addr.address_line1 || addr.address || '');
-    safeSet('addr2',     addr.line2   || addr.address_line2 || '');
-    safeSet('city',      addr.city    || '');
-    safeSet('state',     addr.state   || '');
-    safeSet('pincode',   addr.pincode || addr.pin || addr.zip || '');
-    safeSet('phone',     addr.phone   || '');
-    if(addr.full_name){
-      const parts = addr.full_name.split(' ');
-      safeSet('firstName', parts[0] || '');
-      safeSet('lastName',  parts.slice(1).join(' ') || '');
-    }
+    safeSet('addr1',   addr.line1   || addr.address_line1 || addr.address || '');
+    safeSet('addr2',   addr.line2   || addr.address_line2 || '');
+    safeSet('city',    addr.city    || '');
+    safeSet('state',   addr.state   || '');
+    safeSet('pincode', addr.pincode || addr.pin || addr.zip || '');
+    safeSet('phone',   addr.phone   || '');
+    if(addr.full_name){ const pts=addr.full_name.split(' '); safeSet('firstName',pts[0]||''); safeSet('lastName',pts.slice(1).join(' ')||''); }
   }
 
   async function loadSavedAddresses(userId){
-    // Kept for compatibility; actual autofill is done by autofillFromSupabase()
     const notice = document.querySelector('.guest-address-notice');
     if(notice) notice.style.display = 'none';
   }
 
-  function selectAddress(id, scroll=true){
+  function selectAddress(id){
     selectedAddressId = id;
-    document.querySelectorAll('.address-card').forEach(el=>{
-      el.classList.toggle('selected', el.id==='addrCard_'+id);
-    });
-    // Pre-fill form fields from selected address
+    document.querySelectorAll('.address-card').forEach(el=>el.classList.toggle('selected', el.id==='addrCard_'+id));
     const addr = savedAddresses.find(a=>a.id===id);
-    if(addr){
-      safeSet('addr1', addr.line1);
-      safeSet('addr2', addr.line2);
-      safeSet('city',  addr.city);
-      safeSet('state', addr.state);
-      safeSet('pincode', addr.pincode);
-      safeSet('firstName', (addr.full_name||'').split(' ')[0]);
-      safeSet('lastName',  (addr.full_name||'').split(' ').slice(1).join(' '));
-      safeSet('phone', addr.phone);
-    }
+    if(addr){ safeSet('addr1',addr.line1); safeSet('addr2',addr.line2); safeSet('city',addr.city); safeSet('state',addr.state); safeSet('pincode',addr.pincode); safeSet('firstName',(addr.full_name||'').split(' ')[0]); safeSet('lastName',(addr.full_name||'').split(' ').slice(1).join(' ')); safeSet('phone',addr.phone); }
   }
 
   function showNewAddressForm(){
@@ -1020,13 +872,7 @@ if(codRowEl){ codRowEl.style.display = codFee > 0 ? 'flex' : 'none'; codRowEl.qu
   function editAddress(id){
     showNewAddressForm();
     const addr = savedAddresses.find(a=>a.id===id);
-    if(addr){
-      safeSet('addr1', addr.line1);
-      safeSet('addr2', addr.line2);
-      safeSet('city',  addr.city);
-      safeSet('state', addr.state);
-      safeSet('pincode', addr.pincode);
-    }
+    if(addr){ safeSet('addr1',addr.line1); safeSet('addr2',addr.line2); safeSet('city',addr.city); safeSet('state',addr.state); safeSet('pincode',addr.pincode); }
   }
 
   function safeSet(id, val){
@@ -1037,14 +883,8 @@ if(codRowEl){ codRowEl.style.display = codFee > 0 ? 'flex' : 'none'; codRowEl.qu
   // ── VALIDATE FORM ────────────────────────────────────────────
   function validateForm(){
     const required = [
-      {id:'firstName', label:'First Name'},
-      {id:'lastName',  label:'Last Name'},
-      {id:'email',     label:'Email'},
-      {id:'phone',     label:'Phone'},
-      {id:'addr1',     label:'Address Line 1'},
-      {id:'city',      label:'City'},
-      {id:'state',     label:'State'},
-      {id:'pincode',   label:'PIN Code'},
+      {id:'firstName'},{id:'lastName'},{id:'email'},{id:'phone'},
+      {id:'addr1'},{id:'city'},{id:'state'},{id:'pincode'},
     ];
     let valid = true;
     required.forEach(f=>{
@@ -1055,14 +895,11 @@ if(codRowEl){ codRowEl.style.display = codFee > 0 ? 'flex' : 'none'; codRowEl.qu
       if(!ok) valid = false;
     });
     if(!valid){ alert('Please fill in all required fields.'); return false; }
-
-    const email = document.getElementById('email').value;
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('email').value)){
       document.getElementById('email').classList.add('error');
       alert('Please enter a valid email address.'); return false;
     }
-    const pin = document.getElementById('pincode').value;
-    if(!/^\d{6}$/.test(pin)){
+    if(!/^\d{6}$/.test(document.getElementById('pincode').value)){
       document.getElementById('pincode').classList.add('error');
       alert('Please enter a valid 6-digit PIN code.'); return false;
     }
@@ -1075,261 +912,138 @@ if(codRowEl){ codRowEl.style.display = codFee > 0 ? 'flex' : 'none'; codRowEl.qu
     if(!validateForm()) return;
 
     if(activePayMethod === 'razorpay'){
-      // ─────────────────────────────────────────────────────────────────
-      // TODO: Add your Razorpay Key ID here to enable online payments
-      // Get it from: https://dashboard.razorpay.com/ → Settings → API Keys
-      // ─────────────────────────────────────────────────────────────────
-      const RAZORPAY_KEY_ID = 'YOUR_RAZORPAY_KEY_ID'; // ← PASTE YOUR KEY HERE
-
+      const RAZORPAY_KEY_ID = 'YOUR_RAZORPAY_KEY_ID';
       if(RAZORPAY_KEY_ID === 'YOUR_RAZORPAY_KEY_ID'){
-        // Razorpay not configured — switch to COD automatically
         if(confirm('Online payment is not configured yet.\n\nSwitch to Cash on Delivery instead?')){
-          selectPay('cod');
-          placeOrder(); // retry with COD
+          selectPay('cod'); placeOrder();
         }
         return;
       }
+      // Razorpay flow — add your key above to enable
+      return;
+    }
 
-      // Load Razorpay script dynamically
-      if(!window.Razorpay){
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = 'https://checkout.razorpay.com/v1/checkout.js';
-          s.onload = resolve;
-          s.onerror = () => reject(new Error('Razorpay script failed to load'));
-          document.head.appendChild(s);
-        });
-      }
+    // ── COD FLOW ─────────────────────────────────────────────
+    const btn = document.getElementById('placeOrderBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span style="display:inline-block;animation:spin .7s linear infinite">⏳</span> Placing order…';
 
-      const subtotal   = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
-      const shipping   = subtotal >= 999 ? 0 : 79;
-      const tax        = Math.round(subtotal * 0.08);
-      const total      = (subtotal - cartDiscount) + shipping + tax;
-      const totalPaise = Math.round(total * 100);
+    // Safety net — always re-enable after 15s
+    const safetyTimer = setTimeout(()=>{
+      btn.disabled = false;
+      btn.innerHTML = '📦 Place Order (COD)';
+      alert('Request timed out. Please check your internet connection and try again.');
+    }, 15000);
 
-      const options = {
-        key:      RAZORPAY_KEY_ID,
-        amount:   totalPaise,
-        currency: 'INR',
-        name:     'VYNEIT',
-        description: `Order of ${cartItems.length} item(s)`,
-        // order_id: '', // ← Add backend-generated Razorpay order_id here for production
-        prefill: {
-          name:    (document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value).trim(),
-          email:   document.getElementById('email').value,
-          contact: document.getElementById('phone').value
-        },
-        notes: {
-          address: document.getElementById('addr1').value + ', ' + document.getElementById('city').value,
-          coupon:  cartCoupon?.code || ''
-        },
-        theme: { color: '#102C26' },
-        handler: async function(response){
-          const orderNum = '#VYN-' + Math.floor(100000 + Math.random()*900000);
-          await saveOrderToSupabase(orderNum, 'Online (Razorpay)', response.razorpay_payment_id);
-          clearCartAndCoupon();
-          showSuccess(orderNum);
-        },
-        modal: {
-          ondismiss: function(){
-            alert('Payment cancelled. Your order has not been placed.');
-            document.getElementById('placeOrderBtn').disabled = false;
-            selectPay('razorpay');
-          }
-        }
-      };
-
-      const btn = document.getElementById('placeOrderBtn');
-      btn.disabled = true;
-      btn.textContent = '⏳ Opening payment…';
-      try {
-        const rzp = new window.Razorpay(options);
-        rzp.on('payment.failed', function(resp){
-          alert('Payment failed: ' + (resp.error?.description || 'Please try again.'));
-          btn.disabled = false;
-          selectPay('razorpay');
-        });
-        rzp.open();
-      } catch(err){
-        alert('Could not open payment gateway. Please try again.');
-        btn.disabled = false;
-        selectPay('razorpay');
-      }
-
-    } else {
-      // ── COD FLOW ───────────────────────────────────────────
-      const btn = document.getElementById('placeOrderBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<span style="animation:spin .7s linear infinite;display:inline-block">⏳</span> Placing order…';
+    try {
+      // ── Financials ──────────────────────────────────────────
+      const sub    = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
+      const ship   = sub >= 999 ? 0 : 79;
+      const tax    = Math.round(sub * 0.08);
+      const codFee = 40;
+      const total  = (sub - (cartDiscount||0)) + ship + tax + codFee;
 
       const orderNum = '#VYN-' + Math.floor(100000 + Math.random()*900000);
-      let savedOrder = null;
 
-      try {
-        savedOrder = await saveOrderToSupabase(orderNum, 'Cash on Delivery', null);
-      } catch(err){
-        console.error('[VYNEIT] Order save failed:', err);
-        // Show error toast with real error message
-        showErrorToast('Order failed: ' + (err.message || 'Database error. Please try again.'));
-        btn.disabled = false;
-        btn.innerHTML = '📦 Place Order (COD)';
-        return;
+      // ── Address snapshot ────────────────────────────────────
+      const deliveryAddress = {
+        name:    ((document.getElementById('firstName')?.value||'') + ' ' + (document.getElementById('lastName')?.value||'')).trim(),
+        phone:   document.getElementById('phone')?.value   || '',
+        line1:   document.getElementById('addr1')?.value   || '',
+        line2:   document.getElementById('addr2')?.value   || '',
+        city:    document.getElementById('city')?.value    || '',
+        state:   document.getElementById('state')?.value   || '',
+        pincode: document.getElementById('pincode')?.value || '',
+      };
+
+      // ── Get userId ──────────────────────────────────────────
+      let userId = null;
+      if(window._db){
+        try{
+          const { data:{ session } } = await window._db.auth.getSession();
+          if(session?.user?.id) userId = session.user.id;
+        }catch(e){}
+      }
+      if(!userId){
+        try{
+          const lsUser = JSON.parse(localStorage.getItem('vyneit_user')||'null');
+          userId = lsUser?.user_id || lsUser?.id || null;
+        }catch(e){}
       }
 
-     // ── SUCCESS ───────────────────────────────────────────
-// Calculate totals BEFORE clearing cart
-const sub    = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0);
-const ship   = sub >= 999 ? 0 : 79;
-const tax    = Math.round(sub * 0.08);
-const total  = (sub - cartDiscount) + ship + tax + 40;
+      const addressText = [deliveryAddress.line1,deliveryAddress.line2,deliveryAddress.city,deliveryAddress.state,deliveryAddress.pincode].filter(Boolean).join(', ');
 
-const deliveryAddress = {
-  name:    ((document.getElementById('firstName')?.value||'') + ' ' + (document.getElementById('lastName')?.value||'')).trim(),
-  phone:   document.getElementById('phone')?.value    || '',
-  line1:   document.getElementById('addr1')?.value    || '',
-  line2:   document.getElementById('addr2')?.value    || '',
-  city:    document.getElementById('city')?.value     || '',
-  state:   document.getElementById('state')?.value    || '',
-  pincode: document.getElementById('pincode')?.value  || '',
-};
-
-// Save order snapshot for confirmation page
-const lastOrder = {
-  order_number:     orderNum,
-  status:           'Confirmed',
-  payment_method:   'Cash on Delivery',
-  created_at:       new Date().toISOString(),
-  items:            cartItems,
-  items_count:      cartItems.reduce((s,i)=>s+(i.qty||1),0),
-  subtotal:         sub,
-  discount:         cartDiscount || 0,
-  shipping:         ship,
-  tax:              tax,
-  cod_fee:          40,
-  total:            total,
-  coupon_code:      cartCoupon?.code || null,
-  delivery_address: deliveryAddress,
-};
-localStorage.setItem('vyneit_last_order', JSON.stringify(lastOrder));
-
-clearCartAndCoupon();
-
-// Redirect to confirmation page
-window.location.href = 'order-confirmation.html';
-    }
-  }
-
-  // ── SAVE ORDER TO SUPABASE ───────────────────────────────────
-  async function saveOrderToSupabase(orderNum, paymentMethod, razorpayPaymentId){
-
-    // ── Get LIVE session from Supabase (NOT from localStorage) ──
-    // localStorage user can be stale; live session guarantees RLS auth.uid() matches
-    let userId = null;
-    if(window._db){
-      try {
-        const { data: { session } } = await window._db.auth.getSession();
-        if(session?.user?.id) userId = session.user.id;
-      } catch(e){}
-    }
-
-    // Fallback: try localStorage if Supabase session unavailable
-    if(!userId){
-      const lsUser = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-      userId = lsUser?.user_id || null;
-    }
-
-    // Guest fallback — save to localStorage so order isn't lost
-    if(!window._db || !userId){
-      const guestOrder = {
-        order_number: orderNum, status: 'Confirmed',
-        payment_method: paymentMethod, created_at: new Date().toISOString(),
-        items: cartItems,
-        total: cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1),0) - cartDiscount
+      const orderRow = {
+        user_id:          userId,
+        order_number:     orderNum,
+        status:           'Confirmed',
+        total:            total,
+        subtotal:         sub,
+        discount:         cartDiscount || 0,
+        shipping:         ship,
+        tax:              tax,
+        cod_fee:          codFee,
+        payment_method:   'Cash on Delivery',
+        razorpay_id:      null,
+        coupon_code:      cartCoupon?.code || null,
+        items:            cartItems,
+        items_count:      cartItems.reduce((s,i)=>s+(i.qty||1),0),
+        delivery_address: deliveryAddress,
+        address_text:     addressText,
+        order_notes:      document.getElementById('orderNote')?.value || null,
       };
-      const prev = JSON.parse(localStorage.getItem('vyneit_guest_orders') || '[]');
-      prev.unshift(guestOrder);
-      localStorage.setItem('vyneit_guest_orders', JSON.stringify(prev));
-      return guestOrder;
+
+      // ── Insert to Supabase (no .select().single() — avoids RLS issues) ──
+      if(window._db && userId){
+        const { error } = await window._db.from('orders').insert(orderRow);
+        if(error){
+          throw new Error(
+            error.code === '42501' ? 'Permission denied — check Supabase RLS policies for the orders table.' :
+            error.code === '42P01' ? 'Orders table not found in database.' :
+            error.code === '23502' ? 'Missing required field: ' + (error.details||'') :
+            (error.message || 'Database error. Please try again.')
+          );
+        }
+      } else {
+        // Guest or no DB — save to localStorage
+        const prev = JSON.parse(localStorage.getItem('vyneit_guest_orders')||'[]');
+        prev.unshift({...orderRow, created_at: new Date().toISOString()});
+        localStorage.setItem('vyneit_guest_orders', JSON.stringify(prev));
+      }
+
+      // ── Save snapshot for confirmation page ─────────────────
+      localStorage.setItem('vyneit_last_order', JSON.stringify({
+        ...orderRow,
+        created_at: new Date().toISOString()
+      }));
+
+      // ── Clear cart ──────────────────────────────────────────
+      clearCartAndCoupon();
+      clearTimeout(safetyTimer);
+
+      // ── Go to confirmation page ─────────────────────────────
+      window.location.href = 'order-confirmation.html';
+
+    } catch(err){
+      clearTimeout(safetyTimer);
+      console.error('[VYNEIT] placeOrder error:', err);
+      btn.disabled = false;
+      btn.innerHTML = '📦 Place Order (COD)';
+      alert('❌ Order failed: ' + (err.message || 'Please try again.'));
     }
-
-    // Financials
-    const subtotal = cartItems.reduce((s,i)=>s+parsePrice(i.price)*(i.qty||1), 0);
-    const shipping = subtotal >= 999 ? 0 : 79;
-    const tax      = Math.round(subtotal * 0.08);
-    const codFee   = activePayMethod === 'cod' ? 40 : 0;
-    const total    = (subtotal - cartDiscount) + shipping + tax + codFee;
-
-    // Delivery address
-    const deliveryAddress = {
-      name:    ((document.getElementById('firstName')?.value || '') + ' ' + (document.getElementById('lastName')?.value || '')).trim(),
-      phone:   document.getElementById('phone')?.value    || '',
-      line1:   document.getElementById('addr1')?.value    || '',
-      line2:   document.getElementById('addr2')?.value    || '',
-      city:    document.getElementById('city')?.value     || '',
-      state:   document.getElementById('state')?.value    || '',
-      pincode: document.getElementById('pincode')?.value  || '',
-    };
-    const addressText = [deliveryAddress.line1, deliveryAddress.line2, deliveryAddress.city, deliveryAddress.state, deliveryAddress.pincode]
-      .filter(Boolean).join(', ');
-
-    const orderRow = {
-      user_id:          userId,
-      order_number:     orderNum,
-      status:           'Confirmed',
-      total:            total,
-      subtotal:         subtotal,
-      discount:         cartDiscount || 0,
-      shipping:         shipping,
-      tax:              tax,
-      cod_fee:          codFee,
-      payment_method:   paymentMethod,
-      razorpay_id:      razorpayPaymentId || null,
-      coupon_code:      cartCoupon?.code  || null,
-      items:            cartItems,
-      items_count:      cartItems.reduce((s,i)=>s+(i.qty||1), 0),
-      delivery_address: deliveryAddress,
-      address_text:     addressText,
-      order_notes:      document.getElementById('orderNote')?.value || null,
-    };
-
-    const { error } = await window._db.from('orders').insert(orderRow);
-if(error){
-  console.error('[VYNEIT] Order save error:', error);
-  throw new Error(
-    error.code === '42501' ? 'Permission denied. Please make sure you are logged in.' :
-    error.code === '42P01' ? 'Orders table not found. Please contact support.' :
-    (error.message || 'Could not save order. Try again.')
-  );
-}
-console.log('[VYNEIT] ✅ Order saved.');
-return orderRow;
   }
 
-  // ── CLEAR CART HELPER ─────────────────────────────────────────
+  // ── CLEAR CART ───────────────────────────────────────────────
   function clearCartAndCoupon(){
-    const _u = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+    const _u = JSON.parse(localStorage.getItem('vyneit_user')||'null');
     localStorage.removeItem(getCartKey(_u));
     localStorage.removeItem('vyneit_cart');
     for(const k of ['vyneit_applied_coupon','vyneit_coupon','vyneit_discount','vyneit_promo'])
       localStorage.removeItem(k);
   }
 
-  // ── ERROR TOAST ───────────────────────────────────────────────
-  function showErrorToast(msg){
-    const toast = document.getElementById('errorToast');
-    document.getElementById('errorToastMsg').textContent = msg;
-    toast.style.transform = 'translateX(-50%) translateY(0)';
-    setTimeout(() => { toast.style.transform = 'translateX(-50%) translateY(120px)'; }, 5000);
-  }
-
-  // ── INIT: Render cart from localStorage immediately so page never looks blank ──
-  // Auth resolves shortly after and upgrades to Supabase data via loadCart(userId)
+  // ── INIT ─────────────────────────────────────────────────────
   loadCart(null);
-
-  // Add spin keyframe
-  const st = document.createElement('style');
-  st.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
-  document.head.appendChild(st);
 </script>
 
 <!-- Supabase -->
@@ -1357,17 +1071,14 @@ return orderRow;
       if(a)  a.textContent  = (userData.name||'?').substring(0,2).toUpperCase();
       if(n)  n.textContent  = userData.name  || 'User';
       if(em) em.textContent = userData.email || '';
-      // Auto-fill contact fields
       const emailInput = document.getElementById('email');
       if(emailInput && !emailInput.value) emailInput.value = userData.email || '';
       const parts = (userData.name||'').split(' ');
       safeSet('firstName', parts[0]);
       safeSet('lastName', parts.slice(1).join(' '));
       if(userData.phone) safeSet('phone', userData.phone);
-      // Hide sign-in notice — user is already logged in
       const signInNotice = document.querySelector('.guest-address-notice');
       if(signInNotice) signInNotice.style.display = 'none';
-      // Address autofill is handled by autofillFromSupabase() called from handleSession
     } else {
       loggedInEl.style.display='none'; loggedOutEl.style.display='block';
       authMenu.style.display='none';   guestMenu.style.display='block';
@@ -1375,69 +1086,48 @@ return orderRow;
   }
 
   async function buildAndSaveUser(user){
-    let name = user.user_metadata?.full_name || user.email.split('@')[0];
+    let name  = user.user_metadata?.full_name || user.email.split('@')[0];
     let phone = user.user_metadata?.phone || '';
     try {
-      // profiles table uses 'users_profile' as the UUID column (not 'id')
-      const { data: p } = await _db.from('profiles').select('full_name, phone')
-        .eq('users_profile', user.id).single();
+      const { data: p } = await _db.from('profiles').select('full_name, phone').eq('id', user.id).single();
       if(p?.full_name) name  = p.full_name;
       if(p?.phone)     phone = p.phone;
     } catch(e){}
-    const userData = { user_id: user.id, email: user.email, name, phone, initials: name.substring(0,2).toUpperCase() };
+    const userData = { user_id:user.id, email:user.email, name, phone, initials:name.substring(0,2).toUpperCase() };
     localStorage.setItem('vyneit_user', JSON.stringify(userData));
     return userData;
   }
 
-  // ── AUTH → CART: reload cart with real userId once session is known ──
   let _lastUid = null;
 
   async function handleSession(session){
     if(session && session.user){
-      if(_lastUid === session.user.id) return; // already handled this user
+      if(_lastUid === session.user.id) return;
       _lastUid = session.user.id;
-
-      // Fill drawer instantly from session
-      updateDrawer({ user_id: session.user.id, email: session.user.email,
-        name: session.user.user_metadata?.full_name || session.user.email.split('@')[0] });
-
-      // Fetch full profile (name + phone) then update drawer
+      updateDrawer({ user_id:session.user.id, email:session.user.email, name:session.user.user_metadata?.full_name||session.user.email.split('@')[0] });
       const userData = await buildAndSaveUser(session.user);
       updateDrawer(userData);
-
-      // ── Single, direct autofill from Supabase addresses table ──
       autofillFromSupabase(session.user.id);
-
-      // Reload cart
       loadCart(session.user.id);
-
     } else {
-      // Logged out — reset and show guest cart
       if(_lastUid !== null){
         _lastUid = null;
         localStorage.removeItem('vyneit_user');
         updateDrawer(null);
         loadCart(null);
       }
-      // If _lastUid was already null: loadCart(null) already ran at init, no-op
     }
   }
 
-  // getSession covers existing sessions (e.g. returning from login page)
-  _db.auth.getSession().then(({ data: { session } }) => handleSession(session));
-  // onAuthStateChange covers login/logout during session
+  _db.auth.getSession().then(({ data:{ session } }) => handleSession(session));
   _db.auth.onAuthStateChange((_event, session) => handleSession(session));
 
   function handleDrawerLogout(){
     if(!confirm('Sign out of VYNEIT?')) return;
     localStorage.removeItem('vyneit_user');
     _lastUid = null;
-    _db.auth.signOut().then(()=>{
-      updateDrawer(null);
-      window.location.href='index.html';
-    });
+    _db.auth.signOut().then(()=>{ updateDrawer(null); window.location.href='index.html'; });
   }
-  
 </script>
 </body>
 </html>
