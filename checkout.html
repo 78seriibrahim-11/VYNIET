@@ -709,7 +709,9 @@
     if(codPanel) codPanel.classList.toggle('active', method==='cod');
     const notice = document.getElementById('razorpayNotice');
     if(notice) notice.style.display = method==='razorpay' ? 'flex' : 'none';
-    document.getElementById('codRow').querySelector('.value').textContent = method==='cod' ? '₹40' : '';
+    document.getElementById('codRow').style.display = method==='cod' ? 'flex' : 'none';
+    const codRowEl = document.getElementById('codRow');
+if(codRowEl){ codRowEl.style.display = codFee > 0 ? 'flex' : 'none'; codRowEl.querySelector('.value').textContent = '₹'+codFee; }
     const btn = document.getElementById('placeOrderBtn');
     btn.innerHTML = method === 'razorpay'
       ? '🔒 Proceed to Payment'
