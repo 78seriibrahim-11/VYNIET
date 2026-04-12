@@ -1529,7 +1529,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   inp.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();vySend();} });
   inp.addEventListener('input',()=>{ inp.style.height='auto'; inp.style.height=Math.min(inp.scrollHeight,80)+'px'; });
   // Show badge after 4s if chat not opened yet
-  setTimeout(()=>{ if(!vyOpen) document.getElementById('vybadge').classList.add('on'); }, 4000);
+  setTimeout(()=>{ if(!vyOpen) document.getElementById('vybadge').classList.add('on'); }, 400000);
 });
 </script>
 
