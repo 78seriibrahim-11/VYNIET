@@ -1340,5 +1340,202 @@
     }
 
   </script>
+  <!-- ============================================================
+  VYNEIT CHATBOT WIDGET
+  Paste this entire block just before </body> on every page
+  ============================================================ -->
+
+<style>
+#vychat-launcher{position:fixed;bottom:24px;right:24px;z-index:99999;width:56px;height:56px;border-radius:50%;background:#102C26;border:2.5px solid #ffffff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 18px rgba(16,44,38,.4);transition:transform .2s,box-shadow .2s}
+#vychat-launcher:hover{transform:scale(1.1);box-shadow:0 6px 26px rgba(16,44,38,.5)}
+#vychat-launcher::after{content:'';position:absolute;inset:-7px;border-radius:50%;border:2px solid rgba(167,146,119,.45);animation:vyring 2.5s ease-out infinite}
+@keyframes vyring{0%{transform:scale(1);opacity:.9}70%{transform:scale(1.28);opacity:0}100%{opacity:0}}
+#vychat-launcher svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#vychat-launcher .vy-x{display:none}
+#vychat-launcher.open .vy-chat{display:none}
+#vychat-launcher.open .vy-x{display:block}
+#vybadge{position:absolute;top:-3px;right:-3px;background:#c0392b;color:#fff;width:17px;height:17px;border-radius:50%;font-size:9px;font-weight:700;display:none;align-items:center;justify-content:center;border:2px solid #FFF2E1;font-family:'DM Sans',sans-serif}
+#vybadge.on{display:flex}
+#vychat-window{position:fixed;bottom:94px;right:24px;z-index:99998;width:360px;height:520px;background:#FFF2E1;border:1px solid #e0d4be;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 52px rgba(16,44,38,.25);transform:scale(.85) translateY(24px);opacity:0;pointer-events:none;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s}
+#vychat-window.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+#vy-head{background:#102C26;padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.vy-av{width:36px;height:36px;border-radius:50%;background:#A79277;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#FFF2E1;flex-shrink:0}
+.vy-hname{font-family:'Bebas Neue',sans-serif;font-size:16px;color:#FFF2E1;letter-spacing:.06em;line-height:1}
+.vy-hsub{font-size:10px;color:rgba(255,242,225,.5);margin-top:2px;display:flex;align-items:center;gap:4px}
+.vy-dot{width:6px;height:6px;border-radius:50%;background:#2e7d4f}
+.vy-hbtn{background:none;border:none;cursor:pointer;color:rgba(255,242,225,.4);font-size:16px;padding:4px;margin-left:auto;transition:color .2s}
+.vy-hbtn:hover{color:#FFF2E1}
+#vy-msgs{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:9px}
+#vy-msgs::-webkit-scrollbar{width:3px}
+#vy-msgs::-webkit-scrollbar-thumb{background:#e0d4be}
+.vym{display:flex;align-items:flex-end;gap:7px;animation:vyin .22s ease both}
+@keyframes vyin{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.vym.bot{flex-direction:row}
+.vym.user{flex-direction:row-reverse}
+.vym-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.vym.bot .vym-av{background:#102C26;color:#FFF2E1;font-family:'Bebas Neue',sans-serif;font-size:9px}
+.vym.user .vym-av{background:#A79277;color:#fff}
+.vybub{max-width:220px;padding:9px 13px;font-size:13px;line-height:1.5;word-break:break-word;font-family:'DM Sans',sans-serif}
+.vym.bot .vybub{background:#fff;border:1px solid #e0d4be;color:#102C26;border-radius:12px 12px 12px 3px}
+.vym.user .vybub{background:#102C26;color:#FFF2E1;border-radius:12px 12px 3px 12px}
+.vysts{font-size:10px;color:#b0a494;margin-top:2px}
+.vym.user .vysts{text-align:right}
+.vy-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;padding-left:33px}
+.vy-chip{background:none;border:1.5px solid #A79277;color:#A79277;padding:4px 11px;border-radius:18px;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.vy-chip:hover{background:#A79277;color:#fff}
+.vy-typing-row{display:flex;gap:7px;align-items:flex-end}
+.vy-typing{display:flex;gap:4px;align-items:center;background:#fff;border:1px solid #e0d4be;padding:10px 14px;border-radius:12px 12px 12px 3px}
+.vydot{width:5px;height:5px;border-radius:50%;background:#A79277;animation:vyb .9s ease-in-out infinite}
+.vydot:nth-child(2){animation-delay:.15s}
+.vydot:nth-child(3){animation-delay:.3s}
+@keyframes vyb{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-4px)}}
+#vy-inp-wrap{background:#fff;border-top:1px solid #e0d4be;padding:10px 12px;flex-shrink:0}
+.vy-inp-row{display:flex;gap:7px;align-items:flex-end}
+#vy-inp{flex:1;padding:9px 13px;border:1.5px solid #e0d4be;background:#FFF2E1;font-family:'DM Sans',sans-serif;font-size:13px;color:#102C26;outline:none;resize:none;border-radius:18px;max-height:80px;overflow-y:auto;transition:border-color .2s;line-height:1.4}
+#vy-inp:focus{border-color:#A79277}
+#vy-inp::placeholder{color:#c0b4a2}
+#vy-send{width:36px;height:36px;border-radius:50%;background:#102C26;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+#vy-send:hover{background:#A79277}
+#vy-send:disabled{background:#e0d4be;cursor:not-allowed}
+#vy-send svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.vy-foot{font-size:10px;color:#c0b4a2;text-align:center;margin-top:7px;font-family:'DM Sans',sans-serif}
+@media(max-width:440px){#vychat-window{right:0;bottom:0;left:0;width:100%;border-radius:14px 14px 0 0;height:88vh}#vychat-launcher{right:16px;bottom:16px}}
+</style>
+
+<!-- Launcher -->
+<div id="vychat-launcher" onclick="vyToggle()">
+  <svg class="vy-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <svg class="vy-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  <span id="vybadge">1</span>
+</div>
+
+<!-- Chat Window -->
+<div id="vychat-window">
+  <div id="vy-head">
+    <div class="vy-av">VY</div>
+    <div>
+      <div class="vy-hname">VYNEIT</div>
+      <div class="vy-hsub"><span class="vy-dot"></span> Online · here to help</div>
+    </div>
+    <button class="vy-hbtn" onclick="vyClear()" title="Clear">🗑</button>
+    <button class="vy-hbtn" onclick="vyToggle()" title="Close">✕</button>
+  </div>
+  <div id="vy-msgs"></div>
+  <div id="vy-inp-wrap">
+    <div class="vy-inp-row">
+      <textarea id="vy-inp" rows="1" placeholder="Ask about orders, sizes, shipping…"></textarea>
+      <button id="vy-send" onclick="vySend()">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="vy-foot">VYNEIT Assistant</div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  ⚙️  PASTE YOUR WEBHOOK URL BELOW
+// ═══════════════════════════════════════
+const VY_WEBHOOK = 'YOUR_N8N_WEBHOOK_URL_HERE';
+//  Example:
+//  const VY_WEBHOOK = 'http://129.154.250.81:5678/webhook/chatbot';
+// ═══════════════════════════════════════
+
+const VY_CHIPS   = ['What sizes are available?','Track my order','Return policy'];
+const VY_SID     = 'vy_' + Math.random().toString(36).substr(2,9);
+let vyHistory    = [], vyOpen = false, vyBusy = false, vyGreeted = false;
+
+function vyToggle(){
+  vyOpen = !vyOpen;
+  document.getElementById('vychat-window').classList.toggle('open', vyOpen);
+  document.getElementById('vychat-launcher').classList.toggle('open', vyOpen);
+  if(vyOpen){
+    document.getElementById('vybadge').classList.remove('on');
+    if(!vyGreeted) vyGreet();
+    setTimeout(()=>document.getElementById('vy-inp').focus(), 300);
+  }
+}
+
+function vyGreet(){
+  vyGreeted = true;
+  vyMsg('bot','Hey! 👋 Welcome to VYNEIT. How can I help you today?');
+  // Quick-reply chips
+  const d = document.getElementById('vy-msgs');
+  const cw = document.createElement('div');
+  cw.className='vy-chips'; cw.id='vy-chips';
+  VY_CHIPS.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='vy-chip'; b.textContent=c;
+    b.onclick=()=>{ const ch=document.getElementById('vy-chips'); if(ch)ch.remove(); document.getElementById('vy-inp').value=c; vySend(); };
+    cw.appendChild(b);
+  });
+  d.appendChild(cw); vyScroll();
+}
+
+function vyMsg(role, text){
+  const d   = document.getElementById('vy-msgs');
+  const now = new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  const w   = document.createElement('div'); w.className='vym '+role;
+  w.innerHTML = `<div class="vym-av">${role==='bot'?'VY':'👤'}</div>
+    <div><div class="vybub">${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div>
+    <div class="vysts">${now}</div></div>`;
+  d.appendChild(w); vyScroll();
+  if(role==='bot' && !vyOpen) document.getElementById('vybadge').classList.add('on');
+}
+
+function vyShowTyping(){
+  const d=document.getElementById('vy-msgs');
+  const r=document.createElement('div'); r.className='vy-typing-row'; r.id='vy-typing';
+  r.innerHTML='<div class="vym-av" style="width:26px;height:26px;border-radius:50%;background:#102C26;color:#FFF2E1;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:Bebas Neue,sans-serif">VY</div><div class="vy-typing"><div class="vydot"></div><div class="vydot"></div><div class="vydot"></div></div>';
+  d.appendChild(r); vyScroll();
+}
+function vyRemoveTyping(){ const r=document.getElementById('vy-typing'); if(r)r.remove(); }
+function vyScroll(){ const d=document.getElementById('vy-msgs'); d.scrollTop=d.scrollHeight; }
+
+async function vySend(){
+  const inp = document.getElementById('vy-inp');
+  const txt = inp.value.trim();
+  if(!txt || vyBusy) return;
+  const ch = document.getElementById('vy-chips'); if(ch) ch.remove();
+  inp.value=''; inp.style.height='auto';
+  vyMsg('user', txt);
+  vyHistory.push({role:'user',content:txt});
+  vyBusy=true; document.getElementById('vy-send').disabled=true;
+  vyShowTyping();
+  try{
+    const res = await fetch(VY_WEBHOOK, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message:txt, history:vyHistory.slice(-20), sessionId:VY_SID })
+    });
+    vyRemoveTyping();
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    const reply = data.reply||data.message||data.response||data.output||data.text||'Sorry, I couldn\'t process that. Please try again.';
+    vyMsg('bot', reply);
+    vyHistory.push({role:'assistant',content:reply});
+  }catch(e){
+    vyRemoveTyping();
+    vyMsg('bot','Oops! Trouble connecting right now. Email us at support@vyneit.shop 😊');
+  }finally{
+    vyBusy=false; document.getElementById('vy-send').disabled=false;
+    document.getElementById('vy-inp').focus();
+  }
+}
+
+function vyClear(){ vyHistory=[]; vyGreeted=false; document.getElementById('vy-msgs').innerHTML=''; vyGreet(); }
+
+// Enter = send, Shift+Enter = newline, auto-resize
+document.addEventListener('DOMContentLoaded',()=>{
+  const inp=document.getElementById('vy-inp');
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();vySend();} });
+  inp.addEventListener('input',()=>{ inp.style.height='auto'; inp.style.height=Math.min(inp.scrollHeight,80)+'px'; });
+  // Show badge after 4s if chat not opened yet
+  setTimeout(()=>{ if(!vyOpen) document.getElementById('vybadge').classList.add('on'); }, 4000);
+});
+</script>
+
+<!-- ============================================================
+  END VYNEIT CHATBOT WIDGET
+  ============================================================ -->
 </body>
 </html>
