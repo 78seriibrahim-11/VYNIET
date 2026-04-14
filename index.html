@@ -1,427 +1,625 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>VYNEIT — Wear What You Stand For</title>
-<meta name="description" content="VYNEIT makes premium organic cotton tees for the generation that refuses to blend in. COD available. Free shipping above ₹999."/>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{max-width:100vw;overflow-x:hidden}
-:root{
-  --black:#102C26;--white:#FFF2E1;--cream:#F7E7CE;
-  --accent:#A79277;--accent2:#8a7560;--muted:#7a6e62;
-  --border:#e0d4be;--red:#c0392b;--green:#2e7d4f;
-}
-html{scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--black);overflow-x:hidden;cursor:none}
-a{text-decoration:none;color:inherit}
-button{font-family:'DM Sans',sans-serif;cursor:none}
-img{display:block;max-width:100%}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--cream)}::-webkit-scrollbar-thumb{background:var(--accent)}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VYNEIT — Premium T-Shirts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── CURSOR ── */
-.cursor{width:12px;height:12px;background:var(--accent);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s}
-.cursor-ring{width:36px;height:36px;border:1.5px solid var(--black);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .2s}
-body:has(a:hover) .cursor,body:has(button:hover) .cursor{width:20px;height:20px}
-body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring{width:54px;height:54px;border-color:var(--accent)}
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
 
-/* ── ANNOUNCEMENT BAR ── */
-.announce-bar{background:var(--black);color:var(--white);height:40px;overflow:hidden;position:relative;z-index:200}
-.announce-track{display:flex;align-items:center;height:100%;white-space:nowrap;animation:marquee 22s linear infinite}
-.announce-item{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;letter-spacing:.06em;padding:0 48px}
-.announce-item span{color:var(--accent);font-weight:700}
-.announce-sep{color:rgba(167,146,119,.35);margin:0 8px;font-size:10px}
-@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.announce-bar:hover .announce-track{animation-play-state:paused}
+    :root {
+      --black:   #102C26;
+      --white:   #FFF2E1;
+      --cream:   #F7E7CE;
+      --accent:  #A79277;
+      --accent2: #8a7560;
+      --muted:   #7a6e62;
+      --border:  #e0d4be;
+      --card-bg: #ffffff;
+    }
 
-/* ── HAMBURGER & DRAWER ── */
-.hamburger{background:none;border:none;display:flex;flex-direction:column;gap:5px;padding:8px;cursor:none;z-index:301}
-.hamburger span{display:block;width:22px;height:2px;background:var(--black);transition:all .3s;transform-origin:center}
-.hamburger:hover span{background:var(--accent)}
-.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
-.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-.drawer-overlay{position:fixed;inset:0;background:rgba(16,44,38,.45);z-index:299;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(2px)}
-.drawer-overlay.show{opacity:1;pointer-events:all}
-.drawer{position:fixed;top:0;left:-340px;width:320px;height:100vh;background:var(--white);z-index:300;transition:left .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:4px 0 32px rgba(16,44,38,.15)}
-.drawer.open{left:0}
-.drawer-top{background:var(--black);padding:32px 28px 28px;position:relative}
-.drawer-close{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,242,225,.5);font-size:22px;line-height:1;transition:color .2s;cursor:none}
-.drawer-close:hover{color:var(--white)}
-.drawer-avatar{width:56px;height:56px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--white);margin-bottom:14px;letter-spacing:.04em}
-.drawer-name{font-family:'DM Serif Display',serif;font-size:20px;color:var(--white);margin-bottom:4px}
-.drawer-email{font-size:12px;color:rgba(255,242,225,.45);letter-spacing:.04em}
-.drawer-login-prompt{font-size:14px;color:rgba(255,242,225,.6);font-weight:300;margin-bottom:16px}
-.drawer-login-btn{background:var(--accent);color:var(--white);border:none;padding:10px 24px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:background .2s;display:inline-block;cursor:none}
-.drawer-login-btn:hover{background:var(--accent2)}
-.drawer-body{flex:1;overflow-y:auto;padding:16px 0}
-.drawer-section-label{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:14px 28px 6px}
-.drawer-item{display:flex;align-items:center;gap:14px;padding:13px 28px;font-size:14px;font-weight:500;color:var(--black);transition:background .15s,color .15s;text-decoration:none;cursor:none;border:none;background:none;width:100%;text-align:left}
-.drawer-item:hover{background:var(--cream);color:var(--accent)}
-.drawer-item-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
-.drawer-item-arrow{margin-left:auto;font-size:12px;color:var(--border)}
-.drawer-divider{height:1px;background:var(--border);margin:8px 28px}
-.drawer-logout{color:var(--red)!important}
-.drawer-logout:hover{background:#fdecea!important}
-.drawer-bottom{padding:20px 28px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center}
+    html { scroll-behavior: smooth; }
 
-/* ── NAV ── */
-nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;padding:0 48px;display:flex;align-items:center;justify-content:space-between;height:68px}
-.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.08em;color:var(--black)}
-.nav-logo span{color:var(--accent)}
-.nav-links{display:flex;gap:28px;list-style:none}
-.nav-links a{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--black);padding-bottom:3px;border-bottom:1.5px solid transparent;transition:all .2s}
-.nav-links a:hover{border-color:var(--accent);color:var(--accent)}
-.nav-actions{display:flex;align-items:center;gap:10px}
-.login-btn{background:none;border:1.5px solid var(--border);color:var(--black);padding:9px 18px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:7px;transition:all .2s;cursor:none}
-.login-btn:hover{border-color:var(--black);background:var(--cream)}
-.cart-btn{background:var(--black);color:var(--white);border:none;padding:10px 20px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:8px;transition:background .2s;cursor:none}
-.cart-btn:hover{background:var(--accent)}
-.cart-count{background:var(--accent);color:var(--white);border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      overflow-x: hidden;
+      cursor: none;
+    }
 
-/* ── HERO ── */
-.hero{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 108px);overflow:hidden}
-.hero-left{background:var(--black);padding:80px 64px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
-.hero-left::before{content:'VYNEIT';font-family:'Bebas Neue',sans-serif;font-size:260px;color:rgba(167,146,119,.05);position:absolute;bottom:-30px;left:-20px;line-height:1;white-space:nowrap;pointer-events:none}
-.hero-drop-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(167,146,119,.15);border:1px solid rgba(167,146,119,.25);color:var(--accent);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:6px 14px;width:fit-content;margin-bottom:24px}
-.hero-drop-badge::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse-dot 1.4s ease infinite}
-@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.5}}
-.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,8.5vw,120px);line-height:.9;color:var(--white);letter-spacing:.02em;margin-bottom:24px}
-.hero-title em{font-family:'DM Serif Display',serif;font-style:italic;color:var(--accent);display:block}
-.hero-desc{color:rgba(255,242,225,.5);font-size:15px;line-height:1.75;max-width:380px;margin-bottom:16px;font-weight:300}
-.hero-offer-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(167,146,119,.1);border:1px solid rgba(167,146,119,.2);padding:7px 14px;font-size:12px;color:rgba(255,242,225,.7);margin-bottom:36px;width:fit-content}
-.hero-offer-pill strong{color:var(--accent)}
-.hero-cta-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-.btn-primary{background:var(--accent);color:var(--white);border:none;cursor:none;padding:16px 36px;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:background .2s,transform .15s;display:inline-flex;align-items:center;gap:10px}
-.btn-primary:hover{background:var(--accent2);transform:translateY(-2px)}
-.btn-outline{background:transparent;color:var(--white);border:1.5px solid rgba(255,242,225,.25);cursor:none;padding:16px 36px;font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:all .2s}
-.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
-.hero-social-proof{display:flex;align-items:center;gap:14px;margin-top:36px;padding-top:28px;border-top:1px solid rgba(167,146,119,.15)}
-.hero-avatars{display:flex}
-.hero-avatar{width:30px;height:30px;border-radius:50%;border:2px solid var(--black);overflow:hidden;margin-left:-8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--white)}
-.hero-avatar:first-child{margin-left:0}
-.hero-sp-text{font-size:12px;color:rgba(255,242,225,.5)}
-.hero-sp-text strong{color:var(--white)}
-.hero-right{position:relative;background:var(--cream);overflow:hidden}
-.hero-img-wrap{width:100%;height:100%;position:relative}
-.hero-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform 9s ease}
-.hero-img-wrap:hover img{transform:scale(1.04)}
-.hero-floating-card{position:absolute;bottom:48px;left:-20px;background:var(--white);border:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 40px rgba(16,44,38,.18);animation:float-card 3s ease-in-out infinite}
-@keyframes float-card{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.fc-icon{font-size:22px}
-.fc-text strong{display:block;font-size:13px;font-weight:700;color:var(--black)}
-.fc-text span{font-size:11px;color:var(--muted)}
-.hero-right-tag{position:absolute;top:24px;right:24px;background:rgba(16,44,38,.8);backdrop-filter:blur(8px);color:var(--white);padding:8px 14px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border:1px solid rgba(167,146,119,.3)}
-.hero-scroll{position:absolute;bottom:36px;right:36px;display:flex;flex-direction:column;align-items:center;gap:8px}
-.hero-scroll span{writing-mode:vertical-rl;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
-.scroll-line{width:1px;height:48px;background:var(--border);position:relative;overflow:hidden}
-.scroll-line::after{content:'';position:absolute;top:-100%;left:0;width:100%;height:100%;background:var(--accent);animation:scrollDown 1.8s ease infinite}
-@keyframes scrollDown{0%{top:-100%}100%{top:100%}}
+    /* ── Custom Cursor ── */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width .2s ease, height .2s ease;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--black);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: width .3s ease, height .3s ease, border-color .2s;
+    }
+    body:has(a:hover) .cursor, body:has(button:hover) .cursor { width: 20px; height: 20px; }
+    body:has(a:hover) .cursor-ring, body:has(button:hover) .cursor-ring { width: 54px; height: 54px; border-color: var(--accent); }
 
-/* ── TRUST BAR ── */
-.trust-bar{background:var(--cream);border-bottom:2px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr)}
-.trust-item{padding:22px 24px;border-right:1px solid var(--border);display:flex;align-items:center;gap:14px;transition:background .2s}
-.trust-item:last-child{border-right:none}
-.trust-item:hover{background:rgba(167,146,119,.1)}
-.trust-icon{font-size:26px;flex-shrink:0}
-.trust-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;font-weight:600}
-.trust-value{font-size:14px;font-weight:700;color:var(--black)}
-.trust-sub{font-size:11px;color:var(--muted);font-weight:300;margin-top:1px}
 
-/* ── SECTION BASE ── */
-section{padding:88px 48px}
-.section-eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.section-eyebrow::before{content:'';width:28px;height:1.5px;background:var(--accent)}
-.section-title{font-family:'DM Serif Display',serif;font-size:clamp(32px,4vw,52px);line-height:1.05;color:var(--black)}
-.section-title em{font-style:italic;color:var(--accent)}
-.section-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:52px;flex-wrap:wrap;gap:16px}
-.view-all{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--black);display:flex;align-items:center;gap:8px;border-bottom:1.5px solid var(--black);padding-bottom:2px;transition:all .2s}
-.view-all:hover{color:var(--accent);border-color:var(--accent)}
 
-/* ── PRODUCT GRID ── */
-.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
-.product-card{background:#fff;border:1px solid var(--border);overflow:hidden;transition:transform .3s,box-shadow .3s;cursor:none;position:relative}
-.product-card:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(16,44,38,.1)}
-.product-img-wrap{position:relative;overflow:hidden;background:var(--cream);aspect-ratio:3/4}
-.product-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
-.product-card:hover .product-img-wrap img{transform:scale(1.07)}
-.product-badge{position:absolute;top:12px;left:12px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;z-index:2}
-.badge-hot{background:var(--red);color:#fff}
-.badge-new{background:var(--green);color:#fff}
-.badge-sale{background:var(--accent);color:#fff}
-.badge-limited{background:var(--black);color:var(--white)}
-.product-fomo{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(16,44,38,.75));padding:12px 14px 10px;display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,242,225,.85);font-weight:600;letter-spacing:.02em;z-index:2;transform:translateY(100%);transition:transform .3s}
-.product-card:hover .product-fomo{transform:translateY(0)}
-.product-actions{position:absolute;bottom:40px;left:0;right:0;padding:0 12px;display:flex;gap:8px;z-index:3;opacity:0;transform:translateY(8px);transition:all .3s}
-.product-card:hover .product-actions{opacity:1;transform:translateY(0)}
-.add-cart-btn{flex:1;background:var(--white);color:var(--black);border:none;cursor:none;padding:11px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'DM Sans',sans-serif;transition:all .2s}
-.add-cart-btn:hover{background:var(--black);color:var(--white)}
-.wishlist-btn{flex:0 0 44px;background:rgba(255,242,225,.9);border:none;cursor:none;font-size:16px;transition:background .2s}
-.wishlist-btn:hover{background:#fff}
-.product-info{padding:16px 18px 20px}
-.product-cat{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.product-name{font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:8px;line-height:1.25;color:var(--black)}
-.product-colors{display:flex;gap:5px;margin-bottom:10px}
-.color-dot{width:13px;height:13px;border-radius:50%;border:1.5px solid transparent;transition:border-color .15s;cursor:none}
-.color-dot:hover{border-color:var(--black)}
-.product-price-row{display:flex;align-items:center;gap:8px}
-.price{font-size:17px;font-weight:700;color:var(--black)}
-.price-old{font-size:13px;color:var(--muted);text-decoration:line-through}
-.price-save{font-size:11px;font-weight:700;color:var(--green)}
-.stock-bar-wrap{padding:0 18px 16px}
-.stock-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
-.stock-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--accent));border-radius:2px;transition:width .6s ease}
-.stock-label{font-size:10px;color:var(--red);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:4px}
-.stock-label::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--red);flex-shrink:0;animation:pulse-dot 1.2s ease infinite}
+    /* ── Navigation ── */
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+      padding: 0 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px;
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: .08em;
+      color: var(--black);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links {
+      display: flex; gap: 28px;
+      list-style: none; justify-content: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--black);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding-bottom: 3px;
+      border-bottom: 1.5px solid transparent;
+      transition: border-color .2s, color .2s;
+    }
+    .nav-links a:hover { border-color: var(--accent); color: var(--accent); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-actions button {
+      background: none; border: none; cursor: none;
+      color: var(--black); font-size: 20px; padding: 4px;
+      transition: color .2s;
+    }
+    .nav-actions button:hover { color: var(--accent); }
+    .login-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--black) !important;
+      padding: 9px 18px !important;
+      font-size: 12px !important;
+      font-family: 'DM Sans', sans-serif !important;
+      font-weight: 600 !important;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 7px;
+      transition: all .2s !important;
+    }
+    .login-btn:hover { border-color: var(--black) !important; background: var(--cream) !important; }
+    .cart-btn {
+      background: var(--black) !important;
+      color: var(--white) !important;
+      border-radius: 0 !important;
+      padding: 10px 20px !important;
+      font-size: 12px !important;
+      font-family: 'DM Sans', sans-serif !important;
+      font-weight: 600 !important;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px;
+      transition: background .2s !important;
+    }
+    .cart-btn:hover { background: var(--accent) !important; }
+    .cart-count {
+      background: var(--accent);
+      color: var(--white);
+      border-radius: 50%;
+      width: 18px; height: 18px;
+      font-size: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+    }
 
-/* ── BRAND STORY ── */
-.brand-story{background:var(--black);overflow:hidden;position:relative}
-.brand-story::before{content:'VYNEIT';font-family:'Bebas Neue',sans-serif;font-size:300px;color:rgba(167,146,119,.04);position:absolute;right:-40px;top:50%;transform:translateY(-50%);line-height:1;white-space:nowrap;pointer-events:none}
-.brand-story-inner{max-width:680px;position:relative;z-index:1}
-.brand-story .section-eyebrow{color:var(--accent)}
-.brand-story-title{font-family:'DM Serif Display',serif;font-size:clamp(36px,5vw,64px);line-height:1.05;color:var(--white);margin-bottom:28px}
-.brand-story-title em{font-style:italic;color:var(--accent)}
-.brand-story-body{color:rgba(255,242,225,.55);font-size:16px;line-height:1.85;font-weight:300;margin-bottom:24px}
-.brand-story-body strong{color:rgba(255,242,225,.85);font-weight:600}
-.brand-story-stats{display:flex;gap:48px;margin-top:40px;padding-top:32px;border-top:1px solid rgba(167,146,119,.2)}
-.bs-stat{}
-.bs-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--accent);line-height:1;letter-spacing:.04em}
-.bs-label{font-size:12px;color:rgba(255,242,225,.45);letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+    /* ── Hero ── */
+    .hero {
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 112px);
+      overflow: hidden;
+    }
+    .hero-left {
+      background: var(--black);
+      padding: 80px 64px;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .hero-left::before {
+      content: 'VYNEIT';
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 260px;
+      color: rgba(167,146,119,.07);
+      position: absolute;
+      bottom: -30px; left: -20px;
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 8vw, 110px);
+      line-height: .92;
+      color: var(--white);
+      letter-spacing: .02em;
+      margin-bottom: 28px;
+    }
+    .hero-title em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--accent);
+    }
+    .hero-desc {
+      color: rgba(255,242,225,.55);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 380px;
+      margin-bottom: 48px;
+      font-weight: 300;
+    }
+    .hero-cta-row { display: flex; gap: 16px; align-items: center; }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--white);
+      border: none; cursor: none;
+      padding: 16px 36px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase;
+      transition: background .2s, transform .2s;
+      display: inline-flex; align-items: center; gap: 10px;
+    }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 1.5px solid rgba(255,242,225,.3);
+      cursor: none;
+      padding: 16px 36px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .hero-right {
+      position: relative;
+      background: var(--cream);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero-img-wrap { width: 100%; height: 100%; position: relative; }
+    .hero-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 8s ease;
+    }
+    .hero-img-wrap:hover img { transform: scale(1.04); }
+    .hero-badge {
+      position: absolute;
+      bottom: 48px; left: -24px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 8px 32px rgba(16,44,38,.14);
+    }
+    .hero-badge-icon { font-size: 24px; }
+    .hero-badge-text strong { display: block; font-size: 14px; font-weight: 700; color: var(--black); }
+    .hero-badge-text span { font-size: 12px; color: var(--muted); }
+    .hero-scroll {
+      position: absolute; bottom: 36px; right: 36px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .hero-scroll span {
+      writing-mode: vertical-rl;
+      font-size: 10px; letter-spacing: .15em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .scroll-line {
+      width: 1px; height: 48px;
+      background: var(--border);
+      position: relative; overflow: hidden;
+    }
+    .scroll-line::after {
+      content: '';
+      position: absolute; top: -100%; left: 0;
+      width: 100%; height: 100%;
+      background: var(--accent);
+      animation: scrollDown 1.6s ease infinite;
+    }
+    @keyframes scrollDown { 0%{top:-100%} 100%{top:100%} }
 
-/* ── WHY VYNEIT ── */
-.why-vyneit{background:var(--cream)}
-.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:52px}
-.why-card{background:var(--white);padding:36px 28px;transition:background .2s,transform .2s;position:relative;overflow:hidden}
-.why-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transition:transform .3s;transform-origin:left}
-.why-card:hover{background:var(--black);transform:translateY(-4px)}
-.why-card:hover::after{transform:scaleX(1)}
-.why-card:hover .why-title{color:var(--white)}
-.why-card:hover .why-desc{color:rgba(255,242,225,.5)}
-.why-card:hover .why-icon-wrap{background:rgba(167,146,119,.15);color:var(--accent)}
-.why-icon-wrap{width:52px;height:52px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;transition:all .2s}
-.why-title{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:10px;color:var(--black);transition:color .2s}
-.why-desc{font-size:13px;color:var(--muted);line-height:1.7;font-weight:300;transition:color .2s}
+    /* ── Stats Bar ── */
+    .stats-bar {
+      background: var(--cream);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(4, 1fr);
+    }
+    .stat-item {
+      padding: 28px 32px;
+      border-right: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-icon { font-size: 28px; }
+    .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 2px; }
+    .stat-value { font-size: 20px; font-weight: 700; color: var(--black); }
 
-/* ── REVIEWS ── */
-.reviews-section{background:var(--black)}
-.reviews-section .section-eyebrow{color:var(--accent)}
-.reviews-section .section-title{color:var(--white)}
-.review-meta-bar{display:flex;align-items:center;gap:32px;margin-bottom:52px;flex-wrap:wrap}
-.overall-rating{}
-.rating-big{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--white);line-height:1}
-.rating-stars{color:#f5c518;font-size:18px;letter-spacing:2px;margin-bottom:4px}
-.rating-count{font-size:13px;color:rgba(255,242,225,.4);font-weight:300}
-.rating-bars{flex:1;min-width:200px}
-.rbar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.rbar-label{font-size:11px;color:rgba(255,242,225,.45);width:28px;text-align:right;flex-shrink:0}
-.rbar{flex:1;height:5px;background:rgba(167,146,119,.15);border-radius:3px;overflow:hidden}
-.rbar-fill{height:100%;background:var(--accent);border-radius:3px}
-.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.review-card{background:rgba(167,146,119,.07);border:1px solid rgba(167,146,119,.15);padding:28px;transition:background .2s}
-.review-card:hover{background:rgba(167,146,119,.13)}
-.review-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
-.stars{color:#f5c518;font-size:13px;letter-spacing:1px}
-.verified-badge{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--green);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.verified-badge::before{content:'✓';font-size:9px;background:var(--green);color:#fff;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.review-text{font-size:14px;line-height:1.75;color:rgba(255,242,225,.68);font-weight:300;margin-bottom:20px;font-style:italic}
-.review-text b{color:rgba(255,242,225,.9);font-style:normal;font-weight:600}
-.reviewer{display:flex;align-items:center;gap:10px}
-.reviewer-avatar{width:38px;height:38px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--white);flex-shrink:0}
-.reviewer-name{font-size:13px;font-weight:600;color:var(--white)}
-.reviewer-meta{font-size:11px;color:rgba(167,146,119,.7)}
-.review-product{font-size:11px;color:rgba(167,146,119,.6);margin-top:4px;letter-spacing:.04em}
+    /* ── Section Utility ── */
+    section { padding: 88px 48px; }
+    .section-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 52px;
+    }
+    .section-eyebrow {
+      font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--accent); font-weight: 600; margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(32px, 4vw, 52px);
+      line-height: 1.1;
+      color: var(--black);
+    }
+    .section-title em { font-style: italic; color: var(--accent); }
+    .view-all {
+      font-size: 13px; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--black);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1.5px solid var(--black);
+      padding-bottom: 2px;
+      transition: color .2s, border-color .2s;
+    }
+    .view-all:hover { color: var(--accent); border-color: var(--accent); }
 
-/* ── BUNDLE DEAL ── */
-.bundle-section{background:var(--cream);overflow:hidden}
-.bundle-inner{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
-.bundle-left{}
-.bundle-tag{display:inline-flex;align-items:center;gap:8px;background:var(--red);color:#fff;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:5px 12px;margin-bottom:20px}
-.bundle-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,7vw,88px);line-height:.9;color:var(--black);margin-bottom:16px}
-.bundle-title span{color:var(--accent)}
-.bundle-subtitle{font-family:'DM Serif Display',serif;font-size:22px;font-style:italic;color:var(--muted);margin-bottom:24px}
-.bundle-desc{font-size:15px;color:var(--muted);line-height:1.7;font-weight:300;margin-bottom:32px;max-width:420px}
-.countdown{display:flex;gap:12px;margin-bottom:36px}
-.cd-unit{text-align:center}
-.cd-num{display:flex;align-items:center;justify-content:center;width:60px;height:60px;background:var(--black);color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.04em;margin-bottom:6px}
-.cd-label{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.cd-sep{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--accent);padding-top:10px;opacity:.6;animation:blink 1s step-end infinite}
-@keyframes blink{0%,100%{opacity:.6}50%{opacity:0}}
-.bundle-btn{background:var(--black);color:var(--white);border:none;cursor:none;padding:18px 44px;font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:background .2s,transform .15s;display:inline-flex;align-items:center;gap:12px}
-.bundle-btn:hover{background:var(--accent);transform:translateY(-2px)}
-.bundle-right{}
-.bundle-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.bundle-card{background:var(--white);border:1px solid var(--border);overflow:hidden;position:relative}
-.bundle-card-img{aspect-ratio:3/4;overflow:hidden;background:var(--cream)}
-.bundle-card-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
-.bundle-card:hover .bundle-card-img img{transform:scale(1.05)}
-.bundle-card-body{padding:12px 14px}
-.bundle-card-name{font-family:'DM Serif Display',serif;font-size:14px;margin-bottom:4px;color:var(--black)}
-.bundle-card-price{font-size:13px;font-weight:700;color:var(--accent)}
-.bundle-plus{display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);position:absolute;top:50%;right:-8px;transform:translateY(-50%);z-index:10;width:24px;height:24px;background:var(--cream);border-radius:50%}
-.bundle-free-badge{position:absolute;top:8px;left:8px;background:var(--green);color:#fff;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px}
+    /* ── Product Grid ── */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
+    }
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: transform .3s ease, box-shadow .3s ease;
+      cursor: none;
+    }
+    .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(16,44,38,.12); }
+    .product-img-wrap {
+      position: relative; overflow: hidden;
+      background: var(--cream);
+      aspect-ratio: 3/4;
+    }
+    .product-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform .5s ease;
+    }
+    .product-card:hover .product-img-wrap img { transform: scale(1.06); }
+    .product-badge {
+      position: absolute; top: 12px; left: 12px;
+      background: var(--black);
+      color: var(--white);
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      padding: 4px 10px;
+    }
+    .product-badge.sale { background: var(--accent); }
+    .product-badge.new-tag { background: #2e7d4f; }
+    .product-actions {
+      position: absolute; bottom: -60px; left: 0; right: 0;
+      padding: 12px;
+      display: flex; gap: 8px;
+      background: linear-gradient(transparent, rgba(16,44,38,.65));
+      transition: bottom .3s ease;
+    }
+    .product-card:hover .product-actions { bottom: 0; }
+    .product-actions button {
+      flex: 1;
+      background: var(--white);
+      border: none; cursor: none;
+      padding: 10px;
+      font-size: 12px; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      font-family: 'DM Sans', sans-serif;
+      transition: background .2s, color .2s;
+    }
+    .add-cart-btn { background: var(--black) !important; color: var(--white) !important; }
+    .add-cart-btn:hover { background: var(--accent) !important; }
+    .wishlist-btn { flex: 0 0 44px !important; font-size: 16px !important; background: rgba(255,242,225,.92) !important; }
+    .wishlist-btn:hover { background: white !important; }
+    .product-info { padding: 16px 18px 20px; }
+    .product-cat { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .product-name { font-family: 'DM Serif Display', serif; font-size: 17px; margin-bottom: 8px; line-height: 1.25; color: var(--black); }
+    .product-colors { display: flex; gap: 5px; margin-bottom: 10px; }
+    .color-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 1.5px solid transparent;
+      transition: border-color .15s;
+    }
+    .color-dot:hover { border-color: var(--black); }
+    .product-price-row { display: flex; align-items: center; gap: 8px; }
+    .price { font-size: 17px; font-weight: 700; color: var(--black); }
+    .price-old { font-size: 14px; color: var(--muted); text-decoration: line-through; }
 
-/* ── UGC SECTION ── */
-.ugc-section{background:var(--white)}
-.ugc-intro{text-align:center;max-width:520px;margin:0 auto 48px}
-.ugc-intro p{font-size:15px;color:var(--muted);line-height:1.7;font-weight:300;margin-top:14px}
-.ugc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
-.ugc-item{position:relative;overflow:hidden;aspect-ratio:1;cursor:none}
-.ugc-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s,filter .4s;filter:brightness(.92)}
-.ugc-item:hover img{transform:scale(1.08);filter:brightness(1)}
-.ugc-overlay{position:absolute;inset:0;background:rgba(16,44,38,.65);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;transition:opacity .3s}
-.ugc-item:hover .ugc-overlay{opacity:1}
-.ugc-handle{font-size:13px;font-weight:700;color:var(--white);letter-spacing:.04em}
-.ugc-product{font-size:11px;color:rgba(255,242,225,.65);text-align:center}
-.ugc-bottom{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:28px}
-.ugc-ig-btn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--border);color:var(--black);padding:12px 24px;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:all .2s;cursor:none}
-.ugc-ig-btn:hover{border-color:var(--black);background:var(--cream)}
+    /* ── Featured Banner ── */
+    .featured-banner {
+      margin: 0 48px 88px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      background: var(--black);
+      overflow: hidden;
+      min-height: 440px;
+    }
+    .banner-left {
+      padding: 64px;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative;
+    }
+    .banner-left::after {
+      content: '';
+      position: absolute; right: 0; top: 15%; bottom: 15%;
+      width: 1px; background: rgba(167,146,119,.18);
+    }
+    .banner-eyebrow { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 20px; }
+    .banner-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 72px; line-height: .95;
+      color: var(--white); margin-bottom: 20px;
+    }
+    .banner-desc { color: rgba(255,242,225,.5); font-size: 14px; line-height: 1.7; max-width: 320px; margin-bottom: 36px; }
+    .banner-right { position: relative; overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; }
+    .banner-img { overflow: hidden; }
+    .banner-img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: grayscale(20%) sepia(15%);
+      transition: transform .5s, filter .5s;
+    }
+    .banner-img:hover img { transform: scale(1.05); filter: grayscale(0) sepia(0); }
 
-/* ── FAQ ── */
-.faq-section{background:var(--cream)}
-.faq-inner{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
-.faq-left-sticky{position:sticky;top:100px}
-.faq-tagline{font-family:'DM Serif Display',serif;font-size:19px;font-style:italic;color:var(--muted);margin-top:16px;line-height:1.5}
-.faq-contact-nudge{margin-top:32px;padding:20px 24px;background:var(--white);border:1px solid var(--border)}
-.faq-contact-nudge p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
-.faq-contact-btn{background:none;border:1.5px solid var(--border);color:var(--black);padding:10px 20px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;transition:all .2s;cursor:none;width:100%}
-.faq-contact-btn:hover{border-color:var(--accent);color:var(--accent)}
-.faq-list{display:flex;flex-direction:column;gap:2px}
-.faq-item{background:var(--white);border:1px solid var(--border);overflow:hidden;transition:border-color .2s}
-.faq-item.open{border-color:var(--accent)}
-.faq-question{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;font-size:14px;font-weight:600;color:var(--black);cursor:none;transition:background .2s;gap:16px;line-height:1.4}
-.faq-question:hover{background:var(--cream)}
-.faq-item.open .faq-question{background:var(--cream)}
-.faq-arrow{font-size:20px;color:var(--accent);flex-shrink:0;transition:transform .3s;line-height:1}
-.faq-item.open .faq-arrow{transform:rotate(45deg)}
-.faq-answer{max-height:0;overflow:hidden;transition:max-height .4s ease}
-.faq-item.open .faq-answer{max-height:240px}
-.faq-answer-inner{padding:0 24px 20px;font-size:13px;color:var(--muted);line-height:1.75;font-weight:300}
-.faq-answer-inner a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+    /* ── Categories ── */
+    .categories { background: var(--cream); }
+    .category-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .category-card { position: relative; overflow: hidden; aspect-ratio: 4/3; cursor: none; }
+    .category-card img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform .5s ease;
+      filter: brightness(.72) sepia(.15);
+    }
+    .category-card:hover img { transform: scale(1.07); filter: brightness(.55) sepia(.1); }
+    .category-overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: flex-start; justify-content: flex-end;
+      padding: 32px;
+      background: linear-gradient(to top, rgba(16,44,38,.7) 0%, transparent 60%);
+    }
+    .category-label { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: white; letter-spacing: .04em; line-height: 1; margin-bottom: 6px; }
+    .category-count { font-size: 12px; color: rgba(255,255,255,.65); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 16px; }
+    .category-btn {
+      background: var(--white);
+      color: var(--black);
+      border: none; cursor: none;
+      padding: 9px 20px;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      font-family: 'DM Sans', sans-serif;
+      opacity: 0; transform: translateY(10px);
+      transition: all .3s ease;
+    }
+    .category-card:hover .category-btn { opacity: 1; transform: translateY(0); }
+    .category-btn:hover { background: var(--accent); color: var(--white); }
 
-/* ── FINAL CTA ── */
-.final-cta{background:var(--black);padding:100px 48px;text-align:center;position:relative;overflow:hidden}
-.final-cta::before{content:'NOW';font-family:'Bebas Neue',sans-serif;font-size:400px;color:rgba(167,146,119,.04);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);line-height:1;pointer-events:none;white-space:nowrap}
-.final-cta-inner{position:relative;z-index:1;max-width:640px;margin:0 auto}
-.final-cta-eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:20px}
-.final-cta-title{font-family:'DM Serif Display',serif;font-size:clamp(40px,6vw,80px);line-height:1;color:var(--white);margin-bottom:20px}
-.final-cta-title em{font-style:italic;color:var(--accent)}
-.final-cta-sub{color:rgba(255,242,225,.45);font-size:16px;line-height:1.7;font-weight:300;margin-bottom:40px;max-width:480px;margin-left:auto;margin-right:auto}
-.cta-email-form{display:flex;max-width:440px;margin:0 auto 20px}
-.cta-email-input{flex:1;padding:15px 20px;border:none;background:rgba(255,242,225,.1);color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;border:1px solid rgba(167,146,119,.25);transition:border-color .2s}
-.cta-email-input:focus{border-color:var(--accent)}
-.cta-email-input::placeholder{color:rgba(255,242,225,.35)}
-.cta-email-btn{background:var(--accent);color:var(--white);border:none;cursor:none;padding:15px 24px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:background .2s;white-space:nowrap}
-.cta-email-btn:hover{background:var(--accent2)}
-.cta-privacy-note{font-size:11px;color:rgba(255,242,225,.25);letter-spacing:.04em}
-.cta-or-divider{display:flex;align-items:center;gap:16px;max-width:440px;margin:24px auto;color:rgba(255,242,225,.25);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
-.cta-or-divider::before,.cta-or-divider::after{content:'';flex:1;height:1px;background:rgba(167,146,119,.2)}
-.cta-shop-btn{background:none;border:1.5px solid rgba(167,146,119,.35);color:var(--white);cursor:none;padding:16px 40px;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:all .2s;display:inline-flex;align-items:center;gap:10px}
-.cta-shop-btn:hover{border-color:var(--accent);background:rgba(167,146,119,.1)}
+    /* ── Testimonials ── */
+    .testimonials { background: var(--black); color: var(--white); }
+    .testimonials .section-title { color: var(--white); }
+    .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .review-card {
+      background: rgba(167,146,119,.08);
+      border: 1px solid rgba(167,146,119,.2);
+      padding: 32px;
+      transition: background .2s;
+    }
+    .review-card:hover { background: rgba(167,146,119,.14); }
+    .stars { color: #f5c842; font-size: 14px; margin-bottom: 16px; letter-spacing: 2px; }
+    .review-text { font-size: 15px; line-height: 1.7; color: rgba(255,242,225,.72); font-weight: 300; margin-bottom: 24px; font-style: italic; }
+    .reviewer { display: flex; align-items: center; gap: 12px; }
+    .reviewer-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; color: var(--white);
+      flex-shrink: 0;
+    }
+    .reviewer-name { font-size: 14px; font-weight: 600; color: var(--white); }
+    .reviewer-meta { font-size: 12px; color: var(--muted); }
 
-/* ── FOOTER ── */
-footer{background:var(--black);color:var(--white);padding:72px 48px 40px}
-.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:52px}
-.footer-brand p{color:rgba(255,242,225,.35);font-size:13px;line-height:1.75;max-width:260px;font-weight:300;margin-top:14px}
-.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.08em;color:var(--white);margin-bottom:4px}
-.footer-logo span{color:var(--accent)}
-.footer-tagline{font-family:'DM Serif Display',serif;font-style:italic;font-size:13px;color:rgba(255,242,225,.35);margin-bottom:16px}
-.footer-socials{display:flex;gap:10px;margin-top:20px}
-.social-icon{width:36px;height:36px;border:1px solid rgba(167,146,119,.2);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:none;transition:all .2s;color:var(--white)}
-.social-icon:hover{border-color:var(--accent);background:var(--accent)}
-.footer-col h4{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,242,225,.3);margin-bottom:18px;font-weight:700}
-.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
-.footer-col a{color:rgba(255,242,225,.55);font-size:13px;font-weight:300;transition:color .2s}
-.footer-col a:hover{color:var(--accent)}
-.footer-trust-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:28px;padding:16px 0;border-top:1px solid rgba(167,146,119,.1);border-bottom:1px solid rgba(167,146,119,.1)}
-.ft-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,242,225,.45);font-weight:500}
-.ft-badge span{font-size:14px}
-.ft-sep{width:1px;height:14px;background:rgba(167,146,119,.2)}
-.footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
-.footer-bottom p{color:rgba(255,242,225,.25);font-size:12px}
-.payment-icons{display:flex;gap:8px;flex-wrap:wrap}
-.pay-icon{background:rgba(167,146,119,.08);border:1px solid rgba(167,146,119,.18);padding:5px 10px;font-size:10px;color:rgba(255,242,225,.45);font-weight:700;letter-spacing:.04em}
+    /* ── Newsletter ── */
+    .newsletter {
+      background: var(--accent);
+      padding: 72px 48px;
+      display: flex; align-items: center; justify-content: space-between; gap: 48px;
+    }
+    .newsletter-text h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px; color: var(--white);
+      line-height: 1; margin-bottom: 10px;
+    }
+    .newsletter-text p { color: rgba(255,242,225,.75); font-size: 15px; font-weight: 300; }
+    .newsletter-form { display: flex; gap: 0; flex: 0 0 auto; width: 460px; }
+    .newsletter-form input {
+      flex: 1; padding: 16px 20px; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      background: rgba(16,44,38,.25); color: var(--white); outline: none;
+    }
+    .newsletter-form input::placeholder { color: rgba(255,242,225,.5); }
+    .newsletter-form button {
+      background: var(--black); color: var(--white); border: none; cursor: none;
+      padding: 16px 28px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+      transition: background .2s;
+    }
+    .newsletter-form button:hover { background: #1a3d35; }
 
-/* ── TOAST NOTIFICATIONS ── */
-.order-toast{position:fixed;bottom:80px;left:24px;background:#fff;border:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(16,44,38,.15);z-index:9000;transform:translateX(-120%);transition:transform .4s cubic-bezier(.34,1.56,.64,1);max-width:280px}
-.order-toast.show{transform:translateX(0)}
-.ot-img{width:40px;height:48px;object-fit:cover;background:var(--cream);flex-shrink:0;border:1px solid var(--border)}
-.ot-text{}
-.ot-name{font-size:12px;font-weight:700;color:var(--black)}
-.ot-meta{font-size:11px;color:var(--muted);margin-top:2px}
-.ot-time{font-size:10px;color:var(--accent);font-weight:600;margin-top:3px}
+    /* ── Footer ── */
+    footer { background: var(--black); color: var(--white); padding: 72px 48px 40px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 56px; }
+    .footer-brand p { color: rgba(255,242,225,.4); font-size: 13px; line-height: 1.7; max-width: 280px; font-weight: 300; margin-top: 16px; }
+    .footer-socials { display: flex; gap: 12px; margin-top: 24px; }
+    .social-icon {
+      width: 38px; height: 38px;
+      border: 1px solid rgba(167,146,119,.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; cursor: none;
+      transition: border-color .2s, background .2s;
+      color: var(--white);
+    }
+    .social-icon:hover { border-color: var(--accent); background: var(--accent); }
+    .footer-col h4 { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,242,225,.35); margin-bottom: 20px; font-weight: 600; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col a { color: rgba(255,242,225,.6); font-size: 14px; font-weight: 300; transition: color .2s; }
+    .footer-col a:hover { color: var(--accent); }
+    .footer-bottom { border-top: 1px solid rgba(167,146,119,.15); padding-top: 32px; display: flex; align-items: center; justify-content: space-between; }
+    .footer-bottom p { color: rgba(255,242,225,.28); font-size: 12px; }
+    .payment-icons { display: flex; gap: 10px; }
+    .pay-icon { background: rgba(167,146,119,.1); border: 1px solid rgba(167,146,119,.2); padding: 5px 10px; font-size: 11px; color: rgba(255,242,225,.45); font-weight: 600; letter-spacing: .04em; }
 
-/* ── STICKY BOTTOM CTA (mobile) ── */
-.sticky-cta-bar{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--black);z-index:800;padding:12px 16px;gap:10px;align-items:center;border-top:1px solid rgba(167,146,119,.2)}
-.sticky-cta-bar a{flex:1;background:var(--accent);color:var(--white);border:none;padding:14px;text-align:center;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;display:block;transition:background .2s}
-.sticky-cta-bar a:hover{background:var(--accent2)}
-.sticky-cta-cart{flex:0 0 52px;background:rgba(167,146,119,.15);color:var(--white);border:1px solid rgba(167,146,119,.3);padding:14px;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:none}
+    /* ── Animations ── */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation: fadeUp .7s ease both; }
+    .delay-1 { animation-delay: .1s; }
+    .delay-2 { animation-delay: .2s; }
+    .delay-3 { animation-delay: .3s; }
 
-/* ── SCROLL REVEAL ── */
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.reveal-delay-1{transition-delay:.1s}
-.reveal-delay-2{transition-delay:.2s}
-.reveal-delay-3{transition-delay:.3s}
-.reveal-delay-4{transition-delay:.4s}
+    /* ── Mobile ── */
+    @media (max-width: 900px) {
+      nav { padding: 0 16px; width: 100%; }
+      
+      .nav-logo { font-size: 22px; }
+      .cart-btn { padding: 8px 14px !important; font-size: 11px !important; }
 
-/* ── RESPONSIVE ── */
-@media(max-width:1100px){
-  .why-grid{grid-template-columns:repeat(2,1fr)}
-  .bundle-inner{grid-template-columns:1fr}
-  .bundle-right{display:none}
-  .ugc-grid{grid-template-columns:repeat(3,1fr)}
-  .faq-inner{grid-template-columns:1fr}
-  .faq-left-sticky{position:static}
-}
-@media(max-width:900px){
-  nav{padding:0 16px}
-  .nav-logo{font-size:22px}
-  .nav-links{display:none}
-  .hero{grid-template-columns:1fr}
-  .hero-left{padding:52px 24px}
-  .hero-left::before{font-size:130px}
-  .hero-right{min-height:320px}
-  .hero-floating-card{display:none}
-  .hero-cta-row{flex-direction:column;align-items:flex-start}
-  .btn-primary,.btn-outline{width:100%;justify-content:center}
-  .trust-bar{grid-template-columns:1fr 1fr}
-  .trust-item{padding:16px 14px}
-  .product-grid{grid-template-columns:1fr 1fr;gap:14px}
-  .reviews-grid{grid-template-columns:1fr}
-  .review-meta-bar{flex-direction:column;gap:16px}
-  .ugc-grid{grid-template-columns:repeat(2,1fr)}
-  section{padding:56px 16px}
-  .section-header{flex-direction:column;align-items:flex-start}
-  footer{padding:52px 16px 32px}
-  .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
-  .footer-bottom{flex-direction:column;text-align:center}
-  .sticky-cta-bar{display:flex}
-  body{padding-bottom:70px}
-}
-@media(max-width:480px){
-  .hero-title{font-size:60px}
-  .hero-social-proof{flex-direction:column;align-items:flex-start;gap:10px}
-  .trust-bar{grid-template-columns:1fr 1fr}
-  .product-grid{grid-template-columns:1fr 1fr;gap:10px}
-  .product-name{font-size:14px}
-  .why-grid{grid-template-columns:1fr}
-  .bundle-cards{grid-template-columns:1fr 1fr}
-  .bundle-title{font-size:52px}
-  .ugc-grid{grid-template-columns:repeat(2,1fr)}
-  .footer-grid{grid-template-columns:1fr}
-  .cta-email-form{flex-direction:column}
-  .cta-email-btn{width:100%}
-  .final-cta{padding:72px 16px}
-}
-</style>
+      .hero { grid-template-columns: 1fr; width: 100%; }
+      .hero-left { padding: 52px 24px; }
+      .hero-left::before { font-size: 130px; }
+      .hero-right { min-height: 300px; }
+      .hero-badge { left: 12px; bottom: 16px; padding: 12px 14px; }
+      .hero-title { font-size: 60px; }
+      .hero-cta-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .btn-primary, .btn-outline { width: 100%; justify-content: center; }
+
+      .stats-bar { grid-template-columns: 1fr 1fr; width: 100%; }
+      .stat-item { padding: 18px 16px; }
+      .stat-value { font-size: 16px; }
+
+      .product-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+      .product-name { font-size: 14px; }
+
+      .category-row { grid-template-columns: 1fr; }
+
+      .featured-banner { grid-template-columns: 1fr; margin: 0 0 60px; width: 100%; }
+      .banner-left { padding: 40px 24px; }
+      .banner-title { font-size: 52px; }
+      .banner-right { display: none; }
+
+      .reviews-grid { grid-template-columns: 1fr; }
+
+      .newsletter { flex-direction: column; padding: 48px 20px; gap: 28px; }
+      .newsletter-text h2 { font-size: 38px; }
+      .newsletter-form { width: 100%; }
+
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+      .payment-icons { flex-wrap: wrap; justify-content: center; }
+
+      section { padding: 52px 16px; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 14px; }
+      footer { padding: 52px 16px 32px; }
+    }
+
+    @media (max-width: 480px) {
+      .product-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 52px; }
+    }
+    /* ── HAMBURGER & DRAWER ── */
+    .hamburger{background:none;border:none;display:flex;flex-direction:column;gap:5px;padding:8px;cursor:none;z-index:301}
+    .hamburger span{display:block;width:22px;height:2px;background:var(--black);transition:all .3s;transform-origin:center}
+    .hamburger:hover span{background:var(--accent)}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+    .drawer-overlay{position:fixed;inset:0;background:rgba(16,44,38,.45);z-index:299;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(2px)}
+    .drawer-overlay.show{opacity:1;pointer-events:all}
+    .drawer{position:fixed;top:0;left:-340px;width:320px;height:100vh;background:var(--white);z-index:300;transition:left .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:4px 0 32px rgba(16,44,38,.15)}
+    .drawer.open{left:0}
+    .drawer-top{background:var(--black);padding:32px 28px 28px;position:relative}
+    .drawer-close{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,242,225,.5);font-size:22px;line-height:1;transition:color .2s}
+    .drawer-close:hover{color:var(--white)}
+    .drawer-avatar{width:56px;height:56px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--white);margin-bottom:14px;letter-spacing:.04em}
+    .drawer-name{font-family:'DM Serif Display',serif;font-size:20px;color:var(--white);margin-bottom:4px}
+    .drawer-email{font-size:12px;color:rgba(255,242,225,.45);letter-spacing:.04em}
+    .drawer-login-prompt{font-size:14px;color:rgba(255,242,225,.6);font-weight:300;margin-bottom:16px}
+    .drawer-login-btn{background:var(--accent);color:var(--white);border:none;padding:10px 24px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:background .2s;display:inline-block}
+    .drawer-login-btn:hover{background:var(--accent2)}
+    .drawer-body{flex:1;overflow-y:auto;padding:16px 0}
+    .drawer-section-label{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:14px 28px 6px}
+    .drawer-item{display:flex;align-items:center;gap:14px;padding:13px 28px;font-size:14px;font-weight:500;color:var(--black);transition:background .15s,color .15s;text-decoration:none;cursor:none;border:none;background:none;width:100%;text-align:left}
+    .drawer-item:hover{background:var(--cream);color:var(--accent)}
+    .drawer-item-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+    .drawer-item-arrow{margin-left:auto;font-size:12px;color:var(--border)}
+    .drawer-divider{height:1px;background:var(--border);margin:8px 28px}
+    .drawer-logout{color:var(--red)!important}
+    .drawer-logout:hover{background:#fdecea!important}
+    .drawer-bottom{padding:20px 28px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center}
+
+  </style>
 </head>
 <body>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
+  
 <!-- Drawer Overlay -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 
@@ -429,11 +627,13 @@ footer{background:var(--black);color:var(--white);padding:72px 48px 40px}
 <div class="drawer" id="sideDrawer">
   <div class="drawer-top" id="drawerTop">
     <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    <!-- shown when logged in -->
     <div id="drawerLoggedIn" style="display:none">
       <div class="drawer-avatar" id="drawerAvatar">?</div>
       <div class="drawer-name" id="drawerName">Loading…</div>
       <div class="drawer-email" id="drawerEmail"></div>
     </div>
+    <!-- shown when logged out -->
     <div id="drawerLoggedOut">
       <div class="drawer-avatar">👤</div>
       <div class="drawer-login-prompt">Sign in to your VYNEIT account</div>
@@ -441,11 +641,12 @@ footer{background:var(--black);color:var(--white);padding:72px 48px 40px}
     </div>
   </div>
   <div class="drawer-body">
+    <!-- Logged in menu -->
     <div id="drawerAuthMenu" style="display:none">
       <div class="drawer-section-label">My Account</div>
       <a class="drawer-item" href="account.html"><span class="drawer-item-icon">👤</span> My Profile <span class="drawer-item-arrow">›</span></a>
-      <a class="drawer-item" href="account.html" onclick="localStorage.setItem('acPanel','orders')"><span class="drawer-item-icon">📦</span> My Orders <span class="drawer-item-arrow">›</span></a>
-      <a class="drawer-item" href="account.html" onclick="localStorage.setItem('acPanel','address')"><span class="drawer-item-icon">📍</span> Addresses <span class="drawer-item-arrow">›</span></a>
+      <a class="drawer-item" href="account.html#orders" onclick="localStorage.setItem('acPanel','orders')"><span class="drawer-item-icon">📦</span> My Orders <span class="drawer-item-arrow">›</span></a>
+      <a class="drawer-item" href="account.html#address" onclick="localStorage.setItem('acPanel','address')"><span class="drawer-item-icon">📍</span> Addresses <span class="drawer-item-arrow">›</span></a>
       <div class="drawer-divider"></div>
       <div class="drawer-section-label">Support</div>
       <a class="drawer-item" href="returns-refunds.html"><span class="drawer-item-icon">🔄</span> Returns & Refunds <span class="drawer-item-arrow">›</span></a>
@@ -454,8 +655,10 @@ footer{background:var(--black);color:var(--white);padding:72px 48px 40px}
       <div class="drawer-divider"></div>
       <button class="drawer-item drawer-logout" onclick="handleDrawerLogout()"><span class="drawer-item-icon">🚪</span> Sign Out</button>
     </div>
+    <!-- Guest menu -->
     <div id="drawerGuestMenu">
       <div class="drawer-section-label">Shop</div>
+      <a class="drawer-item" href="index.html"><span class="drawer-item-icon">🏠</span> Home <span class="drawer-item-arrow">›</span></a>
       <a class="drawer-item" href="collections.html"><span class="drawer-item-icon">👕</span> All Collections <span class="drawer-item-arrow">›</span></a>
       <a class="drawer-item" href="cart.html"><span class="drawer-item-icon">🛍</span> My Cart <span class="drawer-item-arrow">›</span></a>
       <div class="drawer-divider"></div>
@@ -469,1014 +672,674 @@ footer{background:var(--black);color:var(--white);padding:72px 48px 40px}
   <div class="drawer-bottom">© 2025 VYNEIT. All rights reserved.</div>
 </div>
 
-<!-- ════════════════════════════════════════
-  ANNOUNCEMENT BAR
-════════════════════════════════════════ -->
-<div class="announce-bar">
-  <div class="announce-track">
-    <!-- Two copies for seamless loop -->
-    <div class="announce-item"><span>FREE SHIPPING</span> on orders above ₹999</div>
-    <div class="announce-sep">✦</div>
-    <div class="announce-item"><span>COD AVAILABLE</span> — Pay when you receive</div>
-    <div class="announce-sep">✦</div>
-    <div class="announce-item">Use <span>VYNE10</span> for 10% off your first order</div>
-    <div class="announce-sep">✦</div>
-    <div class="announce-item"><span>EASY 7-DAY RETURNS</span> — No questions asked</div>
-    <div class="announce-sep">✦</div>
-    <div class="announce-item">Ships within <span>1–2 business days</span></div>
-    <div class="announce-sep">✦</div>
-    <!-- Duplicate for loop -->
-    <div class="announce-item"><span>FREE SHIPPING</span> on orders above ₹999</div>
-    <div class="announce-sep">✦</div>
-    <div class="announce-item"><span>COD AVAILABLE</span> — Pay when you receive</div>
-    <div class="announce-sep">✦</div>
-    <div class="announce-item">Use <span>VYNE10</span> for 10% off your first order</div>
-    <div class="announce-sep">✦</div>
-    <div class="announce-item"><span>EASY 7-DAY RETURNS</span> — No questions asked</div>
-    <div class="announce-sep">✦</div>
-    <div class="announce-item">Ships within <span>1–2 business days</span></div>
-    <div class="announce-sep">✦</div>
-  </div>
-</div>
 
-<!-- ════════════════════════════════════════
-  NAVIGATION
-════════════════════════════════════════ -->
-<nav>
-  <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()"><span></span><span></span><span></span></button>
-  <a href="index.html" class="nav-logo">VYNE<span>IT</span></a>
-  <ul class="nav-links">
-    <li><a href="collections.html">Collections</a></li>
-    <li><a href="collections.html">Bestsellers</a></li>
-    <li><a href="collections.html">New Drops</a></li>
-  </ul>
-  <div class="nav-actions">
-    <button class="login-btn" id="navLoginBtn" onclick="handleLoginClick()">
-      <span id="navLoginIcon">👤</span>
-      <span id="navLoginText">Login</span>
-    </button>
-    <button class="cart-btn" onclick="window.location.href='cart.html'">
-      🛍 Cart <span class="cart-count" id="cartCount">0</span>
-    </button>
-  </div>
-</nav>
+<div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
 
-<!-- ════════════════════════════════════════
-  HERO
-════════════════════════════════════════ -->
-<div class="hero">
-  <div class="hero-left">
-    <div class="hero-drop-badge">New Drop — Summer '25</div>
-    <h1 class="hero-title">
-      Don't Just<br/>
-      <em>Wear It.</em><br/>
-      Own It.
-    </h1>
-    <p class="hero-desc">Tees built for the generation that doesn't explain itself. Every cut, every thread — made to feel like it was made <i>for you</i>.</p>
-    <div class="hero-offer-pill">🏷️ Use <strong>VYNE10</strong> — Get 10% off your first order</div>
-    <div class="hero-cta-row">
+
+
+  <!-- Navigation -->
+  <nav>
+    <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()"><span></span><span></span><span></span></button><a href="index.html" class="nav-logo">VYNE<span>IT</span></a>
+    <div class="nav-actions">
+    <button class="cart-btn" title="Cart" onclick="window.location.href='cart.html'">
+        🛍 Cart
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section style="padding:0;" class="hero">
+    <div class="hero-left">
+      <span class="hero-tag fade-up">✦ SS 2025 Collection</span>
+      <h1 class="hero-title fade-up delay-1">
+        Wear<br>Your <em>Story</em>
+      </h1>
+      <p class="hero-desc fade-up delay-2">
+        Premium tees crafted from 100% organic cotton. Bold graphics. Clean fits. Made to last — and to be noticed.
+      </p>
+      <div class="hero-cta-row fade-up delay-3">
+        <button class="btn-primary" onclick="window.location.href='collections.html'">Shop Now →</button>
+        <button class="btn-outline" onclick="window.location.href='collections.html'">View Lookbook</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-img-wrap">
+        <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900&auto=format&fit=crop&q=80" alt="Hero T-Shirt"/>
+      </div>
+      <div class="hero-badge">
+        <div class="hero-badge-icon">⭐</div>
+        <div class="hero-badge-text">
+          <strong>4.9 / 5 Rating</strong>
+          <span>From 12,400+ reviews</span>
+        </div>
+      </div>
+      <div class="hero-scroll">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-icon">🌿</div>
+      <div><div class="stat-label">Material</div><div class="stat-value">100% Organic</div></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">🚚</div>
+      <div><div class="stat-label">Delivery</div><div class="stat-value">Free over ₹999</div></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">🔄</div>
+      <div><div class="stat-label">Returns</div><div class="stat-value">30-Day Free</div></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">🏆</div>
+      <div><div class="stat-label">Customers</div><div class="stat-value">50K+ Happy</div></div>
+    </div>
+  </div>
+
+  <!-- Best Sellers -->
+  <section>
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow">✦ Best Sellers</div>
+        <h2 class="section-title">Fan <em>Favourites</em></h2>
+      </div>
+      <a href="collections.html" class="view-all">View All →</a>
+    </div>
+    <div class="product-grid">
+
+      <div class="product-card" style="cursor:none">
+        <div class="product-img-wrap">
+          <span class="product-badge new-tag">New</span>
+          <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&auto=format&fit=crop&q=80" alt="Classic White Tee" onclick="goToProduct('Essential White Crew',599,'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&auto=format&fit=crop&q=80','Classic',null,'new')" style="cursor:none"/>
+          <div class="product-actions">
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Essential White Crew" data-price="599" data-img="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+            <button class="wishlist-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info" onclick="goToProduct('Essential White Crew',599,'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&auto=format&fit=crop&q=80','Classic',null,'new')" style="cursor:none">
+          <div class="product-cat">Classic</div>
+          <div class="product-name">Essential White Crew</div>
+          <div class="product-colors">
+            <div class="color-dot" style="background:#FFF2E1;border-color:#ccc"></div>
+            <div class="color-dot" style="background:#102C26"></div>
+            <div class="color-dot" style="background:#A79277"></div>
+          </div>
+          <div class="product-price-row"><span class="price">₹599</span></div>
+        </div>
+      </div>
+
+      <div class="product-card" style="cursor:none">
+        <div class="product-img-wrap">
+          <span class="product-badge sale">Sale 20%</span>
+          <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&auto=format&fit=crop&q=80" alt="Graphic Tee" onclick="goToProduct('Urban Print Oversized',799,this.src.replace('w=600','w=600'),'Graphic',1499,'sale' || null)" style="cursor:none"/>
+          <div class="product-actions">
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Urban Print Oversized" data-price="799" data-img="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+            <button class="wishlist-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-cat">Graphic</div>
+          <div class="product-name">Urban Print Oversized</div>
+          <div class="product-colors">
+            <div class="color-dot" style="background:#102C26"></div>
+            <div class="color-dot" style="background:#A79277"></div>
+            <div class="color-dot" style="background:#5a4a3a"></div>
+          </div>
+          <div class="product-price-row"><span class="price">₹799</span><span class="price-old">₹1,499</span></div>
+        </div>
+      </div>
+
+      <div class="product-card" style="cursor:none">
+        <div class="product-img-wrap">
+          <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&auto=format&fit=crop&q=80" alt="Vintage Tee" onclick="goToProduct('Faded Retro Wash',699,this.src.replace('w=600','w=600'),'Vintage',null,'' || null)" style="cursor:none"/>
+          <div class="product-actions">
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Faded Retro Wash" data-price="699" data-img="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+            <button class="wishlist-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-cat">Vintage</div>
+          <div class="product-name">Faded Retro Wash</div>
+          <div class="product-colors">
+            <div class="color-dot" style="background:#F7E7CE"></div>
+            <div class="color-dot" style="background:#8fa88e"></div>
+            <div class="color-dot" style="background:#A79277"></div>
+          </div>
+          <div class="product-price-row"><span class="price">₹699</span></div>
+        </div>
+      </div>
+
+      <div class="product-card" style="cursor:none">
+        <div class="product-img-wrap">
+          <span class="product-badge">Limited</span>
+          <img src="https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=600&auto=format&fit=crop&q=80" alt="Premium Tee" onclick="goToProduct('Heavyweight Drop-Shoulder',999,this.src.replace('w=600','w=600'),'Premium',null,'limited' || null)" style="cursor:none"/>
+          <div class="product-actions">
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Heavyweight Drop-Shoulder" data-price="999" data-img="https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+            <button class="wishlist-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-cat">Premium</div>
+          <div class="product-name">Heavyweight Drop-Shoulder</div>
+          <div class="product-colors">
+            <div class="color-dot" style="background:#102C26"></div>
+            <div class="color-dot" style="background:#2d4a22"></div>
+            <div class="color-dot" style="background:#3d2b1f"></div>
+          </div>
+          <div class="product-price-row"><span class="price">₹999</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Featured Collection Banner -->
+  <div class="featured-banner">
+    <div class="banner-left">
+      <div class="banner-eyebrow">✦ Limited Drop</div>
+      <div class="banner-title">Summer<br>Heat<br>2025</div>
+      <p class="banner-desc">Our most vibrant collection yet. Sun-bleached hues, relaxed silhouettes, and graphics inspired by 90s beach culture.</p>
       <button class="btn-primary" onclick="window.location.href='collections.html'">Shop the Drop →</button>
-      <button class="btn-outline" onclick="document.getElementById('bestsellers').scrollIntoView({behavior:'smooth'})">View Bestsellers</button>
     </div>
-    <div class="hero-social-proof">
-      <div class="hero-avatars">
-        <div class="hero-avatar">RK</div>
-        <div class="hero-avatar">AS</div>
-        <div class="hero-avatar">PM</div>
-        <div class="hero-avatar">VT</div>
-        <div class="hero-avatar" style="background:var(--accent2);font-size:9px">+</div>
+    <div class="banner-right">
+      <div class="banner-img">
+        <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=500&auto=format&fit=crop&q=80" alt="Summer 1"/>
       </div>
-      <div class="hero-sp-text"><strong>1,200+ Indians</strong> ordered this month</div>
-    </div>
-  </div>
-  <div class="hero-right">
-    <div class="hero-img-wrap">
-      <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=900&auto=format&fit=crop&q=80" alt="VYNEIT Hero"/>
-    </div>
-    <div class="hero-right-tag">SS 2025 Collection</div>
-    <div class="hero-floating-card">
-      <div class="fc-icon">📦</div>
-      <div class="fc-text">
-        <strong>Rahul from Pune</strong>
-        <span>just ordered — 2 min ago</span>
+      <div class="banner-img">
+        <img src="https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=500&auto=format&fit=crop&q=80" alt="Summer 2"/>
       </div>
     </div>
-    <div class="hero-scroll">
-      <span>Scroll</span>
-      <div class="scroll-line"></div>
-    </div>
   </div>
-</div>
 
-<!-- ════════════════════════════════════════
-  TRUST BAR
-════════════════════════════════════════ -->
-<div class="trust-bar">
-  <div class="trust-item">
-    <div class="trust-icon">💵</div>
-    <div>
-      <div class="trust-label">Cash on Delivery</div>
-      <div class="trust-value">COD Available</div>
-      <div class="trust-sub">Pay when it arrives</div>
+  <!-- New Arrivals -->
+  <section>
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow">✦ Just Dropped</div>
+        <h2 class="section-title">New <em>Arrivals</em></h2>
+      </div>
+      <a href="collections.html" class="view-all">View All →</a>
     </div>
-  </div>
-  <div class="trust-item">
-    <div class="trust-icon">🚚</div>
-    <div>
-      <div class="trust-label">Shipping</div>
-      <div class="trust-value">Free above ₹999</div>
-      <div class="trust-sub">Delivered in 3–5 days</div>
-    </div>
-  </div>
-  <div class="trust-item">
-    <div class="trust-icon">🔄</div>
-    <div>
-      <div class="trust-label">Returns</div>
-      <div class="trust-value">7-Day Easy Returns</div>
-      <div class="trust-sub">No questions asked</div>
-    </div>
-  </div>
-  <div class="trust-item">
-    <div class="trust-icon">⭐</div>
-    <div>
-      <div class="trust-label">Rated by customers</div>
-      <div class="trust-value">4.8 / 5 Stars</div>
-      <div class="trust-sub">800+ verified reviews</div>
-    </div>
-  </div>
-</div>
+    <div class="product-grid">
 
-<!-- ════════════════════════════════════════
-  BESTSELLERS
-════════════════════════════════════════ -->
-<section id="bestsellers">
-  <div class="section-header">
-    <div class="reveal">
-      <div class="section-eyebrow">Flying off the shelves</div>
-      <h2 class="section-title">The <em>Bestsellers</em></h2>
-    </div>
-    <a href="collections.html" class="view-all reveal">View All Collections →</a>
-  </div>
-  <div class="product-grid">
-
-    <!-- Product 1 -->
-    <div class="product-card reveal" onclick="goToProduct(this)">
-      <div class="product-img-wrap">
-        <span class="product-badge badge-hot">🔥 Hot</span>
-        <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&auto=format&fit=crop&q=80" alt="Essential Oversized Tee"
-          data-name="Essential Oversized Tee" data-price="699" data-cat="Classic" data-badge="hot"/>
-        <div class="product-fomo">👁 28 people viewing this</div>
-        <div class="product-actions">
-          <button class="add-cart-btn" onclick="event.stopPropagation();addToCart(this)"
-            data-name="Essential Oversized Tee" data-price="699"
-            data-img="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
-          <button class="wishlist-btn">♡</button>
+      <div class="product-card" style="cursor:none">
+        <div class="product-img-wrap">
+          <span class="product-badge new-tag">New</span>
+          <img src="https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&auto=format&fit=crop&q=80" alt="Tie Dye" onclick="goToProduct('Hand-Dyed Spiral',849,this.src.replace('w=600','w=600'),'Artisan',null,'new' || null)" style="cursor:none"/>
+          <div class="product-actions">
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Hand-Dyed Spiral" data-price="849" data-img="https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+            <button class="wishlist-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-cat">Artisan</div>
+          <div class="product-name">Hand-Dyed Spiral</div>
+          <div class="product-colors">
+            <div class="color-dot" style="background:#F7E7CE"></div>
+            <div class="color-dot" style="background:#A79277"></div>
+          </div>
+          <div class="product-price-row"><span class="price">₹849</span></div>
         </div>
       </div>
-      <div class="stock-bar-wrap">
-        <div class="stock-label">Only 11 left</div>
-        <div class="stock-bar"><div class="stock-fill" style="width:18%"></div></div>
-      </div>
-      <div class="product-info">
-        <div class="product-cat">Classic · Unisex</div>
-        <div class="product-name">Essential Oversized Tee</div>
-        <div class="product-colors">
-          <div class="color-dot" style="background:#102C26"></div>
-          <div class="color-dot" style="background:#FFF2E1;border-color:#ccc"></div>
-          <div class="color-dot" style="background:#5c4a3a"></div>
-        </div>
-        <div class="product-price-row"><span class="price">₹699</span><span class="price-old">₹1,299</span><span class="price-save">Save ₹600</span></div>
-      </div>
-    </div>
 
-    <!-- Product 2 -->
-    <div class="product-card reveal reveal-delay-1" onclick="goToProduct(this)">
-      <div class="product-img-wrap">
-        <span class="product-badge badge-new">✨ New</span>
-        <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&auto=format&fit=crop&q=80" alt="Washed Graphic Tee"
-          data-name="Washed Graphic Tee" data-price="849" data-cat="Graphic" data-badge="new"/>
-        <div class="product-fomo">🛒 12 sold today</div>
-        <div class="product-actions">
-          <button class="add-cart-btn" onclick="event.stopPropagation();addToCart(this)"
-            data-name="Washed Graphic Tee" data-price="849"
-            data-img="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
-          <button class="wishlist-btn">♡</button>
+      <div class="product-card" style="cursor:none">
+        <div class="product-img-wrap">
+          <span class="product-badge new-tag">New</span>
+          <img src="https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&auto=format&fit=crop&q=80" alt="Stripe Tee" onclick="goToProduct('Breton Stripe Crew',649,this.src.replace('w=600','w=600'),'Nautical',null,'new' || null)" style="cursor:none"/>
+          <div class="product-actions">
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Breton Stripe Crew" data-price="649" data-img="https://images.unsplash.com/photo-1562157873-818bc0726f68?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+            <button class="wishlist-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-cat">Nautical</div>
+          <div class="product-name">Breton Stripe Crew</div>
+          <div class="product-colors">
+            <div class="color-dot" style="background:#102C26"></div>
+            <div class="color-dot" style="background:#8b1a1a"></div>
+          </div>
+          <div class="product-price-row"><span class="price">₹649</span></div>
         </div>
       </div>
-      <div class="stock-bar-wrap">
-        <div class="stock-label">Almost gone — 7 left</div>
-        <div class="stock-bar"><div class="stock-fill" style="width:10%"></div></div>
-      </div>
-      <div class="product-info">
-        <div class="product-cat">Graphic · Oversized</div>
-        <div class="product-name">Washed Graphic Tee</div>
-        <div class="product-colors">
-          <div class="color-dot" style="background:#3d3d3d"></div>
-          <div class="color-dot" style="background:#A79277"></div>
-        </div>
-        <div class="product-price-row"><span class="price">₹849</span></div>
-      </div>
-    </div>
 
-    <!-- Product 3 -->
-    <div class="product-card reveal reveal-delay-2" onclick="goToProduct(this)">
-      <div class="product-img-wrap">
-        <span class="product-badge badge-sale">Sale</span>
-        <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=600&auto=format&fit=crop&q=80" alt="Minimalist Drop Shoulder"
-          data-name="Minimalist Drop Shoulder" data-price="599" data-cat="Minimalist" data-old-price="999" data-badge="sale"/>
-        <div class="product-fomo">⚡ Selling fast</div>
-        <div class="product-actions">
-          <button class="add-cart-btn" onclick="event.stopPropagation();addToCart(this)"
-            data-name="Minimalist Drop Shoulder" data-price="599"
-            data-img="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
-          <button class="wishlist-btn">♡</button>
+      <div class="product-card" style="cursor:none">
+        <div class="product-img-wrap">
+          <img src="https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=600&auto=format&fit=crop&q=80" alt="V-Neck" onclick="goToProduct('Clean Slate V-Neck',499,this.src.replace('w=600','w=600'),'Minimalist',null,'' || null)" style="cursor:none"/>
+          <div class="product-actions">
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Clean Slate V-Neck" data-price="499" data-img="https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+            <button class="wishlist-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-cat">Minimalist</div>
+          <div class="product-name">Clean Slate V-Neck</div>
+          <div class="product-colors">
+            <div class="color-dot" style="background:#FFF2E1;border-color:#ccc"></div>
+            <div class="color-dot" style="background:#808080"></div>
+            <div class="color-dot" style="background:#102C26"></div>
+          </div>
+          <div class="product-price-row"><span class="price">₹499</span></div>
         </div>
       </div>
-      <div class="stock-bar-wrap">
-        <div class="stock-label">Only 15 left</div>
-        <div class="stock-bar"><div class="stock-fill" style="width:22%"></div></div>
-      </div>
-      <div class="product-info">
-        <div class="product-cat">Minimalist · Drop Shoulder</div>
-        <div class="product-name">Minimalist Drop Shoulder</div>
-        <div class="product-colors">
-          <div class="color-dot" style="background:#FFF2E1;border-color:#ccc"></div>
-          <div class="color-dot" style="background:#102C26"></div>
-          <div class="color-dot" style="background:#808080"></div>
-        </div>
-        <div class="product-price-row"><span class="price">₹599</span><span class="price-old">₹999</span><span class="price-save">40% off</span></div>
-      </div>
-    </div>
 
-    <!-- Product 4 -->
-    <div class="product-card reveal reveal-delay-3" onclick="goToProduct(this)">
-      <div class="product-img-wrap">
-        <span class="product-badge badge-limited">Limited</span>
-        <img src="https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&auto=format&fit=crop&q=80" alt="Artisan Hand-Dyed"
-          data-name="Artisan Hand-Dyed Tee" data-price="949" data-cat="Artisan" data-badge="limited"/>
-        <div class="product-fomo">🔥 Only 5 left in this drop</div>
-        <div class="product-actions">
-          <button class="add-cart-btn" onclick="event.stopPropagation();addToCart(this)"
-            data-name="Artisan Hand-Dyed Tee" data-price="949"
-            data-img="https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
-          <button class="wishlist-btn">♡</button>
+      <div class="product-card" style="cursor:none">
+        <div class="product-img-wrap">
+          <span class="product-badge sale">15% Off</span>
+          <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=600&auto=format&fit=crop&q=80" alt="Logo Tee" onclick="goToProduct('Big Logo Boxy Fit',749,this.src.replace('w=600','w=600'),'Statement',1599,'sale' || null)" style="cursor:none"/>
+          <div class="product-actions">
+            <button class="add-cart-btn" onclick="addToCart(this)" data-name="Big Logo Boxy Fit" data-price="749" data-img="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=300&auto=format&fit=crop&q=80">Add to Cart</button>
+            <button class="wishlist-btn">♡</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-cat">Statement</div>
+          <div class="product-name">Big Logo Boxy Fit</div>
+          <div class="product-colors">
+            <div class="color-dot" style="background:#F7E7CE"></div>
+            <div class="color-dot" style="background:#102C26"></div>
+          </div>
+          <div class="product-price-row"><span class="price">₹749</span><span class="price-old">₹1,599</span></div>
         </div>
       </div>
-      <div class="stock-bar-wrap">
-        <div class="stock-label">Only 5 left — act fast</div>
-        <div class="stock-bar"><div class="stock-fill" style="width:6%"></div></div>
+
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="categories">
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow">✦ Browse by Vibe</div>
+        <h2 class="section-title">Shop <em>Categories</em></h2>
       </div>
-      <div class="product-info">
-        <div class="product-cat">Artisan · Limited Drop</div>
-        <div class="product-name">Artisan Hand-Dyed Tee</div>
-        <div class="product-colors">
-          <div class="color-dot" style="background:#F7E7CE;border-color:#ccc"></div>
-          <div class="color-dot" style="background:#A79277"></div>
+    </div>
+    <div class="category-row">
+      <div class="category-card">
+        <img src="https://images.unsplash.com/photo-1603252109303-2751441dd157?w=700&auto=format&fit=crop&q=80" alt="Men's"/>
+        <div class="category-overlay">
+          <div class="category-label">Men's Tees</div>
+          <div class="category-count">48 Products</div>
+          <button class="category-btn" onclick="window.location.href='collections.html'">Shop Now</button>
         </div>
-        <div class="product-price-row"><span class="price">₹949</span></div>
+      </div>
+      <div class="category-card">
+        <img src="https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=700&auto=format&fit=crop&q=80" alt="Women's"/>
+        <div class="category-overlay">
+          <div class="category-label">Women's Tees</div>
+          <div class="category-count">62 Products</div>
+          <button class="category-btn" onclick="window.location.href='collections.html'">Shop Now</button>
+        </div>
+      </div>
+      <div class="category-card">
+        <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=700&auto=format&fit=crop&q=80" alt="Graphic"/>
+        <div class="category-overlay">
+          <div class="category-label">Graphic Tees</div>
+          <div class="category-count">35 Products</div>
+          <button class="category-btn" onclick="window.location.href='collections.html'">Shop Now</button>
+        </div>
       </div>
     </div>
+  </section>
 
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════
-  BRAND STORY
-════════════════════════════════════════ -->
-<section class="brand-story">
-  <div class="brand-story-inner reveal">
-    <div class="section-eyebrow">Our Story</div>
-    <h2 class="brand-story-title">Not Just a Brand.<br/><em>A Statement.</em></h2>
-    <p class="brand-story-body">
-      VYNEIT started with one question: <strong>why do good clothes have to feel like a compromise?</strong>
-      Every brand was either too expensive, too generic, or too fast-fashion. We wanted something different.
-    </p>
-    <p class="brand-story-body">
-      We built VYNEIT for people who know what they stand for. People who'd rather wear one honest tee 
-      than ten disposable ones. <strong>Every piece is crafted from 100% organic cotton</strong>, cut for the 
-      Indian body, and priced without the brand tax.
-    </p>
-    <p class="brand-story-body">
-      We're not here to sell you a lifestyle. <strong>We're here to back the one you're already living.</strong>
-    </p>
-    <div class="brand-story-stats">
-      <div class="bs-stat">
-        <div class="bs-num">1,200+</div>
-        <div class="bs-label">Happy Customers</div>
-      </div>
-      <div class="bs-stat">
-        <div class="bs-num">100%</div>
-        <div class="bs-label">Organic Cotton</div>
-      </div>
-      <div class="bs-stat">
-        <div class="bs-num">4.8★</div>
-        <div class="bs-label">Avg. Rating</div>
+  <!-- Testimonials -->
+  <section class="testimonials">
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow">✦ Customer Love</div>
+        <h2 class="section-title">What They're <em>Saying</em></h2>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════
-  WHY VYNEIT
-════════════════════════════════════════ -->
-<section class="why-vyneit">
-  <div style="text-align:center;max-width:520px;margin:0 auto" class="reveal">
-    <div class="section-eyebrow" style="justify-content:center">Why we're different</div>
-    <h2 class="section-title">Built Different.<br/><em>On Purpose.</em></h2>
-  </div>
-  <div class="why-grid">
-    <div class="why-card reveal">
-      <div class="why-icon-wrap">🌿</div>
-      <div class="why-title">Organic Cotton Only</div>
-      <p class="why-desc">We use GOTS-certified 100% organic cotton on every piece. Softer on your skin, better for the planet — no compromise.</p>
-    </div>
-    <div class="why-card reveal reveal-delay-1">
-      <div class="why-icon-wrap">📐</div>
-      <div class="why-title">Cut for Indian Fit</div>
-      <p class="why-desc">Our sizing is designed for real Indian bodies — not copied from some Western brand's size chart. S actually fits like an S.</p>
-    </div>
-    <div class="why-card reveal reveal-delay-2">
-      <div class="why-icon-wrap">🎨</div>
-      <div class="why-title">Print That Lasts</div>
-      <p class="why-desc">Our graphics don't crack after the third wash. We use water-based inks baked at high temperature for prints that age like art.</p>
-    </div>
-    <div class="why-card reveal reveal-delay-3">
-      <div class="why-icon-wrap">💰</div>
-      <div class="why-title">No Brand Tax</div>
-      <p class="why-desc">₹499–₹999 for quality that rivals ₹2,000+ brands. You pay for the tee, not the Instagram ads of some celebrity endorsement.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════
-  SOCIAL PROOF / REVIEWS
-════════════════════════════════════════ -->
-<section class="reviews-section">
-  <div class="section-header">
-    <div class="reveal">
-      <div class="section-eyebrow">Customer Love</div>
-      <h2 class="section-title" style="color:var(--white)">Real People.<br/><em>Real Reviews.</em></h2>
-    </div>
-  </div>
-
-  <div class="review-meta-bar reveal">
-    <div class="overall-rating">
-      <div class="rating-big">4.8</div>
-      <div class="rating-stars">★★★★★</div>
-      <div class="rating-count">Based on 800+ reviews</div>
-    </div>
-    <div class="rating-bars">
-      <div class="rbar-row"><span class="rbar-label">5★</span><div class="rbar"><div class="rbar-fill" style="width:78%"></div></div></div>
-      <div class="rbar-row"><span class="rbar-label">4★</span><div class="rbar"><div class="rbar-fill" style="width:15%"></div></div></div>
-      <div class="rbar-row"><span class="rbar-label">3★</span><div class="rbar"><div class="rbar-fill" style="width:5%"></div></div></div>
-      <div class="rbar-row"><span class="rbar-label">2★</span><div class="rbar"><div class="rbar-fill" style="width:1%"></div></div></div>
-      <div class="rbar-row"><span class="rbar-label">1★</span><div class="rbar"><div class="rbar-fill" style="width:1%"></div></div></div>
-    </div>
-  </div>
-
-  <div class="reviews-grid">
-    <div class="review-card reveal">
-      <div class="review-top">
+    <div class="reviews-grid">
+      <div class="review-card">
         <div class="stars">★★★★★</div>
-        <div class="verified-badge">Verified</div>
-      </div>
-      <p class="review-text">"Ordered the Essential Oversized Tee on a whim. Bhai, ek dum solid quality hai — <b>literally the best tee I own</b> right now. Soft, perfect fit, and the colour hasn't faded after 6 washes."</p>
-      <div class="reviewer">
-        <div class="reviewer-avatar">RK</div>
-        <div>
-          <div class="reviewer-name">Rohan Kumar</div>
-          <div class="reviewer-meta">Mumbai, Maharashtra</div>
-          <div class="review-product">Bought: Essential Oversized Tee</div>
+        <p class="review-text">"The quality blew me away. I've tried dozens of tee brands and nothing comes close to the feel of VYNEIT. Ordered three more colors immediately."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">JM</div>
+          <div><div class="reviewer-name">James M.</div><div class="reviewer-meta">Verified Buyer · New York</div></div>
         </div>
       </div>
-    </div>
-    <div class="review-card reveal reveal-delay-1">
-      <div class="review-top">
+      <div class="review-card">
         <div class="stars">★★★★★</div>
-        <div class="verified-badge">Verified</div>
-      </div>
-      <p class="review-text">"Been buying tees online for years and this is the first brand where the <b>actual product matched the photo</b>. Packaging is beautiful too, made it feel premium. Definitely ordering again."</p>
-      <div class="reviewer">
-        <div class="reviewer-avatar">AS</div>
-        <div>
-          <div class="reviewer-name">Ananya Sharma</div>
-          <div class="reviewer-meta">Bangalore, Karnataka</div>
-          <div class="review-product">Bought: Washed Graphic Tee</div>
+        <p class="review-text">"Love that everything is organic cotton. Fits perfectly, graphics don't crack after washing. This is my go-to brand for tees now."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">SP</div>
+          <div><div class="reviewer-name">Sophia P.</div><div class="reviewer-meta">Verified Buyer · London</div></div>
         </div>
       </div>
-    </div>
-    <div class="review-card reveal reveal-delay-2">
-      <div class="review-top">
+      <div class="review-card">
         <div class="stars">★★★★★</div>
-        <div class="verified-badge">Verified</div>
-      </div>
-      <p class="review-text">"Bhai COD tha, received in 4 days, <b>quality is insane</b> for this price. I've recommended VYNEIT to my entire college friend group. Three of them have already ordered."</p>
-      <div class="reviewer">
-        <div class="reviewer-avatar">VP</div>
-        <div>
-          <div class="reviewer-name">Varun Pillai</div>
-          <div class="reviewer-meta">Pune, Maharashtra</div>
-          <div class="review-product">Bought: Minimalist Drop Shoulder</div>
+        <p class="review-text">"Fast shipping, beautiful packaging, and the tee looks even better in person. The oversized fit is chef's kiss. Already recommended to 5 friends."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">RK</div>
+          <div><div class="reviewer-name">Ravi K.</div><div class="reviewer-meta">Verified Buyer · Toronto</div></div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <div class="newsletter">
+    <div class="newsletter-text">
+      <h2>Stay in the Loop</h2>
+      <p>New drops, exclusive offers, and style inspo — straight to your inbox.</p>
+    </div>
+    <div class="newsletter-form">
+      <input type="email" placeholder="Enter your email address…"/>
+      <button>Subscribe →</button>
     </div>
   </div>
-</section>
 
-<!-- ════════════════════════════════════════
-  BUNDLE DEAL
-════════════════════════════════════════ -->
-<section class="bundle-section" id="bundle">
-  <div class="bundle-inner">
-    <div class="bundle-left reveal">
-      <div class="bundle-tag">⚡ Limited Time Deal</div>
-      <div class="bundle-title">Buy 2<br/><span>Get 1</span><br/>Free</div>
-      <div class="bundle-subtitle">Mix. Match. Save.</div>
-      <p class="bundle-desc">Pick any 3 tees — pay for 2. No minimum. No coupon needed. This deal runs until stock lasts, so don't overthink it.</p>
-
-      <div class="countdown" id="countdown">
-        <div class="cd-unit"><div class="cd-num" id="cdH">05</div><div class="cd-label">Hours</div></div>
-        <div class="cd-sep">:</div>
-        <div class="cd-unit"><div class="cd-num" id="cdM">42</div><div class="cd-label">Mins</div></div>
-        <div class="cd-sep">:</div>
-        <div class="cd-unit"><div class="cd-num" id="cdS">18</div><div class="cd-label">Secs</div></div>
-      </div>
-
-      <button class="bundle-btn" onclick="window.location.href='collections.html'">
-        🛍 Shop the Bundle →
-      </button>
-    </div>
-
-    <div class="bundle-right reveal">
-      <div class="bundle-cards">
-        <div class="bundle-card" style="position:relative">
-          <div class="bundle-card-img">
-            <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&auto=format&fit=crop&q=80" alt="Tee 1"/>
-          </div>
-          <div class="bundle-card-body">
-            <div class="bundle-card-name">Essential Oversized</div>
-            <div class="bundle-card-price">₹699</div>
-          </div>
-          <div class="bundle-plus">+</div>
-        </div>
-        <div class="bundle-card" style="position:relative">
-          <div class="bundle-free-badge">FREE</div>
-          <div class="bundle-card-img">
-            <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400&auto=format&fit=crop&q=80" alt="Tee 2"/>
-          </div>
-          <div class="bundle-card-body">
-            <div class="bundle-card-name">Washed Graphic Tee</div>
-            <div class="bundle-card-price" style="color:var(--green)">FREE!</div>
-          </div>
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()"><span></span><span></span><span></span></button><a href="index.html" class="nav-logo">VYNE<span>IT</span></a>
+        <p>Premium quality tees made from 100% organic cotton. Designed to make you feel as good as you look.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-icon">𝕏</a>
+          <a href="https://www.instagram.com/vyneit?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="social-icon">📸</a>
+          <a href="#" class="social-icon">📘</a>
+          <a href="#" class="social-icon">▶</a>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════
-  UGC / LIFESTYLE
-════════════════════════════════════════ -->
-<section class="ugc-section">
-  <div class="ugc-intro reveal">
-    <div class="section-eyebrow" style="justify-content:center">Real People Wearing VYNEIT</div>
-    <h2 class="section-title" style="text-align:center">Worn by <em>You</em></h2>
-    <p>Tag us <strong>@vyneit</strong> on Instagram and be featured on our feed. Real fits, real people — no filters on the quality.</p>
-  </div>
-  <div class="ugc-grid">
-    <div class="ugc-item reveal">
-      <img src="https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=500&auto=format&fit=crop&q=80" alt="UGC 1"/>
-      <div class="ugc-overlay">
-        <div class="ugc-handle">@rohan.styles</div>
-        <div class="ugc-product">Essential Oversized Tee · Midnight Green</div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="collections.html">New Arrivals</a></li>
+          <li><a href="collections.html">Best Sellers</a></li>
+          <li><a href="collections.html">Men's Tees</a></li>
+          <li><a href="collections.html">Women's Tees</a></li>
+          <li><a href="collections.html">Graphic Tees</a></li>
+          <li><a href="collections.html">Sale</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="collections.html">Size Guide</a></li>
+          <li><a href="track-order.html">Shipping Info</a></li>
+          <li><a href="returns-refunds.html">Returns & Exchanges</a></li>
+          <li><a href="track-order.html">Track Order</a></li>
+          <li><a href="contact-support.html">Contact Us</a></li>
+          <li><a href="contact-support.html">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="contact-support.html">Our Story</a></li>
+          <li><a href="contact-support.html">Sustainability</a></li>
+          <li><a href="contact-support.html">Careers</a></li>
+          <li><a href="contact-support.html">Press</a></li>
+          <li><a href="contact-support.html">Affiliates</a></li>
+          <li><a href="privacy-policy.html">Privacy Policy</a></li>
+        </ul>
       </div>
     </div>
-    <div class="ugc-item reveal reveal-delay-1">
-      <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=500&auto=format&fit=crop&q=80" alt="UGC 2"/>
-      <div class="ugc-overlay">
-        <div class="ugc-handle">@_ananya.fits</div>
-        <div class="ugc-product">Washed Graphic Tee · Charcoal</div>
+    <div class="footer-bottom">
+      <p>© 2025 VYNEIT. All rights reserved.</p>
+      <div class="payment-icons">
+        <span class="pay-icon">VISA</span>
+        <span class="pay-icon">MC</span>
+        <span class="pay-icon">AMEX</span>
+        <span class="pay-icon">PAYPAL</span>
+        <span class="pay-icon">APPLE PAY</span>
       </div>
     </div>
-    <div class="ugc-item reveal reveal-delay-2">
-      <img src="https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=500&auto=format&fit=crop&q=80" alt="UGC 3"/>
-      <div class="ugc-overlay">
-        <div class="ugc-handle">@karan_real</div>
-        <div class="ugc-product">Minimalist Drop Shoulder · Chalk White</div>
-      </div>
-    </div>
-    <div class="ugc-item reveal reveal-delay-3">
-      <img src="https://images.unsplash.com/photo-1527719327859-c6ce80353573?w=500&auto=format&fit=crop&q=80" alt="UGC 4"/>
-      <div class="ugc-overlay">
-        <div class="ugc-handle">@priya.looks</div>
-        <div class="ugc-product">Artisan Hand-Dyed Tee</div>
-      </div>
-    </div>
-  </div>
-  <div class="ugc-bottom">
-    <a href="https://www.instagram.com/vyneit" target="_blank" rel="noopener" class="ugc-ig-btn">
-      📸 Follow @vyneit on Instagram
-    </a>
-  </div>
-</section>
+  </footer>
 
-<!-- ════════════════════════════════════════
-  FAQ
-════════════════════════════════════════ -->
-<section class="faq-section">
-  <div class="faq-inner">
-    <div class="faq-left-sticky reveal">
-      <div class="section-eyebrow">Got questions?</div>
-      <h2 class="section-title">We've Got<br/><em>Answers.</em></h2>
-      <p class="faq-tagline">The questions we hear the most — answered honestly.</p>
-      <div class="faq-contact-nudge">
-        <p>Still have a question? Our team responds in under 2 hours on WhatsApp or email.</p>
-        <button class="faq-contact-btn" onclick="window.location.href='contact-support.html'">Contact Support →</button>
-      </div>
-    </div>
-    <div class="faq-list reveal">
-      <div class="faq-item open">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          Is Cash on Delivery (COD) available?
-          <span class="faq-arrow">+</span>
-        </div>
-        <div class="faq-answer">
-          <div class="faq-answer-inner">Yes! COD is available across India. A ₹40 handling fee applies to COD orders. Pay when your package arrives — no online payment needed. You can also pay via UPI, cards, or net banking if you prefer.</div>
-        </div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          How long does delivery take?
-          <span class="faq-arrow">+</span>
-        </div>
-        <div class="faq-answer">
-          <div class="faq-answer-inner">We ship within 1–2 business days of placing your order. Delivery typically takes 3–5 business days depending on your location. Metro cities usually receive orders faster. You'll get a tracking link via SMS/email once dispatched.</div>
-        </div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          What's your return and exchange policy?
-          <span class="faq-arrow">+</span>
-        </div>
-        <div class="faq-answer">
-          <div class="faq-answer-inner">7-day hassle-free returns from delivery date. If you receive a damaged or wrong item, we'll replace it at no cost. For size issues, we offer free exchanges within 7 days. Visit <a href="returns-refunds.html">Returns & Refunds</a> for the full policy.</div>
-        </div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          How do I find the right size?
-          <span class="faq-arrow">+</span>
-        </div>
-        <div class="faq-answer">
-          <div class="faq-answer-inner">Our sizing guide is on every product page. We size for Indian bodies — our Medium fits chest 38–40" and height 5'7"–5'10". If you're between sizes, size up for a relaxed fit. For oversized styles, go with your regular size.</div>
-        </div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          Are the tees really organic cotton?
-          <span class="faq-arrow">+</span>
-        </div>
-        <div class="faq-answer">
-          <div class="faq-answer-inner">Every single tee we sell is made from 100% GOTS-certified organic cotton. No blends, no shortcuts. We believe if you're going to wear something against your skin all day, it should be free from harmful chemicals.</div>
-        </div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          Do graphics fade or crack after washing?
-          <span class="faq-arrow">+</span>
-        </div>
-        <div class="faq-answer">
-          <div class="faq-answer-inner">Our graphics are printed with water-based reactive inks and heat-set at high temperature. They're tested to last 50+ washes without cracking. For best results: wash inside-out in cold water, avoid tumble drying.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function animCursor(){
+      cursor.style.left=mx+'px';cursor.style.top=my+'px';
+      rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+      ring.style.left=rx+'px';ring.style.top=ry+'px';
+      requestAnimationFrame(animCursor);
+    })();
 
-<!-- ════════════════════════════════════════
-  FINAL CTA
-════════════════════════════════════════ -->
-<div class="final-cta">
-  <div class="final-cta-inner reveal">
-    <div class="final-cta-eyebrow">You've read enough</div>
-    <h2 class="final-cta-title">Time to<br/><em>Own It.</em></h2>
-    <p class="final-cta-sub">Use VYNE10 at checkout for 10% off your first order. Free shipping on ₹999+. COD available everywhere in India.</p>
-    <button class="bundle-btn" onclick="window.location.href='collections.html'" style="margin:0 auto;display:inline-flex">
-      Shop All Collections →
-    </button>
-    <div class="cta-or-divider" style="margin-top:28px">Or get early access to drops</div>
-    <div class="cta-email-form">
-      <input type="email" class="cta-email-input" placeholder="your@email.com" id="ctaEmail"/>
-      <button class="cta-email-btn" onclick="subscribeEmail()">Join →</button>
-    </div>
-    <div class="cta-privacy-note">No spam. Unsubscribe anytime. We hate spam too.</div>
-  </div>
-</div>
+    // ── Cart helpers ─────────────────────────────────────────
+    function getCartKey(){
+      const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+      return user && user.user_id ? 'vyneit_cart_' + user.user_id : 'vyneit_cart_guest';
+    }
 
-<!-- ════════════════════════════════════════
-  FOOTER
-════════════════════════════════════════ -->
-<footer>
-  <div class="footer-trust-row">
-    <div class="ft-badge"><span>💵</span> COD Available</div>
-    <div class="ft-sep"></div>
-    <div class="ft-badge"><span>🚚</span> Free Shipping ₹999+</div>
-    <div class="ft-sep"></div>
-    <div class="ft-badge"><span>🔄</span> 7-Day Returns</div>
-    <div class="ft-sep"></div>
-    <div class="ft-badge"><span>🔒</span> Secure Payments</div>
-    <div class="ft-sep"></div>
-    <div class="ft-badge"><span>📞</span> 24hr Support</div>
-  </div>
-  <div class="footer-grid">
-    <div class="footer-brand">
-      <div class="footer-logo">VYNE<span>IT</span></div>
-      <div class="footer-tagline">Wear what you stand for.</div>
-      <p>Premium organic cotton tees for the generation that refuses to blend in. Made in India, for India.</p>
-      <div class="footer-socials">
-        <a href="https://www.instagram.com/vyneit" target="_blank" rel="noopener" class="social-icon">📸</a>
-        <a href="#" class="social-icon">𝕏</a>
-        <a href="#" class="social-icon">📘</a>
-        <a href="#" class="social-icon">▶</a>
-      </div>
-    </div>
-    <div class="footer-col">
-      <h4>Shop</h4>
-      <ul>
-        <li><a href="collections.html">New Arrivals</a></li>
-        <li><a href="collections.html">Bestsellers</a></li>
-        <li><a href="collections.html">Graphic Tees</a></li>
-        <li><a href="collections.html">Oversized Fits</a></li>
-        <li><a href="collections.html">Sale</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Help</h4>
-      <ul>
-        <li><a href="track-order.html">Track Order</a></li>
-        <li><a href="returns-refunds.html">Returns & Exchanges</a></li>
-        <li><a href="collections.html">Size Guide</a></li>
-        <li><a href="track-order.html">Shipping Info</a></li>
-        <li><a href="contact-support.html">Contact Us</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Company</h4>
-      <ul>
-        <li><a href="contact-support.html">Our Story</a></li>
-        <li><a href="contact-support.html">Sustainability</a></li>
-        <li><a href="privacy-policy.html">Privacy Policy</a></li>
-        <li><a href="privacy-policy.html">Terms of Service</a></li>
-        <li><a href="contact-support.html">Careers</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2025 VYNEIT. All rights reserved. Made with ♥ in India.</p>
-    <div class="payment-icons">
-      <span class="pay-icon">UPI</span>
-      <span class="pay-icon">VISA</span>
-      <span class="pay-icon">MC</span>
-      <span class="pay-icon">RUPAY</span>
-      <span class="pay-icon">COD</span>
-    </div>
-  </div>
-</footer>
+    function refreshCartBadge(){
+      const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
+      document.getElementById('cartCount').textContent = cart.reduce((s,i)=>s+i.qty,0);
+    }
 
-<!-- ════════════════════════════════════════
-  STICKY BOTTOM BAR (mobile)
-════════════════════════════════════════ -->
-<div class="sticky-cta-bar">
-  <a href="collections.html">🛍 Shop Now — Use VYNE10</a>
-  <a href="cart.html" class="sticky-cta-cart">🛒</a>
-</div>
+    // Add to cart — saves locally AND syncs to Supabase for logged-in users
+    async function addToCart(btn){
+      const name  = btn.dataset.name;
+      const price = parseInt(btn.dataset.price);
+      const img   = btn.dataset.img;
 
-<!-- ════════════════════════════════════════
-  ORDER PLACED TOAST
-════════════════════════════════════════ -->
-<div class="order-toast" id="orderToast">
-  <img class="ot-img" src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=80&auto=format&fit=crop&q=80" alt="" id="toastImg"/>
-  <div class="ot-text">
-    <div class="ot-name" id="toastName">Arjun from Mumbai</div>
-    <div class="ot-meta" id="toastMeta">just ordered Essential Oversized Tee</div>
-    <div class="ot-time">2 minutes ago</div>
-  </div>
-</div>
+      const cartKey = getCartKey();
+      let cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
+      const existing = cart.find(i => i.name === name);
+      let itemId;
+      if(existing){
+        existing.qty += 1;
+        itemId = existing.id;
+      } else {
+        itemId = 'item-' + Date.now();
+        cart.push({ id: itemId, name, price, img, qty: 1 });
+      }
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+      refreshCartBadge();
 
-<!-- ════════════════════════════════════════
-  SCRIPTS
-════════════════════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+      // Sync to Supabase if logged in
+      const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
+      if(user && user.user_id && window._db){
+        const row = cart.find(i => i.id === itemId);
+        await window._db.from('carts').upsert([{
+          user_id: user.user_id, item_id: row.id,
+          name: row.name, price: row.price, img: row.img, qty: row.qty
+        }]);
+      }
 
-// ── CURSOR ────────────────────────────────────────────────
-const cursor = document.getElementById('cursor');
-const ring   = document.getElementById('cursorRing');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-(function animCursor(){
-  cursor.style.left=mx+'px';cursor.style.top=my+'px';
-  rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
-  ring.style.left=rx+'px';ring.style.top=ry+'px';
-  requestAnimationFrame(animCursor);
-})();
+      btn.textContent = '✓ Added!';
+      btn.style.background = '#27ae60';
+      setTimeout(()=>{ btn.textContent='Add to Cart'; btn.style.background=''; }, 1500);
+    }
 
-// ── SUPABASE ─────────────────────────────────────────────
-const { createClient } = supabase;
-const _db = createClient(
-  'https://agwrykpdhnqycwqwpegj.supabase.co',
-  'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'
-);
-window._db = _db;
+    refreshCartBadge();
 
-// ── CART HELPERS ─────────────────────────────────────────
-function getCartKey(){
-  const user = JSON.parse(localStorage.getItem('vyneit_user') || 'null');
-  return user && user.user_id ? 'vyneit_cart_' + user.user_id : 'vyneit_cart_guest';
-}
-function refreshCartBadge(){
-  const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
-  document.getElementById('cartCount').textContent = cart.reduce((s,i)=>s+(i.qty||1),0);
-}
-async function addToCart(btn){
-  const name  = btn.dataset.name;
-  const price = parseInt(btn.dataset.price);
-  const img   = btn.dataset.img;
-  const cartKey = getCartKey();
-  let cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
-  const existing = cart.find(i=>i.name===name);
-  let itemId;
-  if(existing){ existing.qty+=1; itemId=existing.id; }
-  else { itemId='item-'+Date.now(); cart.push({id:itemId,name,price,img,qty:1}); }
-  localStorage.setItem(cartKey, JSON.stringify(cart));
-  refreshCartBadge();
-  const user = JSON.parse(localStorage.getItem('vyneit_user')||'null');
-  if(user&&user.user_id&&window._db){
-    const row=cart.find(i=>i.id===itemId);
-    await window._db.from('carts').upsert([{user_id:user.user_id,item_id:row.id,name:row.name,price:row.price,img:row.img,qty:row.qty}]);
-  }
-  btn.textContent='✓ Added!';
-  btn.style.background='#27ae60';
-  btn.style.color='#fff';
-  setTimeout(()=>{btn.textContent='Add to Cart';btn.style.background='';btn.style.color='';},1500);
-}
-refreshCartBadge();
+    // ── Navigate to product detail ────────────────────────────
+    function goToProduct(name, price, img, category, oldPrice, badge) {
+      localStorage.setItem('vyneit_current_product', JSON.stringify({
+        name, price: parseInt(price), img, cat: category, category,
+        oldPrice: oldPrice ? parseInt(oldPrice) : null,
+        badge: badge || null
+      }));
+      window.location.href = 'product-detail.html';
+    }
 
-// ── PRODUCT NAV ──────────────────────────────────────────
-function goToProduct(card){
-  const img = card.querySelector('img');
-  const name     = img.dataset.name;
-  const price    = parseInt(img.dataset.price);
-  const cat      = img.dataset.cat || '';
-  const oldPrice = img.dataset.oldPrice ? parseInt(img.dataset.oldPrice) : null;
-  const badge    = img.dataset.badge || null;
-  const imgUrl   = img.src;
-  localStorage.setItem('vyneit_current_product', JSON.stringify({name,price,img:imgUrl,cat,category:cat,oldPrice,badge}));
-  window.location.href='product-detail.html';
-}
+    // Scroll reveal
+    const observer = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          e.target.style.opacity='1';
+          e.target.style.transform='translateY(0)';
+        }
+      });
+    },{threshold:0.1});
+    document.querySelectorAll('.product-card,.review-card,.category-card,.stat-item').forEach(el=>{
+      el.style.opacity='0';
+      el.style.transform='translateY(22px)';
+      el.style.transition='opacity .6s ease, transform .6s ease';
+      observer.observe(el);
+    });
+  </script>
 
-// ── DRAWER ───────────────────────────────────────────────
-function openDrawer(){
-  document.getElementById('sideDrawer').classList.add('open');
-  document.getElementById('drawerOverlay').classList.add('show');
-  document.getElementById('hamburgerBtn').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeDrawer(){
-  document.getElementById('sideDrawer').classList.remove('open');
-  document.getElementById('drawerOverlay').classList.remove('show');
-  document.getElementById('hamburgerBtn').classList.remove('open');
-  document.body.style.overflow='';
-}
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
 
-// ── AUTH NAV ─────────────────────────────────────────────
-function handleLoginClick(){
-  const user = JSON.parse(localStorage.getItem('vyneit_user')||'null');
-  if(user) window.location.href='account.html';
-  else window.location.href='login.html';
-}
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase
+    window._db = createClient(
+      'https://agwrykpdhnqycwqwpegj.supabase.co',
+      'sb_publishable_OFEKOkOS2P9GLdlR33AuOQ__pP22-7m'
+    )
+    const _db = window._db
 
-function updateDrawer(userData){
-  const li=document.getElementById('drawerLoggedIn'),lo=document.getElementById('drawerLoggedOut');
-  const am=document.getElementById('drawerAuthMenu'),gm=document.getElementById('drawerGuestMenu');
-  const btn=document.getElementById('navLoginBtn');
-  if(!li) return;
-  if(userData){
-    li.style.display='block';lo.style.display='none';am.style.display='block';gm.style.display='none';
-    const av=document.getElementById('drawerAvatar'),nm=document.getElementById('drawerName'),em=document.getElementById('drawerEmail');
-    if(av) av.textContent=(userData.name||'?').substring(0,2).toUpperCase();
-    if(nm) nm.textContent=userData.name||'User';
-    if(em) em.textContent=userData.email||'';
-    if(btn){ document.getElementById('navLoginIcon').textContent='👤'; document.getElementById('navLoginText').textContent=(userData.name||'Account').split(' ')[0]; }
-  } else {
-    li.style.display='none';lo.style.display='block';am.style.display='none';gm.style.display='block';
-    if(btn){ document.getElementById('navLoginIcon').textContent='👤'; document.getElementById('navLoginText').textContent='Login'; }
-  }
-}
+    // ── Show logged-out state immediately (never show stale profile) ──
+    // We do NOT read from localStorage cache here — always wait for Supabase
+    updateDrawer(null);
 
-async function buildAndSaveUser(user){
-  let name=user.user_metadata?.full_name||user.email.split('@')[0];
-  let phone=user.user_metadata?.phone||'';
-  try{
-    const {data:p}=await _db.from('profiles').select('full_name,phone').eq('id',user.id).single();
-    if(p?.full_name) name=p.full_name;
-    if(p?.phone) phone=p.phone;
-  }catch(e){}
-  const userData={user_id:user.id,email:user.email,name,phone,initials:name.substring(0,2).toUpperCase()};
-  localStorage.setItem('vyneit_user',JSON.stringify(userData));
-  return userData;
-}
+    // ── Drawer open/close ────────────────────────────────────
+    function openDrawer(){
+      document.getElementById('sideDrawer').classList.add('open')
+      document.getElementById('drawerOverlay').classList.add('show')
+      document.getElementById('hamburgerBtn').classList.add('open')
+      document.body.style.overflow='hidden'
+    }
+    function closeDrawer(){
+      document.getElementById('sideDrawer').classList.remove('open')
+      document.getElementById('drawerOverlay').classList.remove('show')
+      document.getElementById('hamburgerBtn').classList.remove('open')
+      document.body.style.overflow=''
+    }
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer() })
 
-let _lastUid=null;
-async function handleSession(session){
-  if(session?.user){
-    if(_lastUid===session.user.id) return;
-    _lastUid=session.user.id;
-    updateDrawer({user_id:session.user.id,email:session.user.email,name:session.user.user_metadata?.full_name||session.user.email.split('@')[0]});
-    const userData=await buildAndSaveUser(session.user);
-    updateDrawer(userData);
-  } else {
-    if(_lastUid!==null){ _lastUid=null; localStorage.removeItem('vyneit_user'); updateDrawer(null); refreshCartBadge(); }
-  }
-}
-_db.auth.getSession().then(({data:{session}})=>handleSession(session));
-_db.auth.onAuthStateChange((_e,session)=>handleSession(session));
+    // ── Update drawer UI ─────────────────────────────────────
+    function updateDrawer(userData){
+      const loggedInEl  = document.getElementById('drawerLoggedIn')
+      const loggedOutEl = document.getElementById('drawerLoggedOut')
+      const authMenu    = document.getElementById('drawerAuthMenu')
+      const guestMenu   = document.getElementById('drawerGuestMenu')
+      if(!loggedInEl || !loggedOutEl) return
 
-function handleDrawerLogout(){
-  if(!confirm('Sign out of VYNEIT?')) return;
-  localStorage.removeItem('vyneit_user');
-  _lastUid=null;
-  _db.auth.signOut().then(()=>{ updateDrawer(null); window.location.href='index.html'; });
-}
+      if(userData){
+        loggedInEl.style.display = 'block'
+        loggedOutEl.style.display = 'none'
+        authMenu.style.display = 'block'
+        guestMenu.style.display = 'none'
 
-// ── COUNTDOWN TIMER ──────────────────────────────────────
-(function initCountdown(){
-  const key='vyneit_cd_end';
-  let end = parseInt(localStorage.getItem(key)||'0');
-  if(!end || end < Date.now()){
-    // Random end time between 3 and 8 hours from now
-    end = Date.now() + (3 + Math.random()*5) * 3600000;
-    localStorage.setItem(key, end);
-  }
-  function tick(){
-    const diff = Math.max(0, end - Date.now());
-    const h = Math.floor(diff/3600000);
-    const m = Math.floor((diff%3600000)/60000);
-    const s = Math.floor((diff%60000)/1000);
-    const pad = n => String(n).padStart(2,'0');
-    document.getElementById('cdH').textContent=pad(h);
-    document.getElementById('cdM').textContent=pad(m);
-    document.getElementById('cdS').textContent=pad(s);
-    if(diff===0){ localStorage.removeItem(key); initCountdown(); }
-  }
-  tick();
-  setInterval(tick,1000);
-})();
+        const a  = document.getElementById('drawerAvatar')
+        const n  = document.getElementById('drawerName')
+        const em = document.getElementById('drawerEmail')
+        if(a)  a.textContent  = (userData.name || '?').substring(0,2).toUpperCase()
+        if(n)  n.textContent  = userData.name  || 'User'
+        if(em) em.textContent = userData.email || ''
 
-// ── FAQ ACCORDION ────────────────────────────────────────
-function toggleFaq(btn){
-  const item = btn.parentElement;
-  const isOpen = item.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
-  if(!isOpen) item.classList.add('open');
-}
+        const headerName  = document.getElementById('headerUserName')
+        const headerEmail = document.getElementById('headerUserEmail')
+        if(headerName)  headerName.textContent  = userData.name
+        if(headerEmail) headerEmail.textContent = userData.email
 
-// ── SCROLL REVEAL ────────────────────────────────────────
-const revealObserver = new IntersectionObserver(entries=>{
-  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
-},{threshold:.12});
-document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
+        const loginBtn = document.getElementById('loginBtn')
+        if(loginBtn) loginBtn.style.display = 'none'
 
-// ── SOCIAL PROOF TOAST ───────────────────────────────────
-const TOAST_DATA = [
-  {name:'Arjun from Delhi',meta:'just ordered Essential Oversized Tee',img:'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=80&auto=format'},
-  {name:'Priya from Bangalore',meta:'just ordered Washed Graphic Tee',img:'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=80&auto=format'},
-  {name:'Rohan from Mumbai',meta:'just ordered Artisan Hand-Dyed Tee',img:'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=80&auto=format'},
-  {name:'Sneha from Pune',meta:'just ordered Minimalist Drop Shoulder',img:'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=80&auto=format'},
-  {name:'Kartik from Hyderabad',meta:'just ordered Essential Oversized Tee',img:'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=80&auto=format'},
-];
-let toastIdx = 0;
-function showOrderToast(){
-  const data = TOAST_DATA[toastIdx % TOAST_DATA.length];
-  toastIdx++;
-  document.getElementById('toastName').textContent  = data.name;
-  document.getElementById('toastMeta').textContent  = data.meta;
-  document.getElementById('toastImg').src           = data.img;
-  const toast = document.getElementById('orderToast');
-  toast.classList.add('show');
-  setTimeout(()=>toast.classList.remove('show'),4500);
-}
-// Show first toast after 8 seconds, then every 18s
-setTimeout(()=>{ showOrderToast(); setInterval(showOrderToast, 18000); }, 8000);
+        const profileSection = document.getElementById('profileSection')
+        if(profileSection) profileSection.style.display = 'block'
+      } else {
+        loggedInEl.style.display = 'none'
+        loggedOutEl.style.display = 'block'
+        authMenu.style.display = 'none'
+        guestMenu.style.display = 'block'
 
-// ── EMAIL SUBSCRIBE ──────────────────────────────────────
-function subscribeEmail(){
-  const email = document.getElementById('ctaEmail').value.trim();
-  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    alert('Please enter a valid email address.');
-    return;
-  }
-  // You can hook this to Supabase or a marketing service
-  alert('🎉 You\'re in! Watch your inbox for drops and exclusive offers.');
-  document.getElementById('ctaEmail').value='';
-}
+        const loginBtn = document.getElementById('loginBtn')
+        if(loginBtn) loginBtn.style.display = 'block'
 
-</script>
+        const profileSection = document.getElementById('profileSection')
+        if(profileSection) profileSection.style.display = 'none'
+      }
+    }
 
-<!-- ════════════════════════════════════════
-  VYNEIT CHATBOT WIDGET (preserved from original)
-════════════════════════════════════════ -->
-<style>
-#vychat-launcher{position:fixed;bottom:80px;right:24px;width:52px;height:52px;background:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:800;box-shadow:0 4px 20px rgba(16,44,38,.3);transition:background .2s,transform .2s}
-#vychat-launcher:hover{background:var(--accent);transform:scale(1.08)}
-#vychat-launcher svg{width:22px;height:22px;stroke:var(--white);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:opacity .2s}
-.vy-chat{opacity:1}.vy-x{opacity:0;position:absolute}
-#vychat-launcher.open .vy-chat{opacity:0}
-#vychat-launcher.open .vy-x{opacity:1}
-#vychat-launcher.open{background:var(--accent)}
-#vybadge{position:absolute;top:-3px;right:-3px;background:var(--red);color:#fff;border-radius:50%;width:17px;height:17px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
-#vybadge.on{opacity:1}
-#vychat-window{position:fixed;bottom:144px;right:24px;width:320px;height:420px;background:#F8F5F0;border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 48px rgba(16,44,38,.2);z-index:799;display:flex;flex-direction:column;overflow:hidden;transform:scale(.92) translateY(20px);opacity:0;pointer-events:none;transition:all .25s cubic-bezier(.34,1.56,.64,1);transform-origin:bottom right}
-#vychat-window.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
-#vy-head{background:var(--black);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.vy-av{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--white);flex-shrink:0}
-.vy-hname{font-size:13px;font-weight:700;color:var(--white);flex:1}
-.vy-hsub{font-size:11px;color:rgba(255,242,225,.45);display:flex;align-items:center;gap:5px}
-.vy-dot{width:6px;height:6px;border-radius:50%;background:#2ecc71}
-.vy-hbtn{background:none;border:none;color:rgba(255,242,225,.4);font-size:14px;cursor:pointer;padding:2px 5px;transition:color .2s;line-height:1}
-.vy-hbtn:hover{color:var(--white)}
-#vy-msgs{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px}
-#vy-msgs::-webkit-scrollbar{width:3px}
-#vy-msgs::-webkit-scrollbar-thumb{background:var(--accent)}
-.vym{display:flex;align-items:flex-end;gap:7px;animation:vyin .22s ease both}
-@keyframes vyin{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
-.vym.bot{flex-direction:row}.vym.user{flex-direction:row-reverse}
-.vym-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
-.vym.bot .vym-av{background:#102C26;color:#FFF2E1;font-family:'Bebas Neue',sans-serif}
-.vym.user .vym-av{background:var(--accent);color:#fff}
-.vybub{max-width:220px;padding:9px 13px;font-size:13px;line-height:1.5;word-break:break-word;font-family:'DM Sans',sans-serif}
-.vym.bot .vybub{background:#fff;border:1px solid #e0d4be;color:#102C26;border-radius:12px 12px 12px 3px}
-.vym.user .vybub{background:#102C26;color:#FFF2E1;border-radius:12px 12px 3px 12px}
-.vysts{font-size:10px;color:#b0a494;margin-top:2px}.vym.user .vysts{text-align:right}
-.vy-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;padding-left:33px}
-.vy-chip{background:none;border:1.5px solid var(--accent);color:var(--accent);padding:4px 11px;border-radius:18px;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
-.vy-chip:hover{background:var(--accent);color:#fff}
-.vy-typing-row{display:flex;gap:7px;align-items:flex-end}
-.vy-typing{display:flex;gap:4px;align-items:center;background:#fff;border:1px solid #e0d4be;padding:10px 14px;border-radius:12px 12px 12px 3px}
-.vydot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:vyb .9s ease-in-out infinite}
-.vydot:nth-child(2){animation-delay:.15s}.vydot:nth-child(3){animation-delay:.3s}
-@keyframes vyb{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-4px)}}
-#vy-inp-wrap{background:#fff;border-top:1px solid #e0d4be;padding:10px 12px;flex-shrink:0}
-.vy-inp-row{display:flex;gap:7px;align-items:flex-end}
-#vy-inp{flex:1;padding:9px 13px;border:1.5px solid #e0d4be;background:#FFF2E1;font-family:'DM Sans',sans-serif;font-size:13px;color:#102C26;outline:none;resize:none;border-radius:18px;max-height:80px;overflow-y:auto;transition:border-color .2s;line-height:1.4}
-#vy-inp:focus{border-color:var(--accent)}
-#vy-inp::placeholder{color:#c0b4a2}
-#vy-send{width:36px;height:36px;border-radius:50%;background:#102C26;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
-#vy-send:hover{background:var(--accent)}
-#vy-send:disabled{background:#e0d4be;cursor:not-allowed}
-#vy-send svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.vy-foot{font-size:10px;color:#c0b4a2;text-align:center;margin-top:7px;font-family:'DM Sans',sans-serif}
-@media(max-width:440px){#vychat-window{right:0;bottom:0;left:0;width:100%;border-radius:14px 14px 0 0;height:88vh}#vychat-launcher{right:16px;bottom:80px}}
-</style>
-<div id="vychat-launcher" onclick="vyToggle()">
-  <svg class="vy-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  <svg class="vy-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-  <span id="vybadge">1</span>
-</div>
-<div id="vychat-window">
-  <div id="vy-head">
-    <div class="vy-av">VY</div>
-    <div><div class="vy-hname">VYNEIT</div><div class="vy-hsub"><span class="vy-dot"></span> Online · here to help</div></div>
-    <button class="vy-hbtn" onclick="vyClear()">🗑</button>
-    <button class="vy-hbtn" onclick="vyToggle()">✕</button>
-  </div>
-  <div id="vy-msgs"></div>
-  <div id="vy-inp-wrap">
-    <div class="vy-inp-row">
-      <textarea id="vy-inp" rows="1" placeholder="Ask about orders, sizes, shipping…"></textarea>
-      <button id="vy-send" onclick="vySend()">
-        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      </button>
-    </div>
-    <div class="vy-foot">VYNEIT Assistant</div>
-  </div>
-</div>
-<script>
-const VY_WEBHOOK='http://129.154.250.81:5678/webhook/chatbot';
-const VY_CHIPS=['What sizes are available?','Track my order','Return policy'];
-const VY_SID='vy_'+Math.random().toString(36).substr(2,9);
-let vyHistory=[],vyOpen=false,vyBusy=false,vyGreeted=false;
-function vyToggle(){vyOpen=!vyOpen;document.getElementById('vychat-window').classList.toggle('open',vyOpen);document.getElementById('vychat-launcher').classList.toggle('open',vyOpen);if(vyOpen){document.getElementById('vybadge').classList.remove('on');if(!vyGreeted)vyGreet();setTimeout(()=>document.getElementById('vy-inp').focus(),300);}}
-function vyGreet(){vyGreeted=true;vyMsg('bot','Hey! 👋 Welcome to VYNEIT. How can I help you today?');const d=document.getElementById('vy-msgs');const cw=document.createElement('div');cw.className='vy-chips';cw.id='vy-chips';VY_CHIPS.forEach(c=>{const b=document.createElement('button');b.className='vy-chip';b.textContent=c;b.onclick=()=>{const ch=document.getElementById('vy-chips');if(ch)ch.remove();document.getElementById('vy-inp').value=c;vySend();};cw.appendChild(b);});d.appendChild(cw);vyScroll();}
-function vyMsg(role,text){const d=document.getElementById('vy-msgs');const now=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});const w=document.createElement('div');w.className='vym '+role;w.innerHTML=`<div class="vym-av">${role==='bot'?'VY':'👤'}</div><div><div class="vybub">${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div><div class="vysts">${now}</div></div>`;d.appendChild(w);vyScroll();if(role==='bot'&&!vyOpen)document.getElementById('vybadge').classList.add('on');}
-function vyShowTyping(){const d=document.getElementById('vy-msgs');const r=document.createElement('div');r.className='vy-typing-row';r.id='vy-typing';r.innerHTML='<div class="vym-av" style="width:26px;height:26px;border-radius:50%;background:#102C26;color:#FFF2E1;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:Bebas Neue,sans-serif">VY</div><div class="vy-typing"><div class="vydot"></div><div class="vydot"></div><div class="vydot"></div></div>';d.appendChild(r);vyScroll();}
-function vyRemoveTyping(){const r=document.getElementById('vy-typing');if(r)r.remove();}
-function vyScroll(){const d=document.getElementById('vy-msgs');d.scrollTop=d.scrollHeight;}
-async function vySend(){const inp=document.getElementById('vy-inp');const txt=inp.value.trim();if(!txt||vyBusy)return;const ch=document.getElementById('vy-chips');if(ch)ch.remove();inp.value='';inp.style.height='auto';vyMsg('user',txt);vyHistory.push({role:'user',content:txt});vyBusy=true;document.getElementById('vy-send').disabled=true;vyShowTyping();try{const res=await fetch(VY_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:txt,history:vyHistory.slice(-20),sessionId:VY_SID})});vyRemoveTyping();if(!res.ok)throw new Error('HTTP '+res.status);const data=await res.json();const reply=data.reply||data.message||data.response||data.output||data.text||'Sorry, I couldn\'t process that. Please try again.';vyMsg('bot',reply);vyHistory.push({role:'assistant',content:reply});}catch(e){vyRemoveTyping();vyMsg('bot','Oops! Trouble connecting. Email us at support@vyneit.shop 😊');}finally{vyBusy=false;document.getElementById('vy-send').disabled=false;document.getElementById('vy-inp').focus();}}
-function vyClear(){vyHistory=[];vyGreeted=false;document.getElementById('vy-msgs').innerHTML='';vyGreet();}
-document.addEventListener('DOMContentLoaded',()=>{const inp=document.getElementById('vy-inp');inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();vySend();}});inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,80)+'px';});});
-</script>
+    async function buildAndSaveUser(user){
+      let name = user.user_metadata?.full_name || user.email.split('@')[0]
 
+      try {
+        const { data: p } = await _db
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single()
+        if(p?.full_name) name = p.full_name
+      } catch(e){}
+
+      const userData = {
+        user_id: user.id,
+        email: user.email,
+        name: name,
+        initials: name.substring(0,2).toUpperCase()
+      }
+
+      // Save to Supabase
+      const { error } = await _db.from('users').upsert([userData])
+      if(error) console.log("DB Error:", error)
+
+      // Save to localStorage — used only for cart key lookup, NOT for UI
+      localStorage.setItem('vyneit_user', JSON.stringify(userData))
+
+      return userData
+    }
+
+    // ── Auth state management ────────────────────────────────
+    let _lastUid = null;
+
+    async function handleSession(session){
+      if(session && session.user){
+        if(_lastUid === session.user.id) return;
+        _lastUid = session.user.id;
+
+        // Show profile instantly
+        const quickName = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+        updateDrawer({ user_id: session.user.id, email: session.user.email, name: quickName });
+
+        const userData = await buildAndSaveUser(session.user)
+        updateDrawer(userData)
+
+        // Pull cart from Supabase → localStorage so badge is correct cross-device
+        const { data: rows } = await _db.from('carts').select('*').eq('user_id', session.user.id);
+        if(rows && rows.length > 0){
+          const cart = rows.map(r=>({ id: r.item_id, name: r.name, price: r.price, img: r.img, qty: r.qty }));
+          localStorage.setItem('vyneit_cart_' + session.user.id, JSON.stringify(cart));
+        }
+        refreshCartBadge()
+      } else {
+        if(_lastUid === null) return;
+        _lastUid = null;
+        localStorage.removeItem('vyneit_user')
+        updateDrawer(null)
+        refreshCartBadge()
+      }
+    }
+
+    // 1️⃣ Immediately check for an existing session (covers page-load / redirect-back from login)
+    _db.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session)
+    })
+
+    // 2️⃣ Listen for future changes (login, logout, token refresh)
+    _db.auth.onAuthStateChange((_event, session) => {
+      handleSession(session)
+    })
+
+    // ── Logout ────────────────────────────────────────────────
+    function handleDrawerLogout(){
+      if(!confirm('Sign out of VYNEIT?')) return
+      localStorage.removeItem('vyneit_user')
+      _lastUid = null;
+      _db.auth.signOut().then(()=>{
+        updateDrawer(null)
+        refreshCartBadge()
+        window.location.href='index.html'
+      })
+    }
+
+  </script>
+  
 </body>
 </html>
